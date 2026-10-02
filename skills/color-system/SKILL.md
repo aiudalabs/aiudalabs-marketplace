@@ -4,7 +4,7 @@ description: Builds a complete brand color system from one or two chosen colors,
 license: MIT
 compatibility: The bundled scripts need Node.js 18 or later. They have no dependencies and need no network access.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: aiudalabs
 ---
 
@@ -28,12 +28,14 @@ Offer the user two or three candidates with the reasoning, and let them choose. 
 
 ### 2. Generate the ramps
 
-Run the ramp script for the primary and for a neutral tinted toward the same hue:
+Run the ramp script for the primary and for the neutral:
 
 ```bash
 node scripts/color-ramp.mjs "#2563eb" --name primary
 node scripts/color-ramp.mjs "#2563eb" --name neutral --neutral
 ```
+
+With `--neutral` the script keeps only the hue of the color you pass and builds a near-grey ramp tinted toward it. Decide the neutral's temperature from the brief, separately from the primary: pass the primary for neutrals that lean toward the brand color, or any color with the hue you want, such as a tan for warm paper-like neutrals or a slate blue for cool ones. A neutral tinted toward a saturated primary can make the page background visibly colored, so look at step 50 before accepting it.
 
 Each ramp has 11 steps, 50 to 950, evenly spaced in OKLCH lightness. The step nearest the base color is replaced with the exact base, so the brand color itself is in the ramp. Add `--tokens` to print the ramp as design tokens.
 

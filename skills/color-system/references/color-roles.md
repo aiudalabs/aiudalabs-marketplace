@@ -7,7 +7,7 @@ A ramp gives you eleven steps of one hue. Roles say which step does which job. P
 | Part | Count | Purpose |
 | --- | --- | --- |
 | Primary ramp | 1 | The color people remember. Logo, key actions, key surfaces. |
-| Neutral ramp | 1 | Text, borders, backgrounds. Does most of the work. Tinted slightly toward the primary so it does not look lifeless beside it. |
+| Neutral ramp | 1 | Text, borders, backgrounds. Does most of the work. Tinted slightly, warm or cool or toward the primary, as the brief's direction asks, so it does not look lifeless. |
 | Accent ramp | 0 or 1 | Emphasis only. Should contrast with the primary in hue or lightness. |
 | Semantic colors | 3 or 4 | Success, warning, error, and optionally info. Never used for decoration. |
 

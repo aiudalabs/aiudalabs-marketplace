@@ -52,7 +52,7 @@
     {
       "name": "brand-asset-kit",
       "description": "Produces the image files a brand needs from its logo and colors, such as favicon, web app and app store icons, maskable icons, Apple touch icon and social share images, at the exact pixel sizes each platform asks for, and verifies every file. Use when the user asks for a favicon, app icons, PWA icons, an Open Graph or social share image, logo exports in PNG, or a full set of brand assets.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/brand-asset-kit",
@@ -101,7 +101,7 @@
     {
       "name": "brand-strategy-brief",
       "description": "Turns a company or product idea into a brand brief that visual work can be built on, covering audience, positioning, three brand attributes with what each rules out, a visual audit of competitors, and the visual direction that follows. Use when the user is starting a brand or rebrand, asks for a brand brief, brand strategy, brand attributes or brand personality, or wants colors, fonts or a logo and has no written brief yet.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "path": "skills/brand-strategy-brief",
@@ -115,7 +115,7 @@
     {
       "name": "color-system",
       "description": "Builds a complete brand color system from one or two chosen colors, covering perceptually even tonal ramps, tinted neutrals, semantic and role colors, dark mode, and a WCAG 2.2 contrast check of every text and background pairing. Use when the user asks for a color palette, brand colors, color scheme, shades or tints of a color, dark mode colors, or wants to check the contrast or accessibility of colors.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "path": "skills/color-system",
@@ -178,7 +178,7 @@
     {
       "name": "logo-direction",
       "description": "Develops a logo from brief to a tested concept, covering the choice of mark type, several simple SVG concepts to compare, a review sheet that tests each one small, in one color and reversed, and the usage rules for the chosen mark. Use when the user asks for a logo, logo ideas or concepts, a wordmark, monogram or symbol, a logo brief for a designer, or rules for how a logo may be used.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/logo-direction",
@@ -222,7 +222,7 @@
     {
       "name": "typography-system",
       "description": "Chooses brand typefaces and builds the type system around them, covering selection against brand attributes, pairing, a modular type scale, weights, fallback stacks, language coverage and a license check for every font. Use when the user asks for brand fonts, a font pairing, a typeface recommendation, a type scale, heading and body sizes, or whether a font is licensed for their use.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "path": "skills/typography-system",

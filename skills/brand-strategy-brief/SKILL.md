@@ -3,7 +3,7 @@ name: brand-strategy-brief
 description: Turns a company or product idea into a brand brief that visual work can be built on, covering audience, positioning, three brand attributes with what each rules out, a visual audit of competitors, and the visual direction that follows. Use when the user is starting a brand or rebrand, asks for a brand brief, brand strategy, brand attributes or brand personality, or wants colors, fonts or a logo and has no written brief yet.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: aiudalabs
 ---
 
@@ -21,7 +21,9 @@ Ask for what is missing, in one message. Do not invent any of it.
 4. Fixed constraints: an existing name, logo, color or font that must stay
 5. Where the brand will appear first: website, mobile app, pitch deck, packaging, print
 
-If the user cannot name the audience or the competitors, stop and help them decide that first. A brief built on a guessed audience produces an identity for nobody.
+If the user cannot name the audience, stop and help them decide that first. A brief built on a guessed audience produces an identity for nobody.
+
+If the user cannot name competitors, research them: search for companies with the same offer for the same buyer, propose a list of about five with the source of each, and ask the user to confirm or correct it. Record in the brief that the list came from research and whether it was confirmed.
 
 ## Workflow
 
@@ -31,7 +33,7 @@ Start [assets/brand-brief-template.md](assets/brand-brief-template.md) with what
 
 ### 2. Audit the competitors visually
 
-Follow [references/visual-competitor-audit.md](references/visual-competitor-audit.md). Look at each competitor's real site or product when a web tool is available. Record what you observed and the URL. If you cannot look, say so and label the audit as based on the user's description.
+Follow [references/visual-competitor-audit.md](references/visual-competitor-audit.md). Look at each competitor's real site or product when a web tool is available. A screenshot of the homepage is the best evidence, because a text summary of a page says nothing about its colors or type; save the screenshots beside the brief. Record what you observed and the URL. If you cannot look, say so and label the audit as based on the user's description.
 
 The audit ends with two lists: the conventions of the category, and the territory nobody has claimed.
 

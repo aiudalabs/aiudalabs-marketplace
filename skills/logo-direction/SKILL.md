@@ -4,7 +4,7 @@ description: Develops a logo from brief to a tested concept, covering the choice
 license: MIT
 compatibility: The bundled script needs Node.js 18 or later and has no dependencies. Viewing the review sheet needs a web browser.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: aiudalabs
 ---
 
@@ -43,6 +43,8 @@ Write each concept as its own SVG file. Rules for the files:
 - Use at most two colors, taken from the brand palette.
 - Make the concepts genuinely different ideas, not one idea in five colors.
 - For text, use `<text>` with the brand typeface only if its license allows use in a logo, and say that the final file needs the text converted to outlines so it renders without the font installed.
+- Draw a cut-out as a real hole, with a `mask` or an even-odd path, not as a light shape painted over a dark one. In one-color printing a painted light shape is ink too, and the review sheet shows it that way.
+- Make a square symbol file and a full logo file for each concept. Small-size behavior is judged on the symbol.
 
 Avoid the clichés of the category found in the competitor audit, and generic symbols that say nothing about this company: globes, light bulbs, abstract swooshes, generic gradients.
 
@@ -52,7 +54,9 @@ Avoid the clichés of the category found in the competitor audit, and generic sy
 node scripts/logo-sheet.mjs concepts/*.svg --out logo-review.html
 ```
 
-The sheet shows each concept in color on light and dark, as a one-color silhouette in dark and reversed, and at 64, 32 and 16 pixels. Pass `--light` and `--dark` to use the brand's own background colors.
+The sheet shows each concept in color on light and dark, as a one-color silhouette in dark and reversed, and at 64, 32 and 16 pixels high. Pass `--light` and `--dark` to use the brand's own background colors. If a concept uses a web font in `<text>`, pass the font's stylesheet with `--font-css <url>` so the sheet loads it.
+
+Two results are expected and are not failures of the concept: a color version with dark parts disappears on the dark background, which tells you a reversed variant is required; and a wide logo is unreadable at 16 pixels high, which is why the symbol exists.
 
 Look at the sheet yourself before showing it, and judge each concept:
 

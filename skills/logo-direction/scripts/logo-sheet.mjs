@@ -4,9 +4,12 @@
 // large, small (64, 32 and 16 px), one color, and reversed on a dark background.
 //
 // Usage:
-//   node logo-sheet.mjs <concept.svg>... [--out logo-review.html] [--dark "#111111"] [--light "#ffffff"]
+//   node logo-sheet.mjs <concept.svg>... [--out logo-review.html] [--dark "#111111"] [--light "#ffffff"] [--font-css <url>]
 //
-// Open the output file in a browser. Nothing is uploaded and no network is used.
+//   --font-css  stylesheet URL of a web font used by <text> in the concepts
+//
+// Open the output file in a browser. Nothing is uploaded; the network is used
+// only to load the stylesheet given with --font-css.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
@@ -14,7 +17,7 @@ import { basename } from 'node:path';
 const SMALL_SIZES = [64, 32, 16];
 
 function readOptions(args) {
-  const options = { out: 'logo-review.html', dark: '#111111', light: '#ffffff', files: [] };
+  const options = { out: 'logo-review.html', dark: '#111111', light: '#ffffff', 'font-css': '', files: [] };
   for (let index = 0; index < args.length; index++) {
     const key = args[index].startsWith('--') ? args[index].slice(2) : null;
     if (!key) options.files.push(args[index]);
@@ -54,7 +57,7 @@ ${cell('large mono-light', `background:${dark};color:${light}`, svg, 'One color,
 
 const options = readOptions(process.argv.slice(2));
 if (!options) {
-  console.error('Usage: node logo-sheet.mjs <concept.svg>... [--out logo-review.html] [--dark "#111111"] [--light "#ffffff"]');
+  console.error('Usage: node logo-sheet.mjs <concept.svg>... [--out logo-review.html] [--dark "#111111"] [--light "#ffffff"] [--font-css <url>]');
   process.exit(2);
 }
 
@@ -66,13 +69,15 @@ try {
   process.exit(2);
 }
 
+const fontLink = /^https?:\/\//.test(options['font-css']) ? `<link rel="stylesheet" href="${escapeHtml(options['font-css'])}">\n` : '';
+
 // brightness(0) turns every painted pixel black, which shows the silhouette the
 // mark would have in a one-color print. invert(1) then makes that silhouette white.
 const html = `<!doctype html>
 <html lang="en">
 <meta charset="utf-8">
 <title>Logo review</title>
-<style>
+${fontLink}<style>
 body{margin:0;padding:32px;font:14px/1.4 system-ui,sans-serif;background:#f3f3f3;color:#222}
 h1{font-size:20px;margin:0 0 4px}
 p{margin:0 0 24px;color:#555;max-width:70ch}
@@ -84,13 +89,13 @@ figcaption{padding:6px 10px;font-size:12px;background:#fff;color:#555;border-top
 .mark{display:flex;align-items:center;justify-content:center}
 .large .mark{width:260px;height:180px;padding:24px;box-sizing:border-box}
 .large svg{max-width:100%;max-height:100%}
-.small .mark{width:96px;height:96px}
-.small svg{width:var(--size);height:var(--size)}
+.small .mark{min-width:96px;height:96px;padding:0 16px;box-sizing:border-box}
+.small svg{height:var(--size);width:auto}
 .mono-dark svg{filter:brightness(0)}
 .mono-light svg{filter:brightness(0) invert(1)}
 </style>
 <h1>Logo review</h1>
-<p>Each concept is shown in color on light and dark backgrounds, as a one-color silhouette, and at 64, 32 and 16 pixels. A concept that loses its idea in the silhouette or at 16 pixels needs a simpler small-size variant, or another idea.</p>
+<p>Each concept is shown in color on light and dark backgrounds, as a one-color silhouette, and at 64, 32 and 16 pixels high. A symbol that loses its idea in the silhouette or at 16 pixels needs a simpler small-size variant, or another idea. Dark parts vanishing on the dark background means a reversed variant is needed.</p>
 ${sections.join('\n')}
 </html>
 `;

@@ -1,7 +1,8 @@
 {
   "outDir": "exports",
+  "stylesheets": [],
   "assets": [
-    { "name": "favicon-32", "source": "logo/svg/brand-symbol-small.svg", "width": 32, "height": 32 },
+    { "name": "favicon-32", "source": "logo/svg/brand-symbol-small.svg", "width": 32, "height": 32, "background": "#ffffff", "padding": 4 },
     { "name": "apple-touch-icon", "source": "logo/svg/brand-symbol-color.svg", "width": 180, "height": 180, "background": "#ffffff", "padding": 20 },
     { "name": "icon-192", "source": "logo/svg/brand-symbol-color.svg", "width": 192, "height": 192 },
     { "name": "icon-512", "source": "logo/svg/brand-symbol-color.svg", "width": 512, "height": 512 },

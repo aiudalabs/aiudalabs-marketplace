@@ -111,6 +111,9 @@ test('logo-sheet: builds a review sheet and strips script from the SVG', (t) => 
   const html = readFileSync(out, 'utf8');
   assert.equal(html.match(/<figure/g).length, 7, 'four large views and three small sizes');
   assert.ok(!html.includes('alert('), 'scripts and event handlers are removed');
+  assert.ok(!html.includes('rel="stylesheet"'), 'no stylesheet unless asked');
+  run('logo-direction', 'logo-sheet.mjs', svg, '--out', out, '--font-css', 'https://fonts.example/css?family=Brand');
+  assert.match(readFileSync(out, 'utf8'), /<link rel="stylesheet" href="https:\/\/fonts\.example\/css\?family=Brand">/);
   assert.equal(run('logo-direction', 'logo-sheet.mjs').status, 2);
 });
 

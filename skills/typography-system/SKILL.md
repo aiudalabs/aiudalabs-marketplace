@@ -4,7 +4,7 @@ description: Chooses brand typefaces and builds the type system around them, cov
 license: MIT
 compatibility: The bundled script needs Node.js 18 or later. It has no dependencies and needs no network access.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: aiudalabs
 ---
 
@@ -27,13 +27,11 @@ Start from one family. Add a second only when a brand attribute asks for a contr
 
 ### 2. Shortlist candidates
 
-Search [references/font-pairings.csv](references/font-pairings.csv) for the mood words in the brief. It lists 74 pairings of freely available fonts with their mood and typical use. For example:
+Start from the brief, not from a list. Take the typeface structure the visual direction asks for, using the table in [references/selection-and-pairing.md](references/selection-and-pairing.md), and name families with that structure that are available under the user's budget.
 
-```bash
-grep -i "editorial" references/font-pairings.csv
-```
+[references/font-pairings.csv](references/font-pairings.csv) lists 74 pairings of freely available fonts by mood and typical industry. Use it to widen the shortlist, for example with `grep -i "editorial" references/font-pairings.csv`. It is organized by what each pairing is commonly used for, so it mostly tells you what a category already looks like. If the brief says to break a category convention, a pairing listed as typical for that category is the wrong pick.
 
-Treat the table as a list of candidates. It tells you what a pairing is commonly used for, which also means it tells you what the category already looks like. If the brief says to break a category convention, a pairing listed as typical for that category is the wrong pick.
+Show the candidates set in the brand's own words and colors, at heading, body and table sizes, with accented characters from every language in the brief. A rendered comparison is worth more than a description.
 
 Present two or three candidates, each tied to a brand attribute, and let the user choose.
 

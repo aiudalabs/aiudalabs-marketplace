@@ -4,7 +4,7 @@ description: Produces the image files a brand needs from its logo and colors, su
 license: MIT
 compatibility: The render script needs Node.js 18 or later and one renderer already installed, either a Chromium-based browser (Chrome, Chromium or Edge) or ImageMagick. It installs nothing. Without a renderer it lists the files still to be produced.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: aiudalabs
 ---
 
@@ -47,6 +47,8 @@ Copy [assets/asset-manifest.template.json](assets/asset-manifest.template.json) 
 - Use the symbol, not the full logo, for anything square and small.
 - Icons that a platform will crop to a shape need padding, so nothing important is cut. See the safe zone notes in the sizes reference.
 - Icons that must not be transparent need a `background`.
+- Give the favicon a background too if the mark has dark parts, or it disappears on a dark browser tab.
+- If an SVG source contains `<text>` in a web font, list the font's stylesheet under `"stylesheets"` at the top of the manifest. Only the browser renderer can load it.
 
 ### 4. Build the social share image
 

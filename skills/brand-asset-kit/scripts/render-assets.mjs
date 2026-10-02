@@ -10,6 +10,7 @@
 // Manifest:
 //   {
 //     "outDir": "exports",
+//     "stylesheets": ["https://fonts.example/css?family=Brand"],
 //     "assets": [
 //       { "name": "icon-512", "source": "logo/symbol.svg", "width": 512, "height": 512,
 //         "background": "#ffffff", "padding": 48 },
@@ -17,7 +18,8 @@
 //     ]
 //   }
 // Paths are relative to the manifest. "background" defaults to transparent and
-// "padding" (px, SVG sources only) to 0.
+// "padding" (px, SVG sources only) to 0. "stylesheets" is optional: web font
+// stylesheets to load for <text> inside SVG sources. HTML sources link their own.
 //
 // Renderers, in order of preference:
 //   1. A Chromium-based browser (Chrome, Chromium, Edge) run headless. Handles
@@ -78,14 +80,16 @@ function loadManifest(file) {
     const kind = extname(sourcePath).toLowerCase() === '.svg' ? 'svg' : 'html';
     return { name, sourcePath, kind, width, height, background, padding };
   });
-  return { outDir: resolve(base, manifest.outDir ?? 'exports'), assets };
+  const stylesheets = (manifest.stylesheets ?? []).filter((url) => /^https?:\/\//.test(url));
+  return { outDir: resolve(base, manifest.outDir ?? 'exports'), assets, stylesheets };
 }
 
 // The SVG is inlined, not referenced, so fonts declared by the page apply to its text.
-function svgPage({ sourcePath, width, height, background, padding }) {
+function svgPage({ sourcePath, width, height, background, padding }, stylesheets) {
+  const links = stylesheets.map((url) => `<link rel="stylesheet" href="${url.replace(/"/g, '&quot;')}">`).join('');
   const svg = readFileSync(sourcePath, 'utf8').replace(/<\?xml[^>]*\?>/, '');
   const inner = `width:${width - 2 * padding}px;height:${height - 2 * padding}px`;
-  return `<!doctype html><meta charset="utf-8"><style>
+  return `<!doctype html><meta charset="utf-8">${links}<style>
 html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;background:${background}}
 body{display:flex;align-items:center;justify-content:center}
 .fit{${inner};display:flex;align-items:center;justify-content:center}
@@ -102,11 +106,11 @@ function pngIsComplete(file) {
 
 // Headless browsers sometimes stay alive after writing the screenshot (first-run
 // and background tasks), so this waits for the file, not for the process to exit.
-function renderWithBrowser(browser, asset, output, workDir) {
+function renderWithBrowser(browser, asset, output, workDir, stylesheets) {
   let url = pathToFileURL(asset.sourcePath).href;
   if (asset.kind === 'svg') {
     const page = join(workDir, `${asset.name}.html`);
-    writeFileSync(page, svgPage(asset));
+    writeFileSync(page, svgPage(asset, stylesheets));
     url = pathToFileURL(page).href;
   }
   const args = [
@@ -154,7 +158,7 @@ const args = process.argv.slice(2);
 const manifestFile = args.find((arg) => !arg.startsWith('--'));
 if (!manifestFile) fail('Usage: node render-assets.mjs <manifest.json> [--check]');
 
-const { outDir, assets } = loadManifest(manifestFile);
+const { outDir, assets, stylesheets } = loadManifest(manifestFile);
 const browser = findBrowser();
 const hasMagick = onPath('magick');
 const rendererFor = (asset) => (browser ? 'browser' : hasMagick && asset.kind === 'svg' ? 'magick' : null);
@@ -180,7 +184,7 @@ for (const asset of assets) {
     continue;
   }
   rmSync(output, { force: true });
-  const result = renderer === 'browser' ? await renderWithBrowser(browser, asset, output, workDir) : renderWithMagick(asset, output);
+  const result = renderer === 'browser' ? await renderWithBrowser(browser, asset, output, workDir, stylesheets) : renderWithMagick(asset, output);
   const size = existsSync(output) ? pngSize(output) : null;
   if (size && size.width === asset.width && size.height === asset.height) {
     console.log(`ok       ${asset.name}.png  ${size.width}x${size.height}`);
