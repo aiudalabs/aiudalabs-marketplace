@@ -1,82 +1,113 @@
 ---
 name: visual-identity
-description: Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, logo, design tokens, asset kit and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.
+description: Builds a complete visual identity for a company, startup or product from start to finish, from zero or as a refresh. It settles the look first, by collecting the owner's taste and comparing whole-page directions by eye, then builds the system behind the chosen look, covering color, typography, logo, design tokens, asset kit and brand guidelines. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, a rebrand or a brand refresh, and wants the whole thing and not one piece.
 license: MIT
 metadata:
-  version: "0.2.1"
+  version: "0.3.0"
   author: aiudalabs
-  requires: brand-strategy-brief color-system typography-system logo-direction design-tokens brand-asset-kit brand-guidelines
+  requires: brand-strategy-brief visual-directions color-system typography-system logo-direction design-tokens brand-asset-kit brand-guidelines
 ---
 
 # Visual Identity
 
-Run the whole identity process in order. Each stage is a separate skill; this one sequences them, carries decisions from one stage to the next, and stops for the user's approval between stages.
+Run the whole identity process. It has two halves, in this order:
 
-If the user wants only one piece, such as a palette or a font pairing, use that skill directly instead of this one.
+1. **Find the look.** Understand the brand and the owner's taste, then compare complete directions by eye and choose one.
+2. **Build the system behind it.** Turn the chosen look into colors, type, tokens, assets and guidelines, repairing what is measurably wrong without changing how it looks.
+
+The order matters. A system built before the look is chosen produces parts that each pass their checks and a whole that nobody wants. The checks in the second half are quality control for something that is already liked. They never choose the look.
+
+If the user wants only one piece, such as a palette or a font pairing, use that skill directly.
 
 ## Stages
 
 | # | Stage | Skill | Produces | Gate |
 | --- | --- | --- | --- | --- |
-| 1 | Strategy | `brand-strategy-brief` | `brand-brief.md` | User confirms attributes and follow-or-break decisions |
-| 2 | Color | `color-system` | Ramps, roles, `palette.json`, contrast results | User chooses the primary; all pairings pass |
-| 3 | Typography | `typography-system` | Families, scale, license table | User chooses the families; licenses verified |
-| 4 | Logo | `logo-direction` | Logo brief, tested concepts, variant files, usage rules | User chooses the mark |
-| 5 | Tokens | `design-tokens` | `brand.tokens.json`, `brand.css` | Validator reports zero errors |
-| 6 | Assets | `brand-asset-kit` | Icons and share image, with the manifest | Every file verified by the script |
-| 7 | Guidelines | `brand-guidelines` | `brand-guidelines.md` | User approves the guide |
+| 1 | Brief | `brand-strategy-brief` | `brand-brief.md` | Audience and attributes confirmed |
+| 2 | Directions | `visual-directions` | Taste notes, two or three full-page directions, a comparison board | A direction is chosen by looking at it |
+| 3 | Color | `color-system` | Ramps, roles and `palette.json` from the chosen direction | Every allowed pairing passes, with the look intact |
+| 4 | Typography | `typography-system` | Scale, weights, fallbacks and license table for the chosen faces | Licenses verified |
+| 5 | Logo | `logo-direction` | The mark, its variants and usage rules | The mark is chosen on the chosen direction's page |
+| 6 | Tokens | `design-tokens` | `brand.tokens.json`, `brand.css` | Validator reports zero errors |
+| 7 | Assets | `brand-asset-kit` | Icons and share image | Every file verified |
+| 8 | Guidelines | `brand-guidelines` | `brand-guidelines.md` | Owner approves |
 
-Stages 4 and 6 depend on scope. If the user already has a logo, stage 4 records its variants and checks them against the new palette instead of designing a new one. If no screen assets are needed yet, skip stage 6 and say so.
+Stage 2 is where the identity is decided. Stages 3 to 8 serve it.
 
-## How to run it
-
-### Before starting
+## Before starting
 
 1. Ask where the files should go. Default to a `brand/` folder in the current project.
-2. Check for existing material: a brief, a logo, colors or fonts already in use. Existing decisions are inputs, not things to redo. Skip a stage whose output already exists and is approved, after confirming with the user.
-3. Tell the user the seven stages and that you will stop after each one.
+2. Find out whether this is a new identity or a refresh.
+   - **New.** There is nothing to evolve. The look will come from the owner's taste and from the directions, so plan to collect references in stage 2.
+   - **Refresh.** The existing identity is an input. What works in it is kept unless there is a reason to lose it. Ask whether the logo is in scope.
+3. Tell the user the stages and where their decisions are needed: the attributes in stage 1, the direction in stage 2, and approval at the end.
 
-### For each stage
+## Running each stage
 
-1. Follow the stage's skill completely. Do not improvise a shorter version of it.
-2. Pass forward what earlier stages decided. Stages 2, 3 and 4 take the attributes and visual direction from the brief. Stage 4 also takes the colors and typefaces. Stage 5 takes the values from stages 2 and 3. Stage 6 takes the logo and the colors. Stage 7 takes everything.
+1. Follow the stage's skill completely.
+2. Pass decisions forward. Stage 2 takes the brief. Stages 3 and 4 take their colors and typefaces from the chosen direction's `direction.json`; they do not propose new ones. Stage 5 designs the mark to live on the chosen direction's page. Stage 6 takes the values from stages 3 and 4. Stage 8 takes everything.
 3. Save the stage's output to the brand folder.
-4. Show the user the result and the decision you need from them. Where the stage's skill has a preview or review script (color, typography, logo), build it and give the user the file, so they choose by looking. Wait for the decision. Do not start the next stage on an assumed yes.
+4. Show the user the result and the decision needed, with something to look at wherever the stage's skill has a preview or review script. Wait for the decision.
 
-If the user changes an earlier decision later, go back: redo that stage and every stage that used its output. A new primary color means new ramps, a new contrast check, new tokens and an updated guide.
+### Stages 3 and 4 protect the look
+
+When a check fails after the direction is chosen, repair with the smallest change and compare before and after:
+
+- A color pair that fails contrast is moved to the nearest color that passes, in the same hue. Use the `color-system` repair script.
+- If a repair would visibly change the direction, show both versions and let the user decide. A color that fails as body text may stay for large text or decoration, recorded as a usage rule.
+- Never replace a chosen color or typeface because a different one scores better.
+
+### If the look is not good enough
+
+Judge the result as a whole page beside the benchmark from stage 2. If it does not hold up, the fault is in stage 2, not in the tokens. Go back, change the directions, and choose again. Do not polish a system built on a look nobody wants.
+
+### When the user changes an earlier decision
+
+Go back to that stage and redo every stage that used its output.
+
+## Running without the user
+
+Sometimes the user asks for the whole process with no questions. Then:
+
+1. Write `brand/owner-decisions.md` from [assets/owner-decisions.template.md](assets/owner-decisions.template.md) before stage 1. Fill it only with what the user has actually said or what their material shows, and give the source of each line. Leave the rest as "Not stated".
+2. At each gate, decide from that file. Where it is silent, choose what best matches the taste the owner has shown, not what you would find most interesting or easiest to justify.
+3. Log every decision in `brand/decision-log.md`: the gate, what was chosen, what it was based on, and how confident you are.
+4. Never fill a factual gap by invention. Unknown facts about the company stay "Open" in the brief.
+5. At the end, list the decisions made on the user's behalf, most uncertain first, so they can overrule them.
 
 ## Final delivery
 
-When every gate has passed, confirm the brand folder contains:
+Confirm the brand folder contains:
 
 ```
 brand/
 ├── brand-brief.md
-├── brand-guidelines.md
+├── directions/            the pages, their direction.json and the board
 ├── palette.json
+├── brand-guidelines.md
 ├── tokens/
-│   ├── brand.tokens.json
-│   └── brand.css
 ├── logo/
-│   └── svg/
 └── exports/
 ```
 
-Then give a short summary: the three attributes, the primary color, the typefaces, and the open questions that remain. List what was not done or remains: a trademark check of the name and mark, any designer refinement of the logo, print specifications, and any stage that was skipped.
+Then show the result the way it will be judged: a full page in the final identity, next to the benchmark. Summarize the look in one sentence, what was repaired, and what remains open.
 
 ## Rules
 
-- Do not skip the brief, even when the user asks to "just pick colors". Without attributes there is nothing to judge a color against. If they insist, use `color-system` directly and say what is missing.
+- The look is chosen by looking. No direction, palette or typeface is selected because it satisfied a rule.
+- Attributes guide the directions. They do not generate the look by deduction.
+- Being different from competitors is not a goal in itself.
+- In a refresh, what already works is kept unless there is a stated reason to lose it.
 - Do not invent facts about the company, its audience or its competitors.
-- Every value in the tokens and the guide traces back to a stage output. Nothing is typed from memory.
-- Each gate is the user's decision. Recommend, then wait.
+- Every value in the tokens and the guide traces back to the chosen direction or a recorded repair.
 
 ## Quality checks
 
-- [ ] Every stage in scope has a saved output, and skipped stages are named
-- [ ] The user approved each gate explicitly
-- [ ] The contrast check passes for every allowed pairing
+- [ ] The owner's taste was collected, or it is stated that the references were your own
+- [ ] A direction was chosen from rendered pages, with the benchmark on the same board
+- [ ] The final page was compared side by side with the benchmark and holds up
+- [ ] Repairs changed as little as possible, and each is listed with before and after
+- [ ] Every allowed text and background pairing passes contrast
 - [ ] Every font has a verified license
-- [ ] The tokens validator reports zero errors
-- [ ] Values in the guide match the tokens file
-- [ ] What was not delivered is stated plainly
+- [ ] The tokens validator reports zero errors, and the guide matches the tokens
+- [ ] In an unattended run, every decision made for the user is logged with its basis

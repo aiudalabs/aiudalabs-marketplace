@@ -4,7 +4,7 @@ description: Chooses brand typefaces and builds the type system around them, cov
 license: MIT
 compatibility: The bundled scripts need Node.js 18 or later and have no dependencies. The preview page loads web fonts from the stylesheet you give it, which needs network access when the page is opened.
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
   author: aiudalabs
 ---
 
@@ -18,6 +18,12 @@ Deliver a type system a team can apply without asking questions: which family fo
 - Languages and scripts the brand must support
 - Where type will be used: website, app, documents, print, the logo
 - Whether paid fonts are allowed
+
+## Two ways in
+
+**The typefaces are already chosen**, from an existing identity or a chosen visual direction. Then keep them. Skip to step 3 and do the work that makes them a system: verify each license, check language coverage, build the scale, set fallbacks and write the usage rules. Replace a typeface only if its license does not allow the intended use or it lacks a required language, and then choose the closest match and show both.
+
+**There are no typefaces yet.** Type is best chosen as part of whole-page directions, compared by eye. When type alone is asked for, follow all the steps.
 
 ## Workflow
 

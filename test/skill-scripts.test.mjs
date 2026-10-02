@@ -180,3 +180,34 @@ test('type-preview: one column per family, with the stylesheet and escaped text'
   assert.equal(run('typography-system', 'type-preview.mjs', '--heading', 'no fonts').status, 2);
   assert.equal(run('typography-system', 'type-preview.mjs', '--font', 'X', '--ratio', '1').status, 2);
 });
+
+test('contrast-fix: repairs a failing pair with the same hue and reports it', () => {
+  const fixed = run('color-system', 'contrast-fix.mjs', '#8a8a92', '#faf8f4');
+  assert.equal(fixed.status, 0);
+  const hex = /Fixed: +(#[0-9a-f]{6}) on #faf8f4/.exec(fixed.stdout)[1];
+  assert.ok(contrastRatio(parseHex(hex), parseHex('#faf8f4')) >= 4.5);
+  const hueBefore = rgbToOklch(parseHex('#8a8a92'))[2];
+  const hueAfter = rgbToOklch(parseHex(hex))[2];
+  assert.ok(Math.abs(hueBefore - hueAfter) < 8, 'hue is kept');
+  assert.match(fixed.stdout, /points darker/);
+
+  assert.match(run('color-system', 'contrast-fix.mjs', '#000', '#fff').stdout, /Already passes/);
+  const background = run('color-system', 'contrast-fix.mjs', '#ffffff', '#e8440a', '--adjust', 'background');
+  assert.match(background.stdout, /Changed the background/);
+  assert.equal(run('color-system', 'contrast-fix.mjs', '#777', '#888', '--use', 'text-aaa').status, 1);
+  assert.equal(run('color-system', 'contrast-fix.mjs', 'nope', '#fff').status, 2);
+});
+
+test('direction-board: one column per reference and direction', (t) => {
+  const out = join(tempFile(t, 'placeholder.txt', ''), '..', 'board.html');
+  const result = run('visual-directions', 'direction-board.mjs', '--reference', 'Current site=current.png', '--direction', 'A. First=a.html', '--direction', 'B. <Second>=dir/b page.html', '--out', out);
+  assert.equal(result.status, 0);
+  const html = readFileSync(out, 'utf8');
+  assert.equal(html.match(/<article/g).length, 3);
+  assert.match(html, /<img src="current\.png"/);
+  assert.match(html, /<iframe src="a\.html"/);
+  assert.match(html, /B\. &lt;Second&gt;/);
+  assert.match(html, /src="dir\/b%20page\.html"/);
+  assert.equal(run('visual-directions', 'direction-board.mjs', '--reference', 'x=y.png').status, 2);
+  assert.equal(run('visual-directions', 'direction-board.mjs', '--direction', 'no-path').status, 2);
+});

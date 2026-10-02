@@ -1,0 +1,29 @@
+{
+  "name": "A. Workshop",
+  "character-source": "Where this direction gets its character: the company's activity, the audience's world, a material, a type voice, a color or a motif.",
+  "feeling": "One sentence a non-designer could repeat.",
+  "risk": "The one bold choice this direction makes.",
+  "references": ["Which of the owner's references it draws on, and which quality"],
+  "keeps": ["For an existing brand: what it keeps"],
+  "changes": ["For an existing brand: what it changes, and why"],
+  "page": "directions/a-workshop.html",
+  "colors": {
+    "background": "#REPLACE",
+    "surface": "#REPLACE",
+    "border": "#REPLACE",
+    "text": "#REPLACE",
+    "text-muted": "#REPLACE",
+    "action": "#REPLACE",
+    "on-action": "#REPLACE",
+    "accent": "#REPLACE"
+  },
+  "fonts": {
+    "heading": "Family name",
+    "body": "Family name",
+    "accent": "Family name, or empty",
+    "mono": "Family name, or empty"
+  },
+  "stylesheets": ["https://fonts.example/css?family=..."],
+  "shape": "Corner radius, shadows and surfaces, in a few words",
+  "notes": "Honest assessment after rendering it: what works, what does not, and whether it holds up against the benchmark."
+}

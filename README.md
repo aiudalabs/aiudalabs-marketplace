@@ -25,8 +25,9 @@ Skills follow progressive disclosure: a harness loads only `name` and `descripti
 | --- | --- | --- |
 | Agent | [`brand-guardian`](agents/design/brand-guardian.md) | Brand identity lead who builds and protects a visual identity |
 | Agent | [`positioning-red-team`](agents/strategy/positioning-red-team.md) | Adversarial positioning advisor for startups |
-| Skill | [`visual-identity`](skills/visual-identity/SKILL.md) | The full identity process, from brief to guidelines, with an approval gate per stage |
+| Skill | [`visual-identity`](skills/visual-identity/SKILL.md) | The full identity process: find the look first, then build the system behind it |
 | Skill | [`brand-strategy-brief`](skills/brand-strategy-brief/SKILL.md) | Brand brief: audience, attributes, visual audit of competitors, visual direction |
+| Skill | [`visual-directions`](skills/visual-directions/SKILL.md) | Whole-page directions compared by eye, from the owner's taste, before any system is built |
 | Skill | [`color-system`](skills/color-system/SKILL.md) | Tonal ramps, color roles, dark mode and a WCAG 2.2 contrast check of every pairing |
 | Skill | [`typography-system`](skills/typography-system/SKILL.md) | Typeface selection, pairing, type scale and font license check |
 | Skill | [`logo-direction`](skills/logo-direction/SKILL.md) | Mark type, SVG concepts, a review sheet that tests them small and in one color, usage rules |
@@ -37,7 +38,7 @@ Skills follow progressive disclosure: a harness loads only `name` and `descripti
 | Skill | [`startup-positioning-audit`](skills/startup-positioning-audit/SKILL.md) | Full adversarial positioning and launch-readiness audit, scored out of 60 |
 | Skill | [`homepage-copy-audit`](skills/homepage-copy-audit/SKILL.md) | Audits a homepage for clarity and conversion and delivers replacement copy |
 | Skill | [`competitor-research`](skills/competitor-research/SKILL.md) | Maps the competitive landscape and delivers a sourced competitor brief |
-| Stack | [`brand-identity`](stacks/brand-identity/stack.json) | `brand-guardian` with the nine identity skills |
+| Stack | [`brand-identity`](stacks/brand-identity/stack.json) | `brand-guardian` with the ten identity skills |
 | Stack | [`launch-readiness`](stacks/launch-readiness/stack.json) | `positioning-red-team` with the three audit and research skills |
 
 The machine-readable index is [`catalog/catalog.json`](catalog/catalog.json). It is generated, and CI fails when it is stale.
@@ -63,7 +64,7 @@ Useful flags: `--global` installs for your user instead of the project, `--dry-r
 npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-code
 ```
 
-This writes the nine skills to `.claude/skills/` and the agent to `.claude/agents/brand-guardian.md`. The agent loads each skill on demand, by name.
+This writes the ten skills to `.claude/skills/` and the agent to `.claude/agents/brand-guardian.md`. The agent loads each skill on demand, by name.
 
 You can also add the repository as a plugin marketplace, where each stack is a plugin:
 

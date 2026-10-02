@@ -50,13 +50,15 @@ Unclaimed territory (what none of them does):
 
 ## 6. Brand attributes
 
-| Attribute | What it means here | What it rules out |
+| Attribute | What it means here | What it leans away from |
 | --- | --- | --- |
 |  |  |  |
 |  |  |  |
 |  |  |  |
 
-Attribute that separates us from the category leader:
+Attribute about how the brand feels:
+
+What the current identity already expresses, if there is one:
 
 ## 7. Visual direction
 

@@ -43,6 +43,12 @@ Attribute: **warm**, in the same brand. Meaning here: "written by people for peo
 
 Notice the tension: "precise" asks for stark contrast, "warm" asks for off-white and softened black. That tension is the identity. Resolve it explicitly, for example "stark contrast in data views, warm neutrals everywhere else", and write the resolution in the brief.
 
+## Do not over-constrain
+
+The exclusions from three attributes add up. If together they remove color, emphasis, contrast and warmth, what is left is correct and lifeless. After writing the table, read the "Excludes" column as one list. If it reads like a ban on anything expressive, cut it back until at least one source of warmth and one moment of contrast survive.
+
+The direction here feeds the next step, where whole pages are compared by eye. It is guidance for those pages, not a specification.
+
 ## Checks
 
 - Each direction can reject a real option. "Clean and modern" rejects nothing.

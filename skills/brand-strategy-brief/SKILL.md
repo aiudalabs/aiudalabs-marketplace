@@ -3,7 +3,7 @@ name: brand-strategy-brief
 description: Turns a company or product idea into a brand brief that visual work can be built on, covering audience, positioning, three brand attributes with what each rules out, a visual audit of competitors, and the visual direction that follows. Use when the user is starting a brand or rebrand, asks for a brand brief, brand strategy, brand attributes or brand personality, or wants colors, fonts or a logo and has no written brief yet.
 license: MIT
 metadata:
-  version: "0.1.1"
+  version: "0.2.0"
   author: aiudalabs
 ---
 
@@ -42,11 +42,16 @@ The audit ends with two lists: the conventions of the category, and the territor
 Propose three attributes, such as "precise, warm, direct". For each one write:
 
 - what it means for this company, in one sentence
-- what it rules out, concretely
+- what it leans away from, concretely
 
-An attribute that rules nothing out is decoration. "Innovative", "modern" and "trustworthy" almost always fail this test. Replace them.
+An attribute that points nowhere is decoration. "Innovative", "modern" and "trustworthy" almost always fail this test. Replace them.
 
-Check the set against the audit. If all three attributes also describe the category leader, the brand will not be told apart. At least one attribute should pull away from the category.
+Two checks on the set:
+
+- **At least one attribute is about how the brand feels**, such as warm, bold, playful, calm or generous. A set made only of virtues, such as rigorous, direct and practical, describes a good supplier and produces an identity with no appeal. People choose with feeling first.
+- **The "leans away from" lines are a direction, not a ban list.** Three attributes that each forbid several things add up to forbidding almost everything expressive. If the combined list rules out color, emphasis, contrast and warmth, rewrite it.
+
+If the brand already has an identity, start from it: write the attributes that the current identity expresses, then ask whether they are still the right ones. Do not design attributes in a vacuum and then discover that they contradict what the owner likes.
 
 ### 4. Translate attributes into visual direction
 
@@ -54,11 +59,15 @@ Follow [references/attributes-to-visual-decisions.md](references/attributes-to-v
 
 ### 5. Decide: follow or break the category
 
-For each convention found in the audit, record one decision: follow it, because buyers need the reassurance, or break it, because standing out matters more here. Give the reason. This section stops later arguments about whether the brand "looks like a fintech".
+For each convention found in the audit, record one decision: follow it, or break it, with the reason.
+
+Differentiation is a tool, not the goal. Break a convention when it is the weakest part of the category or when the brand is being confused with a competitor. Keep a trait that suits the brand even when competitors share it. "Most competitors use a warm accent" is a fact about the category; it is not a reason to give up a warm accent that the brand wears well. The cost of a wrong "break" is an identity that is unlike its competitors and also unlike itself.
 
 ### 6. Confirm with the user
 
 Present the attributes and the follow-or-break decisions and get explicit confirmation before closing the brief. These two sections are the user's decisions, not yours.
+
+When you offer options, do not steer. Describe each fairly, include at least one option that keeps what the brand already does, and say so when your recommendation would make the identity plainer.
 
 ## Output
 
@@ -67,15 +76,17 @@ The completed brief, as one Markdown file named `brand-brief.md`. One to two pag
 ## Quality checks
 
 - [ ] Every fact in the brief was stated by the user or observed at a recorded URL
-- [ ] Each attribute has a "rules out" line that would reject a real design option
-- [ ] At least one attribute separates the brand from the category leader
+- [ ] Each attribute has a "leans away from" line that points somewhere real
+- [ ] At least one attribute is about feeling, and the combined list still leaves room for color, contrast and warmth
+- [ ] For an existing brand, the attributes were checked against what the current identity already expresses
+- [ ] Every "break" decision has a reason beyond "competitors do it"
 - [ ] The competitor audit says how it was done: observed, or from the user's description
 - [ ] Open questions are listed, not hidden
 - [ ] The user confirmed the attributes
 
 ## Common mistakes
 
-- Choosing colors or fonts in the brief. The brief sets direction and limits.
+- Choosing colors or fonts in the brief. The brief sets direction; the look is chosen later, by comparing whole pages.
 - Writing attributes the founder likes instead of attributes the audience needs to perceive.
 - Describing competitors from memory. Their sites change; look, or say you did not.
 - Treating "color psychology" lists as evidence. What a color signals depends on the category and the culture, which is why the audit comes first.

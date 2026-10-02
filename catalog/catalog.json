@@ -6,11 +6,12 @@
     {
       "name": "brand-guardian",
       "description": "Brand identity lead who builds and protects a company's visual identity. Use when creating a brand or rebrand, choosing brand colors or typefaces, developing a logo, producing design tokens, icons or brand guidelines, or checking whether a design, page or asset is on-brand.",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "category": "design",
       "requires": [
         "visual-identity",
         "brand-strategy-brief",
+        "visual-directions",
         "color-system",
         "typography-system",
         "logo-direction",
@@ -101,7 +102,7 @@
     {
       "name": "brand-strategy-brief",
       "description": "Turns a company or product idea into a brand brief that visual work can be built on, covering audience, positioning, three brand attributes with what each rules out, a visual audit of competitors, and the visual direction that follows. Use when the user is starting a brand or rebrand, asks for a brand brief, brand strategy, brand attributes or brand personality, or wants colors, fonts or a logo and has no written brief yet.",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/brand-strategy-brief",
@@ -115,7 +116,7 @@
     {
       "name": "color-system",
       "description": "Builds a complete brand color system from one or two chosen colors, covering perceptually even tonal ramps, tinted neutrals, semantic and role colors, dark mode, and a WCAG 2.2 contrast check of every text and background pairing. Use when the user asks for a color palette, brand colors, color scheme, shades or tints of a color, dark mode colors, or wants to check the contrast or accessibility of colors.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/color-system",
@@ -126,6 +127,7 @@
         "references/color-roles.md",
         "scripts/color-lib.mjs",
         "scripts/color-ramp.mjs",
+        "scripts/contrast-fix.mjs",
         "scripts/contrast.mjs",
         "scripts/palette-preview.mjs"
       ]
@@ -223,7 +225,7 @@
     {
       "name": "typography-system",
       "description": "Chooses brand typefaces and builds the type system around them, covering selection against brand attributes, pairing, a modular type scale, weights, fallback stacks, language coverage and a license check for every font. Use when the user asks for brand fonts, a font pairing, a typeface recommendation, a type scale, heading and body sizes, or whether a font is licensed for their use.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/typography-system",
@@ -238,12 +240,29 @@
       ]
     },
     {
+      "name": "visual-directions",
+      "description": "Finds the look of a brand, new or existing, by collecting the owner's taste, building two or three complete visual directions as full-page mockups with real content, comparing them side by side against the best alternatives, and choosing one by eye before any system is built. Use when the user wants to see options for a brand's look, asks for a redesign, refresh, moodboard or stylescape, says a design looks bland, ugly or generic, or before fixing colors, fonts or tokens for a new identity.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/visual-directions",
+      "files": [
+        "SKILL.md",
+        "assets/direction.template.json",
+        "references/making-directions-different.md",
+        "references/reading-an-existing-identity.md",
+        "references/starting-from-zero.md",
+        "scripts/direction-board.mjs"
+      ]
+    },
+    {
       "name": "visual-identity",
-      "description": "Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, logo, design tokens, asset kit and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.",
-      "version": "0.2.1",
+      "description": "Builds a complete visual identity for a company, startup or product from start to finish, from zero or as a refresh. It settles the look first, by collecting the owner's taste and comparing whole-page directions by eye, then builds the system behind the chosen look, covering color, typography, logo, design tokens, asset kit and brand guidelines. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, a rebrand or a brand refresh, and wants the whole thing and not one piece.",
+      "version": "0.3.0",
       "license": "MIT",
       "requires": [
         "brand-strategy-brief",
+        "visual-directions",
         "color-system",
         "typography-system",
         "logo-direction",
@@ -253,21 +272,23 @@
       ],
       "path": "skills/visual-identity",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "assets/owner-decisions.template.md"
       ]
     }
   ],
   "stacks": [
     {
       "name": "brand-identity",
-      "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
-      "version": "0.2.0",
+      "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, visual directions, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
+      "version": "0.3.0",
       "agents": [
         "brand-guardian"
       ],
       "skills": [
         "visual-identity",
         "brand-strategy-brief",
+        "visual-directions",
         "color-system",
         "typography-system",
         "logo-direction",

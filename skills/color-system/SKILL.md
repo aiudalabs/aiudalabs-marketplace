@@ -4,7 +4,7 @@ description: Builds a complete brand color system from one or two chosen colors,
 license: MIT
 compatibility: The bundled scripts need Node.js 18 or later. They have no dependencies and need no network access.
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
   author: aiudalabs
 ---
 
@@ -17,6 +17,20 @@ Deliver a palette where every color has a job and every text pairing is proven r
 - The brand attributes and visual direction, ideally from a brand brief. If there is no brief, ask what the brand should feel like and which competitors' colors to stay away from.
 - Any color that must stay.
 - Whether dark mode is in scope.
+
+## Two ways in
+
+**The look is already chosen**, from an existing identity or a chosen visual direction. Then this skill does not choose colors. Take the colors as given, build ramps around them (step 2), assign roles (step 3), check the pairings (step 4) and repair failures with the smallest change:
+
+```bash
+node scripts/contrast-fix.mjs "#8a8a92" "#faf8f4" --use text
+```
+
+It keeps the hue and moves only the lightness until the pair passes, and reports how far it moved. Use `--adjust background` to move the background instead, for example to darken a button under white text. Show the before and after side by side. If a repair would visibly change the look, show both and let the user decide; a color that fails for body text may still be allowed for large text or decoration, recorded as a usage rule.
+
+Do not replace a chosen color with a different hue because it scores better.
+
+**There is no look yet.** Then do not pick a palette in isolation. Colors are chosen as part of whole-page directions, compared by eye. Use this skill to build and check the palette of the direction that wins. The steps below describe the full procedure, for the cases where a palette is the only thing asked for.
 
 ## Workflow
 
