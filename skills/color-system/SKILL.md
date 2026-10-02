@@ -4,7 +4,7 @@ description: Builds a complete brand color system from one or two chosen colors,
 license: MIT
 compatibility: The bundled scripts need Node.js 18 or later. They have no dependencies and need no network access.
 metadata:
-  version: "0.1.1"
+  version: "0.2.0"
   author: aiudalabs
 ---
 
@@ -25,6 +25,14 @@ Deliver a palette where every color has a job and every text pairing is proven r
 Pick one hue for the primary and say which brand attribute it serves. If the brief has a competitor audit, check the choice against it: a primary that matches the category leader makes the brand harder to tell apart, unless following the category was a recorded decision.
 
 Offer the user two or three candidates with the reasoning, and let them choose. This is their decision.
+
+People choose colors by looking at them, so show the candidates applied, not as a list of hex values. For each candidate, generate its ramps (step 2), map the starting roles (step 3) into a `palette.json` (step 4), and build a side-by-side preview:
+
+```bash
+node scripts/palette-preview.mjs candidate-a.palette.json candidate-b.palette.json --out palette-preview.html --heading "A real headline from the brand"
+```
+
+The page shows each candidate on the same sample, with its swatches and the contrast of its declared pairs, failures included. Give the user the file to open in a browser. To look at it yourself, render it to an image with whatever screenshot or rendering tool is available.
 
 ### 2. Generate the ramps
 
@@ -79,6 +87,7 @@ State, in a few lines:
 3. The contrast script output, pasted in full
 4. The usage rules
 5. `palette.json`, so the check can be repeated
+6. The preview page the user chose from
 
 ## Quality checks
 

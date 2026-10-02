@@ -2,9 +2,9 @@
 name: typography-system
 description: Chooses brand typefaces and builds the type system around them, covering selection against brand attributes, pairing, a modular type scale, weights, fallback stacks, language coverage and a license check for every font. Use when the user asks for brand fonts, a font pairing, a typeface recommendation, a type scale, heading and body sizes, or whether a font is licensed for their use.
 license: MIT
-compatibility: The bundled script needs Node.js 18 or later. It has no dependencies and needs no network access.
+compatibility: The bundled scripts need Node.js 18 or later and have no dependencies. The preview page loads web fonts from the stylesheet you give it, which needs network access when the page is opened.
 metadata:
-  version: "0.1.1"
+  version: "0.2.0"
   author: aiudalabs
 ---
 
@@ -31,7 +31,16 @@ Start from the brief, not from a list. Take the typeface structure the visual di
 
 [references/font-pairings.csv](references/font-pairings.csv) lists 74 pairings of freely available fonts by mood and typical industry. Use it to widen the shortlist, for example with `grep -i "editorial" references/font-pairings.csv`. It is organized by what each pairing is commonly used for, so it mostly tells you what a category already looks like. If the brief says to break a category convention, a pairing listed as typical for that category is the wrong pick.
 
-Show the candidates set in the brand's own words and colors, at heading, body and table sizes, with accented characters from every language in the brief. A rendered comparison is worth more than a description.
+Show the candidates set in the brand's own words and colors, with accented characters from every language in the brief. A rendered comparison is worth more than a description:
+
+```bash
+node scripts/type-preview.mjs --font "Family One" --font "Family Two" \
+  --font-css "https://fonts.example/css?family=..." \
+  --heading "A real headline from the brand" --accents "ñ á é ü ¿ ¡" \
+  --background "#faf8f4" --text "#1a1a1a" --out type-preview.html
+```
+
+Each candidate gets the same heading, body text, table of numbers, accents and weights. Pass the stylesheet that loads the fonts with `--font-css`; a family that does not load shows a fallback font without any warning, so check that the columns really differ. Give the user the file to open in a browser. To look at it yourself, render it to an image with whatever screenshot or rendering tool is available.
 
 Present two or three candidates, each tied to a brand attribute, and let the user choose.
 

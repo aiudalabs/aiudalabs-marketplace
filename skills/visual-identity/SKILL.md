@@ -3,7 +3,7 @@ name: visual-identity
 description: Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, logo, design tokens, asset kit and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   author: aiudalabs
   requires: brand-strategy-brief color-system typography-system logo-direction design-tokens brand-asset-kit brand-guidelines
 ---
@@ -41,7 +41,7 @@ Stages 4 and 6 depend on scope. If the user already has a logo, stage 4 records 
 1. Follow the stage's skill completely. Do not improvise a shorter version of it.
 2. Pass forward what earlier stages decided. Stages 2, 3 and 4 take the attributes and visual direction from the brief. Stage 4 also takes the colors and typefaces. Stage 5 takes the values from stages 2 and 3. Stage 6 takes the logo and the colors. Stage 7 takes everything.
 3. Save the stage's output to the brand folder.
-4. Show the user the result and the decision you need from them. Wait for it. Do not start the next stage on an assumed yes.
+4. Show the user the result and the decision you need from them. Where the stage's skill has a preview or review script (color, typography, logo), build it and give the user the file, so they choose by looking. Wait for the decision. Do not start the next stage on an assumed yes.
 
 If the user changes an earlier decision later, go back: redo that stage and every stage that used its output. A new primary color means new ramps, a new contrast check, new tokens and an updated guide.
 

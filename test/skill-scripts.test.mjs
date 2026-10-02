@@ -148,3 +148,35 @@ test('render-assets: validates the manifest and reports readiness without writin
   const badSize = tempFile(t, 'bad2.json', { assets: [{ name: 'icon', source: 'bad2.json', width: 0, height: 64 }] });
   assert.equal(run('brand-asset-kit', 'render-assets.mjs', badSize).status, 2);
 });
+
+test('palette-preview: shows each candidate with its pair results', (t) => {
+  const palette = { colors: { background: '#ffffff', text: '#1a1a1a', action: '#999999', 'on-action': '#ffffff' }, pairs: [{ foreground: 'text', background: 'background', use: 'text' }, { foreground: 'on-action', background: 'action', use: 'text' }] };
+  const first = tempFile(t, 'one.palette.json', palette);
+  const second = tempFile(t, 'two.palette.json', palette);
+  const out = join(first, '..', 'preview.html');
+
+  const result = run('color-system', 'palette-preview.mjs', first, second, '--out', out, '--heading', 'Real <headline>');
+  assert.equal(result.status, 0);
+  const html = readFileSync(out, 'utf8');
+  assert.equal(html.match(/<section/g).length, 2);
+  assert.match(html, /Real &lt;headline&gt;/);
+  assert.match(html, /text on background<\/td><td>17\.40:1<\/td><td>pass/);
+  assert.match(html, /on-action on action<\/td><td>2\.85:1<\/td><td><b>FAIL<\/b>/);
+
+  const noRoles = tempFile(t, 'bad.palette.json', { colors: { bg: '#ffffff', ink: '#000000' } });
+  assert.equal(run('color-system', 'palette-preview.mjs', noRoles).status, 2);
+});
+
+test('type-preview: one column per family, with the stylesheet and escaped text', (t) => {
+  const out = join(tempFile(t, 'placeholder.txt', ''), '..', 'type.html');
+  const result = run('typography-system', 'type-preview.mjs', '--font', 'Family One', '--font', 'Family Two', '--font-css', 'https://fonts.example/css?family=One', '--heading', '¿Qué <tal>?', '--out', out);
+  assert.equal(result.status, 0);
+  const html = readFileSync(out, 'utf8');
+  assert.equal(html.match(/<section/g).length, 2);
+  assert.match(html, /font-family:'Family One',sans-serif/);
+  assert.match(html, /<link rel="stylesheet" href="https:\/\/fonts\.example\/css\?family=One">/);
+  assert.match(html, /¿Qué &lt;tal&gt;\?/);
+
+  assert.equal(run('typography-system', 'type-preview.mjs', '--heading', 'no fonts').status, 2);
+  assert.equal(run('typography-system', 'type-preview.mjs', '--font', 'X', '--ratio', '1').status, 2);
+});

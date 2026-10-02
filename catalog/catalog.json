@@ -115,7 +115,7 @@
     {
       "name": "color-system",
       "description": "Builds a complete brand color system from one or two chosen colors, covering perceptually even tonal ramps, tinted neutrals, semantic and role colors, dark mode, and a WCAG 2.2 contrast check of every text and background pairing. Use when the user asks for a color palette, brand colors, color scheme, shades or tints of a color, dark mode colors, or wants to check the contrast or accessibility of colors.",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/color-system",
@@ -126,7 +126,8 @@
         "references/color-roles.md",
         "scripts/color-lib.mjs",
         "scripts/color-ramp.mjs",
-        "scripts/contrast.mjs"
+        "scripts/contrast.mjs",
+        "scripts/palette-preview.mjs"
       ]
     },
     {
@@ -222,7 +223,7 @@
     {
       "name": "typography-system",
       "description": "Chooses brand typefaces and builds the type system around them, covering selection against brand attributes, pairing, a modular type scale, weights, fallback stacks, language coverage and a license check for every font. Use when the user asks for brand fonts, a font pairing, a typeface recommendation, a type scale, heading and body sizes, or whether a font is licensed for their use.",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "path": "skills/typography-system",
@@ -232,13 +233,14 @@
         "references/font-licensing.md",
         "references/font-pairings.csv",
         "references/selection-and-pairing.md",
+        "scripts/type-preview.mjs",
         "scripts/type-scale.mjs"
       ]
     },
     {
       "name": "visual-identity",
       "description": "Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, logo, design tokens, asset kit and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "requires": [
         "brand-strategy-brief",
