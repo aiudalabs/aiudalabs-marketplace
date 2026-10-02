@@ -24,8 +24,13 @@ Skills follow progressive disclosure: a harness loads only `name` and `descripti
 | Type | Name | Description |
 | --- | --- | --- |
 | Agent | [`brand-guardian`](agents/design/brand-guardian.md) | Brand strategist and identity steward |
+| Agent | [`positioning-red-team`](agents/strategy/positioning-red-team.md) | Adversarial positioning advisor for startups |
 | Skill | [`startup-visual-identity`](skills/startup-visual-identity/SKILL.md) | Builds a first visual identity and delivers a brand guide with design tokens |
-| Stack | [`brand-starter`](stacks/brand-starter/stack.json) | The agent and the skill above, installed together |
+| Skill | [`startup-positioning-audit`](skills/startup-positioning-audit/SKILL.md) | Full adversarial positioning and launch-readiness audit, scored out of 60 |
+| Skill | [`homepage-copy-audit`](skills/homepage-copy-audit/SKILL.md) | Audits a homepage for clarity and conversion and delivers replacement copy |
+| Skill | [`competitor-research`](skills/competitor-research/SKILL.md) | Maps the competitive landscape and delivers a sourced competitor brief |
+| Stack | [`brand-starter`](stacks/brand-starter/stack.json) | `brand-guardian` with `startup-visual-identity` |
+| Stack | [`launch-readiness`](stacks/launch-readiness/stack.json) | `positioning-red-team` with the three audit and research skills |
 
 The machine-readable index is [`catalog/catalog.json`](catalog/catalog.json). It is generated, and CI fails when it is stale.
 
@@ -42,7 +47,7 @@ npx github:aiudalabs/aiudalabs-marketplace harnesses
 npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness claude-code
 ```
 
-Useful flags: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses.
+Useful flags: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, and installing a skill also installs the skills it requires.
 
 ### Claude Code
 

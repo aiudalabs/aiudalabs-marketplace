@@ -1,0 +1,7 @@
+{
+  "name": "launch-readiness",
+  "description": "Pressure-test a startup before launch: the Positioning Red Team persona plus the positioning audit, homepage copy audit and competitor research skills.",
+  "version": "0.1.0",
+  "agents": ["positioning-red-team"],
+  "skills": ["startup-positioning-audit", "homepage-copy-audit", "competitor-research"]
+}

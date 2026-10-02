@@ -41,10 +41,28 @@ skills/<name>/
 | `description` | Yes | 1 to 1024 characters. Say what the skill does and when to use it. This is all a harness sees at discovery time. |
 | `license` | No | License name or a reference to a bundled license file. |
 | `compatibility` | No | Up to 500 characters on environment requirements. |
-| `metadata` | Yes (for `version`) | Map of string keys to string values. `metadata.version` is required here and must be semver, quoted: `"0.1.0"`. |
+| `metadata` | Yes (for `version`) | Map of string keys to string values. `metadata.version` is required here and must be semver, quoted: `"0.1.0"`. `metadata.requires` is optional, see below. |
 | `allowed-tools` | No | Space-delimited string. Experimental in the specification. |
 
 Any other top-level field is an error. The specification has no top-level `version`, which is why the version lives in `metadata`.
+
+### Skill dependencies
+
+A skill that hands part of its work to another skill declares it in `metadata.requires`, as a space-delimited list of skill names from this repository:
+
+```yaml
+metadata:
+  version: "0.1.0"
+  requires: homepage-copy-audit competitor-research
+```
+
+The installer adds required skills automatically, and the validator fails on names that do not exist. Each skill is installed as its own folder, so refer to a required skill by name in the instructions ("follow the `competitor-research` skill"). Do not link to files inside another skill's folder.
+
+Use this sparingly. A skill should still say what to do when a required skill is missing.
+
+### Evals
+
+A skill may include `evals/evals.json` with test prompts and expected outputs. The folder is optional and the validator does not check its contents yet.
 
 ### Body
 

@@ -20,6 +20,21 @@
       "agents": [
         "./agents/design/brand-guardian.md"
       ]
+    },
+    {
+      "name": "launch-readiness",
+      "description": "Pressure-test a startup before launch: the Positioning Red Team persona plus the positioning audit, homepage copy audit and competitor research skills.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/startup-positioning-audit",
+        "./skills/homepage-copy-audit",
+        "./skills/competitor-research"
+      ],
+      "agents": [
+        "./agents/strategy/positioning-red-team.md"
+      ]
     }
   ]
 }

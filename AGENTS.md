@@ -43,6 +43,7 @@ CI runs the last two and fails when generated files are stale.
 - **Do not edit generated files by hand**: `catalog/catalog.json` and `.claude-plugin/marketplace.json`.
 - **Do not invent harness paths or config fields.** Adapter paths come from vendor documentation, with the link recorded in the adapter file and in `adapters/README.md`.
 - **Do not add top-level frontmatter fields to skills.** The specification allows only `name`, `description`, `license`, `compatibility`, `metadata` and `allowed-tools`. Put extras under `metadata`.
+- **Skills are self-contained.** Never link to files in another skill's folder. If a skill needs another one, declare it in `metadata.requires` and refer to it by name.
 - **Stay inside the frontmatter subset** described in `docs/component-formats.md`. Quote any value that contains `: ` or ` #`.
 - **Names are lowercase-hyphenated** and must match the folder name (skills, stacks) or file name (agents).
 

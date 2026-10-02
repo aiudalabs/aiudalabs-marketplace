@@ -60,27 +60,42 @@ function skillFixture(data, body = 'Instructions.') {
 
 test('validateSkill: accepts a spec-compliant skill', () => {
   const skill = skillFixture({ name: 'demo-skill', description: 'Does a thing. Use when asked.', metadata: { version: '1.0.0' } });
-  assert.deepEqual(validateSkill(skill), []);
+  assert.deepEqual(validateSkill(skill, new Set()), []);
 });
 
 test('validateSkill: enforces the Agent Skills naming and field rules', () => {
-  const badName = (name) => errorsOf(validateSkill(skillFixture({ name, description: 'x', metadata: { version: '1.0.0' } })));
+  const badName = (name) => errorsOf(validateSkill(skillFixture({ name, description: 'x', metadata: { version: '1.0.0' } }), new Set()));
   assert.ok(badName('Demo-Skill').length > 0, 'uppercase');
   assert.ok(badName('demo--skill').length > 0, 'consecutive hyphens');
   assert.ok(badName('-demo-skill').length > 0, 'leading hyphen');
   assert.ok(badName('other-name').length > 0, 'does not match folder');
 
   const tooLong = skillFixture({ name: 'demo-skill', description: 'x'.repeat(1025), metadata: { version: '1.0.0' } });
-  assert.match(errorsOf(validateSkill(tooLong)).join(), /longer than 1024/);
+  assert.match(errorsOf(validateSkill(tooLong, new Set())).join(), /longer than 1024/);
 
   const unknownField = skillFixture({ name: 'demo-skill', description: 'x', version: '1.0.0', metadata: { version: '1.0.0' } });
-  assert.match(errorsOf(validateSkill(unknownField)).join(), /unknown field `version`/);
+  assert.match(errorsOf(validateSkill(unknownField, new Set())).join(), /unknown field `version`/);
 
   const noVersion = skillFixture({ name: 'demo-skill', description: 'x' });
-  assert.match(errorsOf(validateSkill(noVersion)).join(), /metadata\.version/);
+  assert.match(errorsOf(validateSkill(noVersion, new Set())).join(), /metadata\.version/);
 
   const brokenLink = skillFixture({ name: 'demo-skill', description: 'x', metadata: { version: '1.0.0' } }, 'See [ref](references/missing-file.md).');
-  assert.match(errorsOf(validateSkill(brokenLink)).join(), /missing file/);
+  assert.match(errorsOf(validateSkill(brokenLink, new Set())).join(), /missing file/);
+});
+
+test('validateSkill: metadata.requires must name other existing skills', () => {
+  const withRequires = (requires) => skillFixture({ name: 'demo-skill', description: 'x', metadata: { version: '1.0.0', requires } });
+  const known = new Set(['demo-skill', 'other-skill']);
+  assert.deepEqual(validateSkill(withRequires('other-skill'), known), []);
+  assert.match(errorsOf(validateSkill(withRequires('missing-skill'), known)).join(), /unknown skill "missing-skill"/);
+  assert.match(errorsOf(validateSkill(withRequires('demo-skill'), known)).join(), /cannot list the skill itself/);
+});
+
+test('expand: a skill brings the skills it requires', () => {
+  const components = loadAll();
+  const { agents, skills } = expand([resolveReference('skill/startup-positioning-audit', components)], components);
+  assert.deepEqual(agents, []);
+  assert.deepEqual(skills.map((skill) => skill.id).sort(), ['competitor-research', 'homepage-copy-audit', 'startup-positioning-audit']);
 });
 
 test('validateAgent: requires known skills and a matching file name', () => {

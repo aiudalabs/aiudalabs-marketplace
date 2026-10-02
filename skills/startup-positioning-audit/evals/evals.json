@@ -1,0 +1,23 @@
+{
+  "skill_name": "startup-positioning-audit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Red team this AI consulting website copy and tell me why it won't convert:\n\nHeadline: Transforming businesses with intelligent AI solutions\nSubheadline: We help companies leverage cutting-edge artificial intelligence to drive growth and operational efficiency.\nServices: AI Strategy, Machine Learning, Process Automation, AI Training\nCTA: Contact Us\nAbout: Our team of experts has years of experience delivering AI solutions across industries.\n\nWe're targeting operations managers at manufacturing companies in Brazil. Pre-launch, 3 pilot clients done, no case studies published yet.",
+      "expected_output": "Adversarial critique identifying specific failures in hero copy, ICP clarity, offer design, jargon, missing proof, and unaddressed objections. Must include specific rewrite suggestions for headline, subheadline, and CTA.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Audit my startup homepage before launch. Here's everything about my company:\n\nName: FlowAI (fictional)\nWhat we do: WhatsApp automation for small retail businesses in Mexico — automated order confirmations, inventory alerts, customer service bots\nTarget: Owner-operators of small retail stores (5-50 employees) who use WhatsApp to manage orders\nOffer: MX$299/month subscription (after a free 2-week trial)\nCurrently: Pre-launch, no clients yet, but have a working product\nCompetitors: We think it's mainly manual WhatsApp management and maybe Twilio-based DIY solutions\nMain concern: Is our positioning clear enough and will the trial CTA convert?",
+      "expected_output": "Full audit including ICP analysis (owner-operator vs. employee split), offer evaluation (subscription pricing for this ICP), competitive assessment of WhatsApp automation landscape in Mexico, specific headline/CTA recommendations, and launch readiness score out of 60.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I haven't built my website yet. Company: DataMente. We help retail companies in Brazil automate their inventory reporting using AI. We serve operations directors at retail chains with 10-50 stores. Main offer: a 6-week implementation sprint. Two clients so far, no documented case studies. Audit my positioning before I write a single word of copy.",
+      "expected_output": "Positioning audit that works without a website: category, ICP and offer analysis, labeled assumptions for everything not stated, a recommended positioning statement and hero copy, and a launch readiness score out of 60. Competitive claims labeled as assumptions unless research was run.",
+      "files": []
+    }
+  ]
+}

@@ -17,14 +17,89 @@
         "identity"
       ],
       "path": "agents/design/brand-guardian.md"
+    },
+    {
+      "name": "positioning-red-team",
+      "description": "Adversarial positioning advisor for startups. Use when a founder wants their positioning, homepage, offer or launch plan pressure-tested by someone who will not be polite about it, or wants to know why their site is not converting.",
+      "version": "0.1.0",
+      "category": "strategy",
+      "skills": [
+        "startup-positioning-audit",
+        "homepage-copy-audit",
+        "competitor-research"
+      ],
+      "tags": [
+        "strategy",
+        "positioning",
+        "marketing",
+        "launch",
+        "b2b"
+      ],
+      "path": "agents/strategy/positioning-red-team.md"
     }
   ],
   "skills": [
+    {
+      "name": "competitor-research",
+      "description": "Maps the competitive landscape for a startup or B2B offer, covering direct, indirect and status-quo competitors, their messaging, pricing signals, vulnerabilities and white space, and delivers a sourced competitor brief. Use when the user asks who their competitors are, wants a competitor analysis, competitive intelligence, alternatives research, a pricing benchmark or a differentiation map.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/competitor-research",
+      "files": [
+        "SKILL.md",
+        "assets/competitor-research-brief.md",
+        "references/competitor-analysis-framework.md",
+        "scripts/perplexity_research.py"
+      ]
+    },
+    {
+      "name": "homepage-copy-audit",
+      "description": "Audits a homepage or landing page for clarity and conversion, covering the 5-second test, hero, CTA, message hierarchy, proof, jargon, trust signals and friction, and delivers replacement copy with at least three hero variants. Use when the user asks to review, critique, roast or rewrite a homepage, landing page, hero section, headline or CTA, or asks why a page does not convert.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/homepage-copy-audit",
+      "files": [
+        "SKILL.md",
+        "assets/homepage-rewrite-template.md",
+        "references/homepage-audit-framework.md",
+        "scripts/extract_site_text.py"
+      ]
+    },
+    {
+      "name": "startup-positioning-audit",
+      "description": "Runs a full adversarial positioning and launch-readiness audit of a startup, covering category, ICP, offer, claims, credibility, buyer objections, competitive risk and traction, and delivers a 21-section report with a 12-dimension score out of 60. Use when the user asks to audit, red team or pressure-test their startup positioning, messaging, value proposition, ICP or offer, or asks whether they are ready to launch. Built for B2B AI, SaaS, consulting and services companies.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "homepage-copy-audit",
+        "competitor-research"
+      ],
+      "path": "skills/startup-positioning-audit",
+      "files": [
+        "SKILL.md",
+        "assets/audit-report-template.md",
+        "assets/executive-summary-template.md",
+        "assets/launch-readiness-template.md",
+        "assets/scoring-matrix-template.md",
+        "evals/evals.json",
+        "references/icp-framework.md",
+        "references/offer-design-framework.md",
+        "references/positioning-framework.md",
+        "references/red-team-objections.md",
+        "references/sample-input.md",
+        "references/sample-output.md",
+        "references/scoring-rubric.md",
+        "references/traction-hypotheses-framework.md"
+      ]
+    },
     {
       "name": "startup-visual-identity",
       "description": "Builds a first visual identity for a startup or new product, covering brand attributes, color palette, typography, logo direction and design tokens, and delivers a short brand guide. Use when the user asks for a brand identity, visual identity, brand guide, color palette, font pairing or logo direction for a new company, product or side project.",
       "version": "0.1.0",
       "license": "MIT",
+      "requires": [],
       "path": "skills/startup-visual-identity",
       "files": [
         "SKILL.md",
@@ -48,6 +123,20 @@
         "startup-visual-identity"
       ],
       "path": "stacks/brand-starter/stack.json"
+    },
+    {
+      "name": "launch-readiness",
+      "description": "Pressure-test a startup before launch: the Positioning Red Team persona plus the positioning audit, homepage copy audit and competitor research skills.",
+      "version": "0.1.0",
+      "agents": [
+        "positioning-red-team"
+      ],
+      "skills": [
+        "startup-positioning-audit",
+        "homepage-copy-audit",
+        "competitor-research"
+      ],
+      "path": "stacks/launch-readiness/stack.json"
     }
   ]
 }
