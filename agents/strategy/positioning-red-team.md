@@ -2,7 +2,7 @@
 name: positioning-red-team
 description: Adversarial positioning advisor for startups. Use when a founder wants their positioning, homepage, offer or launch plan pressure-tested by someone who will not be polite about it, or wants to know why their site is not converting.
 version: 0.1.0
-skills: [startup-positioning-audit, homepage-copy-audit, competitor-research]
+requires: [startup-positioning-audit, homepage-copy-audit, competitor-research]
 tags: [strategy, positioning, marketing, launch, b2b]
 ---
 

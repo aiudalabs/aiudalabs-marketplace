@@ -35,7 +35,7 @@ If your idea is both a persona and a procedure, submit both: a short agent that 
 ## Add an agent
 
 1. Create `agents/<category>/<name>.md`. Reuse an existing category when one fits.
-2. Fill in `name`, `description`, `version`, and `skills` if it uses any.
+2. Fill in `name`, `description`, `version`, and `requires` if it uses any skills. Name the same skills in the body's "Skills" section, since that text is how the agent knows to load them.
 3. Write the persona using the sections in [docs/component-formats.md](docs/component-formats.md).
 4. Describe tools by capability ("file search", "script execution"), not by one harness's tool names.
 

@@ -1,5 +1,7 @@
 // Claude Code: https://code.claude.com/docs/en/skills and /sub-agents
-// Subagents accept a `skills` list, so the persona's skills are wired natively.
+// The subagent `skills` field is deliberately not written: it injects the full
+// content of every listed skill at startup. Without it the subagent still
+// discovers installed skills and loads them on demand.
 
 import { markdownAgent } from './shared.mjs';
 
@@ -8,8 +10,5 @@ export default {
   label: 'Claude Code',
   skillsDir: { project: '.claude/skills', global: '.claude/skills' },
   agentsDir: { project: '.claude/agents', global: '.claude/agents' },
-  renderAgent(agent) {
-    const skills = agent.data.skills ?? [];
-    return markdownAgent(agent, { extra: skills.length > 0 ? { skills } : {} });
-  },
+  renderAgent: (agent) => markdownAgent(agent),
 };

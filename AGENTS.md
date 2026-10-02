@@ -44,6 +44,7 @@ CI runs the last two and fails when generated files are stale.
 - **Do not invent harness paths or config fields.** Adapter paths come from vendor documentation, with the link recorded in the adapter file and in `adapters/README.md`.
 - **Do not add top-level frontmatter fields to skills.** The specification allows only `name`, `description`, `license`, `compatibility`, `metadata` and `allowed-tools`. Put extras under `metadata`.
 - **Skills are self-contained.** Never link to files in another skill's folder. If a skill needs another one, declare it in `metadata.requires` and refer to it by name.
+- **Agents declare skills with `requires`, never `skills`.** Claude Code reads a `skills` field as "preload the full content of these skills", which defeats progressive disclosure.
 - **Stay inside the frontmatter subset** described in `docs/component-formats.md`. Quote any value that contains `: ` or ` #`.
 - **Names are lowercase-hyphenated** and must match the folder name (skills, stacks) or file name (agents).
 
@@ -74,7 +75,7 @@ CI runs the last two and fails when generated files are stale.
 
 **Add a skill**: create `skills/<name>/SKILL.md`, keep the body under 500 lines, move detail to `references/`, then run the three commands above.
 
-**Add an agent**: create `agents/<category>/<name>.md`, list its skills in `skills`, keep the body a persona.
+**Add an agent**: create `agents/<category>/<name>.md`, list its skills in `requires` and name them in the body's "Skills" section, keep the body a persona.
 
 **Add a stack**: create `stacks/<name>/stack.json` listing existing agents and skills.
 

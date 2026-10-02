@@ -101,10 +101,11 @@ test('expand: a skill brings the skills it requires', () => {
 test('validateAgent: requires known skills and a matching file name', () => {
   const agent = {
     type: 'agent', id: 'demo-agent', category: 'design', path: 'agents/design/demo-agent.md', error: null, body: 'Persona.',
-    data: { name: 'demo-agent', description: 'A persona.', version: '0.1.0', skills: ['missing-skill'] },
+    data: { name: 'demo-agent', description: 'A persona.', version: '0.1.0', requires: ['missing-skill'] },
   };
   assert.match(errorsOf(validateAgent(agent, new Set())).join(), /unknown skill "missing-skill"/);
-  assert.deepEqual(validateAgent(agent, new Set(['missing-skill'])), []);
+  assert.match(errorsOf(validateAgent(agent, new Set(['missing-skill']))).join(), /not named in the body/);
+  assert.deepEqual(validateAgent({ ...agent, body: 'Persona. Load `missing-skill` when needed.' }, new Set(['missing-skill'])), []);
 });
 
 test('repository components are valid', () => {
@@ -119,7 +120,7 @@ test('resolveReference: bare, qualified and unknown names', () => {
   assert.throws(() => resolveReference('widget/brand-guardian', components), InstallError);
 });
 
-test('expand: an agent brings the skills it uses', () => {
+test('expand: an agent brings the skills it requires', () => {
   const components = loadAll();
   const { agents, skills } = expand([resolveReference('agent/brand-guardian', components)], components);
   assert.deepEqual(agents.map((agent) => agent.id), ['brand-guardian']);
@@ -152,7 +153,7 @@ test('adapters render agents in each harness format', () => {
 
   const claude = getAdapter('claude-code').renderAgent(agent);
   assert.equal(claude.fileName, 'brand-guardian.md');
-  assert.deepEqual(parseFrontmatter(claude.content).data.skills, ['startup-visual-identity']);
+  assert.deepEqual(Object.keys(parseFrontmatter(claude.content).data), ['name', 'description'], 'no `skills` field: it would preload every skill');
 
   assert.equal(getAdapter('copilot').renderAgent(agent).fileName, 'brand-guardian.agent.md');
 

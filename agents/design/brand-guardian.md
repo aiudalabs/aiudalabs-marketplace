@@ -2,7 +2,7 @@
 name: brand-guardian
 description: Brand strategist and identity steward. Use when defining a brand from scratch, reviewing designs or copy for brand consistency, or deciding whether a new asset is on-brand.
 version: 0.1.0
-skills: [startup-visual-identity]
+requires: [startup-visual-identity]
 tags: [design, brand, identity]
 ---
 

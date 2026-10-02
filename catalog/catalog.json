@@ -8,7 +8,7 @@
       "description": "Brand strategist and identity steward. Use when defining a brand from scratch, reviewing designs or copy for brand consistency, or deciding whether a new asset is on-brand.",
       "version": "0.1.0",
       "category": "design",
-      "skills": [
+      "requires": [
         "startup-visual-identity"
       ],
       "tags": [
@@ -23,7 +23,7 @@
       "description": "Adversarial positioning advisor for startups. Use when a founder wants their positioning, homepage, offer or launch plan pressure-tested by someone who will not be polite about it, or wants to know why their site is not converting.",
       "version": "0.1.0",
       "category": "strategy",
-      "skills": [
+      "requires": [
         "startup-positioning-audit",
         "homepage-copy-audit",
         "competitor-research"

@@ -8,7 +8,7 @@ Project paths are relative to the project root. Global paths are relative to the
 
 | Harness | Id | Skills (project) | Skills (global) | Agents (project) | Agents (global) | Agent format |
 | --- | --- | --- | --- | --- | --- | --- |
-| Claude Code | `claude-code` | `.claude/skills/` | `.claude/skills/` | `.claude/agents/` | `.claude/agents/` | `<name>.md` with `name`, `description`, `skills` |
+| Claude Code | `claude-code` | `.claude/skills/` | `.claude/skills/` | `.claude/agents/` | `.claude/agents/` | `<name>.md` with `name`, `description` |
 | Cursor | `cursor` | `.cursor/skills/` | `.cursor/skills/` | `.cursor/agents/` | `.cursor/agents/` | `<name>.md` with `name`, `description` |
 | OpenAI Codex CLI | `codex` | `.agents/skills/` | `.agents/skills/` | `.codex/agents/` | `.codex/agents/` | `<name>.toml` with `name`, `description`, `developer_instructions` |
 | Gemini CLI | `gemini-cli` | `.gemini/skills/` | `.gemini/skills/` | `.gemini/agents/` | `.gemini/agents/` | `<name>.md` with `name`, `description` |
@@ -25,6 +25,14 @@ These paths were taken from each vendor's documentation on 2026-10-01. Sources:
 - OpenCode: <https://opencode.ai/docs/skills/>, <https://opencode.ai/docs/agents/>
 - GitHub Copilot: <https://docs.github.com/en/copilot/reference/custom-agents-configuration>, <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
 - Osaurus: <https://github.com/osaurus-ai/osaurus> (`docs/SKILLS.md`)
+
+## How agents reach their skills
+
+Rendered agents carry only what each harness needs to register them. None of them gets a list of skills in its frontmatter. An agent names its skills in the "Skills" section of its body, and the harness finds them because the installer always copies an agent's required skills next to it.
+
+This is deliberate for Claude Code, whose subagent `skills` field injects the full content of every listed skill at startup. Leaving it out keeps progressive disclosure: only the `name` and `description` of each skill are in context until one is needed. For the same reason the canonical field is called `requires`, so Claude Code does not read it as `skills` when a stack is installed as a plugin.
+
+Codex (`skills.config`) and OpenCode (`permission.skill`) can enable, disable or restrict skills per agent. The adapters do not use those settings.
 
 ## What has been tested
 

@@ -55,7 +55,7 @@ Useful flags: `--global` installs for your user instead of the project, `--dry-r
 npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness claude-code
 ```
 
-This writes the skill to `.claude/skills/startup-visual-identity/` and the agent to `.claude/agents/brand-guardian.md`. The agent's `skills` field is set, so Claude Code makes the skill available to the subagent.
+This writes the skill to `.claude/skills/startup-visual-identity/` and the agent to `.claude/agents/brand-guardian.md`. The agent loads the skill on demand, by name.
 
 You can also add the repository as a plugin marketplace, where each stack is a plugin:
 

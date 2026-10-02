@@ -10,7 +10,7 @@ The tooling has no dependencies, so it reads a strict subset of YAML:
 name: plain-value
 description: "Quote any value that contains a colon followed by a space, or a hash"
 tags: [inline, list]
-skills:
+requires:
   - block-list
 metadata:
   version: "0.1.0"
@@ -90,7 +90,7 @@ An agent is one Markdown file at `agents/<category>/<name>.md`. It describes a p
 | `name` | Yes | Same naming rule as skills. Must equal the file name without `.md`. Unique across all categories. |
 | `description` | Yes | 1 to 1024 characters. Who the agent is and when to delegate to it. |
 | `version` | Yes | Semver. |
-| `skills` | No | List of skill names from this repository that the agent uses. |
+| `requires` | No | List of skill names from this repository that the agent uses. The installer copies them with the agent. |
 | `tags` | No | List of free-form tags for the catalog. |
 
 Any other field is an error.
@@ -104,7 +104,7 @@ Recommended sections, as used by [`brand-guardian`](../agents/design/brand-guard
 3. **How you work**: principles and priorities, not steps
 4. **Communication style**
 5. **Preferred tools**: described by capability, such as "file search" or "script execution", so the persona stays portable across harnesses
-6. **Skills**: which skills to load and when
+6. **Skills**: which skills to load and when. Repeat every name from `requires` here: the frontmatter list is for the installer, and this section is what the agent reads. The validator fails when a required skill is not named in the body
 7. **Success metrics**: observable outcomes
 8. **Boundaries**: what the agent refuses or hands off
 
