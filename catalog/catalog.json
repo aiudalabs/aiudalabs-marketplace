@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "name": "aiudalabs-marketplace",
+  "version": "0.1.0",
+  "agents": [
+    {
+      "name": "brand-guardian",
+      "description": "Brand strategist and identity steward. Use when defining a brand from scratch, reviewing designs or copy for brand consistency, or deciding whether a new asset is on-brand.",
+      "version": "0.1.0",
+      "category": "design",
+      "skills": [
+        "startup-visual-identity"
+      ],
+      "tags": [
+        "design",
+        "brand",
+        "identity"
+      ],
+      "path": "agents/design/brand-guardian.md"
+    }
+  ],
+  "skills": [
+    {
+      "name": "startup-visual-identity",
+      "description": "Builds a first visual identity for a startup or new product, covering brand attributes, color palette, typography, logo direction and design tokens, and delivers a short brand guide. Use when the user asks for a brand identity, visual identity, brand guide, color palette, font pairing or logo direction for a new company, product or side project.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "path": "skills/startup-visual-identity",
+      "files": [
+        "SKILL.md",
+        "assets/brand-brief-template.md",
+        "assets/design-tokens.template.json",
+        "references/color-systems.md",
+        "references/typography-pairing.md",
+        "scripts/contrast-check.mjs"
+      ]
+    }
+  ],
+  "stacks": [
+    {
+      "name": "brand-starter",
+      "description": "Everything needed to define and protect a first brand identity: the Brand Guardian persona plus the visual identity procedure.",
+      "version": "0.1.0",
+      "agents": [
+        "brand-guardian"
+      ],
+      "skills": [
+        "startup-visual-identity"
+      ],
+      "path": "stacks/brand-starter/stack.json"
+    }
+  ]
+}

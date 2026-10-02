@@ -1,0 +1,7 @@
+{
+  "name": "brand-starter",
+  "description": "Everything needed to define and protect a first brand identity: the Brand Guardian persona plus the visual identity procedure.",
+  "version": "0.1.0",
+  "agents": ["brand-guardian"],
+  "skills": ["startup-visual-identity"]
+}

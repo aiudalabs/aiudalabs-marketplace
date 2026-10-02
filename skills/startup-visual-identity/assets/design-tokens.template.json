@@ -1,0 +1,34 @@
+{
+  "color": {
+    "primary": "REPLACE_ME",
+    "accent": "REPLACE_ME",
+    "neutral": {
+      "50": "REPLACE_ME",
+      "100": "REPLACE_ME",
+      "300": "REPLACE_ME",
+      "500": "REPLACE_ME",
+      "700": "REPLACE_ME",
+      "900": "REPLACE_ME"
+    },
+    "semantic": {
+      "success": "REPLACE_ME",
+      "warning": "REPLACE_ME",
+      "error": "REPLACE_ME"
+    }
+  },
+  "font": {
+    "heading": { "family": "REPLACE_ME", "fallback": "REPLACE_ME", "weight": "REPLACE_ME" },
+    "body": { "family": "REPLACE_ME", "fallback": "REPLACE_ME", "weight": "REPLACE_ME" }
+  },
+  "typeScale": {
+    "base": "REPLACE_ME",
+    "ratio": "REPLACE_ME",
+    "steps": {
+      "caption": "REPLACE_ME",
+      "body": "REPLACE_ME",
+      "h3": "REPLACE_ME",
+      "h2": "REPLACE_ME",
+      "h1": "REPLACE_ME"
+    }
+  }
+}

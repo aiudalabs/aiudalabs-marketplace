@@ -1,0 +1,25 @@
+{
+  "name": "aiudalabs-marketplace",
+  "owner": {
+    "name": "Aiuda Labs"
+  },
+  "metadata": {
+    "description": "Multi-harness marketplace of AI agents, skills, workflows and MCPs.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "brand-starter",
+      "description": "Everything needed to define and protect a first brand identity: the Brand Guardian persona plus the visual identity procedure.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/startup-visual-identity"
+      ],
+      "agents": [
+        "./agents/design/brand-guardian.md"
+      ]
+    }
+  ]
+}

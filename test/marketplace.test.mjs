@@ -1,0 +1,163 @@
+import assert from 'node:assert/strict';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { test } from 'node:test';
+import { adapters, getAdapter } from '../adapters/index.mjs';
+import { loadAll } from '../lib/components.mjs';
+import { FrontmatterError, parseFrontmatter, stringifyFrontmatter } from '../lib/frontmatter.mjs';
+import { InstallError, applyInstall, expand, planInstall, resolveReference } from '../lib/install.mjs';
+import { validateAgent, validateAll, validateSkill } from '../lib/validate.mjs';
+
+const doc = (frontmatter, body = 'Body.') => `---\n${frontmatter}\n---\n\n${body}\n`;
+const errorsOf = (issues) => issues.filter((issue) => issue.level === 'error').map((issue) => issue.message);
+
+test('frontmatter: parses scalars, lists, maps and block scalars', () => {
+  const { data, body } = parseFrontmatter(doc([
+    'name: demo',
+    'quoted: "has: colon"',
+    "single: 'it''s'",
+    'inline: [a, "b c"]',
+    'block:',
+    '  - one',
+    '  - two',
+    'metadata:',
+    '  version: "0.1.0"',
+    'folded: >',
+    '  first line',
+    '  second line',
+  ].join('\n')));
+
+  assert.deepEqual(data, {
+    name: 'demo',
+    quoted: 'has: colon',
+    single: "it's",
+    inline: ['a', 'b c'],
+    block: ['one', 'two'],
+    metadata: { version: '0.1.0' },
+    folded: 'first line second line',
+  });
+  assert.equal(body, 'Body.\n');
+});
+
+test('frontmatter: rejects what a real YAML parser would misread', () => {
+  assert.throws(() => parseFrontmatter('no frontmatter'), FrontmatterError);
+  assert.throws(() => parseFrontmatter('---\nname: demo\n'), FrontmatterError);
+  assert.throws(() => parseFrontmatter(doc('description: Use when: something')), FrontmatterError);
+  assert.throws(() => parseFrontmatter(doc('name: a\nname: b')), FrontmatterError);
+});
+
+test('frontmatter: stringify output parses back to the same data', () => {
+  const data = { name: 'demo', description: 'Tricky: "quotes" and # hashes', skills: ['a', 'b'] };
+  const parsed = parseFrontmatter(stringifyFrontmatter(data, '# Title\n\nText.'));
+  assert.deepEqual(parsed.data, data);
+  assert.equal(parsed.body, '# Title\n\nText.\n');
+});
+
+function skillFixture(data, body = 'Instructions.') {
+  return { type: 'skill', id: 'demo-skill', dir: tmpdir(), path: 'skills/demo-skill', data, body, error: null };
+}
+
+test('validateSkill: accepts a spec-compliant skill', () => {
+  const skill = skillFixture({ name: 'demo-skill', description: 'Does a thing. Use when asked.', metadata: { version: '1.0.0' } });
+  assert.deepEqual(validateSkill(skill), []);
+});
+
+test('validateSkill: enforces the Agent Skills naming and field rules', () => {
+  const badName = (name) => errorsOf(validateSkill(skillFixture({ name, description: 'x', metadata: { version: '1.0.0' } })));
+  assert.ok(badName('Demo-Skill').length > 0, 'uppercase');
+  assert.ok(badName('demo--skill').length > 0, 'consecutive hyphens');
+  assert.ok(badName('-demo-skill').length > 0, 'leading hyphen');
+  assert.ok(badName('other-name').length > 0, 'does not match folder');
+
+  const tooLong = skillFixture({ name: 'demo-skill', description: 'x'.repeat(1025), metadata: { version: '1.0.0' } });
+  assert.match(errorsOf(validateSkill(tooLong)).join(), /longer than 1024/);
+
+  const unknownField = skillFixture({ name: 'demo-skill', description: 'x', version: '1.0.0', metadata: { version: '1.0.0' } });
+  assert.match(errorsOf(validateSkill(unknownField)).join(), /unknown field `version`/);
+
+  const noVersion = skillFixture({ name: 'demo-skill', description: 'x' });
+  assert.match(errorsOf(validateSkill(noVersion)).join(), /metadata\.version/);
+
+  const brokenLink = skillFixture({ name: 'demo-skill', description: 'x', metadata: { version: '1.0.0' } }, 'See [ref](references/missing-file.md).');
+  assert.match(errorsOf(validateSkill(brokenLink)).join(), /missing file/);
+});
+
+test('validateAgent: requires known skills and a matching file name', () => {
+  const agent = {
+    type: 'agent', id: 'demo-agent', category: 'design', path: 'agents/design/demo-agent.md', error: null, body: 'Persona.',
+    data: { name: 'demo-agent', description: 'A persona.', version: '0.1.0', skills: ['missing-skill'] },
+  };
+  assert.match(errorsOf(validateAgent(agent, new Set())).join(), /unknown skill "missing-skill"/);
+  assert.deepEqual(validateAgent(agent, new Set(['missing-skill'])), []);
+});
+
+test('repository components are valid', () => {
+  assert.deepEqual(errorsOf(validateAll(loadAll())), []);
+});
+
+test('resolveReference: bare, qualified and unknown names', () => {
+  const components = loadAll();
+  assert.equal(resolveReference('brand-guardian', components).type, 'agent');
+  assert.equal(resolveReference('skill/startup-visual-identity', components).type, 'skill');
+  assert.throws(() => resolveReference('nope', components), InstallError);
+  assert.throws(() => resolveReference('widget/brand-guardian', components), InstallError);
+});
+
+test('expand: an agent brings the skills it uses', () => {
+  const components = loadAll();
+  const { agents, skills } = expand([resolveReference('agent/brand-guardian', components)], components);
+  assert.deepEqual(agents.map((agent) => agent.id), ['brand-guardian']);
+  assert.deepEqual(skills.map((skill) => skill.id), ['startup-visual-identity']);
+});
+
+test('every adapter installs the brand-starter stack into a project', (t) => {
+  const components = loadAll();
+  const expanded = expand([resolveReference('stack/brand-starter', components)], components);
+
+  for (const adapter of adapters.filter((candidate) => candidate.skillsDir.project)) {
+    const baseDir = mkdtempSync(join(tmpdir(), `aiuda-${adapter.id}-`));
+    t.after(() => rmSync(baseDir, { recursive: true, force: true }));
+
+    const { operations, skipped } = planInstall(expanded, adapter, { scope: 'project', baseDir });
+    assert.deepEqual(skipped, [], adapter.id);
+    const results = applyInstall(operations);
+    assert.ok(results.every((result) => result.status === 'installed'), adapter.id);
+    for (const operation of operations) assert.ok(existsSync(operation.target), `${adapter.id}: ${operation.target}`);
+
+    const skillFile = join(baseDir, adapter.skillsDir.project, 'startup-visual-identity', 'SKILL.md');
+    assert.equal(parseFrontmatter(readFileSync(skillFile, 'utf8')).data.name, 'startup-visual-identity');
+
+    assert.ok(applyInstall(operations).every((result) => result.status === 'exists'), `${adapter.id}: second run must not overwrite`);
+  }
+});
+
+test('adapters render agents in each harness format', () => {
+  const agent = loadAll().agents.find((candidate) => candidate.id === 'brand-guardian');
+
+  const claude = getAdapter('claude-code').renderAgent(agent);
+  assert.equal(claude.fileName, 'brand-guardian.md');
+  assert.deepEqual(parseFrontmatter(claude.content).data.skills, ['startup-visual-identity']);
+
+  assert.equal(getAdapter('copilot').renderAgent(agent).fileName, 'brand-guardian.agent.md');
+
+  const opencode = parseFrontmatter(getAdapter('opencode').renderAgent(agent).content);
+  assert.deepEqual(Object.keys(opencode.data), ['description']);
+
+  const codex = getAdapter('codex').renderAgent(agent);
+  assert.equal(codex.fileName, 'brand-guardian.toml');
+  assert.match(codex.content, /^name = "brand-guardian"\ndescription = ".+"\ndeveloper_instructions = """\n/);
+});
+
+test('osaurus: skills are global only and agents are skipped', () => {
+  const components = loadAll();
+  const expanded = expand([resolveReference('stack/brand-starter', components)], components);
+  const osaurus = getAdapter('osaurus');
+
+  const project = planInstall(expanded, osaurus, { scope: 'project', baseDir: '/unused' });
+  assert.equal(project.operations.length, 0);
+  assert.equal(project.skipped.length, 2);
+
+  const global = planInstall(expanded, osaurus, { scope: 'global', baseDir: '/home/someone' });
+  assert.deepEqual(global.operations.map((operation) => operation.kind), ['skill']);
+});

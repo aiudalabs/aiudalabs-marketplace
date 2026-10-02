@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+*.log
+
+# Local harness settings for people working on this repo
+.claude/
