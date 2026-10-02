@@ -1,0 +1,31 @@
+{
+  "colors": {
+    "background": "#REPLACE",
+    "surface": "#REPLACE",
+    "border": "#REPLACE",
+    "border-strong": "#REPLACE",
+    "text": "#REPLACE",
+    "text-muted": "#REPLACE",
+    "action": "#REPLACE",
+    "action-hover": "#REPLACE",
+    "on-action": "#REPLACE",
+    "focus-ring": "#REPLACE",
+    "success": "#REPLACE",
+    "warning": "#REPLACE",
+    "error": "#REPLACE"
+  },
+  "pairs": [
+    { "foreground": "text", "background": "background", "use": "text" },
+    { "foreground": "text", "background": "surface", "use": "text" },
+    { "foreground": "text-muted", "background": "background", "use": "text" },
+    { "foreground": "text-muted", "background": "surface", "use": "text" },
+    { "foreground": "on-action", "background": "action", "use": "text" },
+    { "foreground": "on-action", "background": "action-hover", "use": "text" },
+    { "foreground": "action", "background": "background", "use": "text" },
+    { "foreground": "border-strong", "background": "background", "use": "ui" },
+    { "foreground": "focus-ring", "background": "background", "use": "ui" },
+    { "foreground": "success", "background": "background", "use": "text" },
+    { "foreground": "warning", "background": "background", "use": "text" },
+    { "foreground": "error", "background": "background", "use": "text" }
+  ]
+}

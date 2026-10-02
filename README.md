@@ -2,7 +2,7 @@
 
 An open-source marketplace of AI agents, skills and stacks that installs into Claude Code, Cursor, OpenAI Codex CLI, Gemini CLI, OpenCode, GitHub Copilot and Osaurus from one canonical source.
 
-> Status: v0.1.0. The structure, the tooling and one example of each component type are in place. Workflows and MCP definitions are reserved folders with no installer support yet.
+> Status: v0.1.0, not yet released. Two stacks are available: brand identity and launch readiness. Workflows and MCP definitions are reserved folders with no installer support yet.
 
 ## The idea: agents are the "who", skills are the "how"
 
@@ -23,13 +23,18 @@ Skills follow progressive disclosure: a harness loads only `name` and `descripti
 
 | Type | Name | Description |
 | --- | --- | --- |
-| Agent | [`brand-guardian`](agents/design/brand-guardian.md) | Brand strategist and identity steward |
+| Agent | [`brand-guardian`](agents/design/brand-guardian.md) | Brand identity lead who builds and protects a visual identity |
 | Agent | [`positioning-red-team`](agents/strategy/positioning-red-team.md) | Adversarial positioning advisor for startups |
-| Skill | [`startup-visual-identity`](skills/startup-visual-identity/SKILL.md) | Builds a first visual identity and delivers a brand guide with design tokens |
+| Skill | [`visual-identity`](skills/visual-identity/SKILL.md) | The full identity process, from brief to guidelines, with an approval gate per stage |
+| Skill | [`brand-strategy-brief`](skills/brand-strategy-brief/SKILL.md) | Brand brief: audience, attributes, visual audit of competitors, visual direction |
+| Skill | [`color-system`](skills/color-system/SKILL.md) | Tonal ramps, color roles, dark mode and a WCAG 2.2 contrast check of every pairing |
+| Skill | [`typography-system`](skills/typography-system/SKILL.md) | Typeface selection, pairing, type scale and font license check |
+| Skill | [`design-tokens`](skills/design-tokens/SKILL.md) | A validated tokens file in the DTCG 2025.10 format, exported to CSS |
+| Skill | [`brand-guidelines`](skills/brand-guidelines/SKILL.md) | The brand guidelines document, with versioning and an exceptions log |
 | Skill | [`startup-positioning-audit`](skills/startup-positioning-audit/SKILL.md) | Full adversarial positioning and launch-readiness audit, scored out of 60 |
 | Skill | [`homepage-copy-audit`](skills/homepage-copy-audit/SKILL.md) | Audits a homepage for clarity and conversion and delivers replacement copy |
 | Skill | [`competitor-research`](skills/competitor-research/SKILL.md) | Maps the competitive landscape and delivers a sourced competitor brief |
-| Stack | [`brand-starter`](stacks/brand-starter/stack.json) | `brand-guardian` with `startup-visual-identity` |
+| Stack | [`brand-identity`](stacks/brand-identity/stack.json) | `brand-guardian` with the six identity skills |
 | Stack | [`launch-readiness`](stacks/launch-readiness/stack.json) | `positioning-red-team` with the three audit and research skills |
 
 The machine-readable index is [`catalog/catalog.json`](catalog/catalog.json). It is generated, and CI fails when it is stale.
@@ -44,7 +49,7 @@ npx github:aiudalabs/aiudalabs-marketplace list
 npx github:aiudalabs/aiudalabs-marketplace harnesses
 
 # Install a stack, an agent or a skill
-npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness claude-code
+npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-code
 ```
 
 Useful flags: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, and installing a skill also installs the skills it requires.
@@ -52,41 +57,41 @@ Useful flags: `--global` installs for your user instead of the project, `--dry-r
 ### Claude Code
 
 ```bash
-npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness claude-code
+npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-code
 ```
 
-This writes the skill to `.claude/skills/startup-visual-identity/` and the agent to `.claude/agents/brand-guardian.md`. The agent loads the skill on demand, by name.
+This writes the six skills to `.claude/skills/` and the agent to `.claude/agents/brand-guardian.md`. The agent loads each skill on demand, by name.
 
 You can also add the repository as a plugin marketplace, where each stack is a plugin:
 
 ```
 /plugin marketplace add aiudalabs/aiudalabs-marketplace
-/plugin install brand-starter@aiudalabs-marketplace
+/plugin install brand-identity@aiudalabs-marketplace
 ```
 
 ### Cursor
 
 ```bash
-npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness cursor
+npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness cursor
 ```
 
-This writes `.cursor/skills/startup-visual-identity/` and `.cursor/agents/brand-guardian.md`.
+This writes the skills to `.cursor/skills/` and the agent to `.cursor/agents/brand-guardian.md`.
 
 ### GitHub Copilot
 
 ```bash
-npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness copilot
+npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness copilot
 ```
 
-This writes `.github/skills/startup-visual-identity/` and `.github/agents/brand-guardian.agent.md`, which VS Code, Copilot CLI and the coding agent read.
+This writes the skills to `.github/skills/` and the agent to `.github/agents/brand-guardian.agent.md`, which VS Code, Copilot CLI and the coding agent read.
 
 ### OpenAI Codex CLI
 
 ```bash
-npx github:aiudalabs/aiudalabs-marketplace add brand-starter --harness codex
+npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness codex
 ```
 
-This writes `.agents/skills/startup-visual-identity/` and converts the agent to `.codex/agents/brand-guardian.toml`.
+This writes the skills to `.agents/skills/` and converts the agent to `.codex/agents/brand-guardian.toml`.
 
 ### Other harnesses
 
@@ -103,7 +108,7 @@ Full path table and the adapter contract: [adapters/README.md](adapters/README.m
 ```bash
 git clone https://github.com/aiudalabs/aiudalabs-marketplace.git
 cd aiudalabs-marketplace
-node bin/cli.mjs add brand-starter --harness cursor --dir /path/to/your/project
+node bin/cli.mjs add brand-identity --harness cursor --dir /path/to/your/project
 ```
 
 ## Repository layout

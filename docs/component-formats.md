@@ -60,6 +60,10 @@ The installer adds required skills automatically, and the validator fails on nam
 
 Use this sparingly. A skill should still say what to do when a required skill is missing.
 
+### Third-party content
+
+When a skill includes content adapted from another project, add a `THIRD_PARTY_NOTICES.md` file inside the skill folder with the source, what was adapted and the full license text. It must live in the skill folder, because skills are installed one folder at a time. Port only content whose license allows it, and note the origin at the top of each adapted file.
+
 ### Evals
 
 A skill may include `evals/evals.json` with test prompts and expected outputs. The folder is optional and the validator does not check its contents yet.
@@ -116,11 +120,11 @@ A stack is a curated bundle at `stacks/<name>/stack.json`.
 
 ```json
 {
-  "name": "brand-starter",
+  "name": "brand-identity",
   "description": "What the bundle is for.",
   "version": "0.1.0",
   "agents": ["brand-guardian"],
-  "skills": ["startup-visual-identity"]
+  "skills": ["visual-identity", "color-system"]
 }
 ```
 

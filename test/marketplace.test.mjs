@@ -115,7 +115,7 @@ test('repository components are valid', () => {
 test('resolveReference: bare, qualified and unknown names', () => {
   const components = loadAll();
   assert.equal(resolveReference('brand-guardian', components).type, 'agent');
-  assert.equal(resolveReference('skill/startup-visual-identity', components).type, 'skill');
+  assert.equal(resolveReference('skill/color-system', components).type, 'skill');
   assert.throws(() => resolveReference('nope', components), InstallError);
   assert.throws(() => resolveReference('widget/brand-guardian', components), InstallError);
 });
@@ -124,12 +124,13 @@ test('expand: an agent brings the skills it requires', () => {
   const components = loadAll();
   const { agents, skills } = expand([resolveReference('agent/brand-guardian', components)], components);
   assert.deepEqual(agents.map((agent) => agent.id), ['brand-guardian']);
-  assert.deepEqual(skills.map((skill) => skill.id), ['startup-visual-identity']);
+  assert.deepEqual(skills.map((skill) => skill.id).sort(), [...agents[0].data.requires].sort());
+  assert.ok(skills.length > 1);
 });
 
-test('every adapter installs the brand-starter stack into a project', (t) => {
+test('every adapter installs the brand-identity stack into a project', (t) => {
   const components = loadAll();
-  const expanded = expand([resolveReference('stack/brand-starter', components)], components);
+  const expanded = expand([resolveReference('stack/brand-identity', components)], components);
 
   for (const adapter of adapters.filter((candidate) => candidate.skillsDir.project)) {
     const baseDir = mkdtempSync(join(tmpdir(), `aiuda-${adapter.id}-`));
@@ -141,8 +142,9 @@ test('every adapter installs the brand-starter stack into a project', (t) => {
     assert.ok(results.every((result) => result.status === 'installed'), adapter.id);
     for (const operation of operations) assert.ok(existsSync(operation.target), `${adapter.id}: ${operation.target}`);
 
-    const skillFile = join(baseDir, adapter.skillsDir.project, 'startup-visual-identity', 'SKILL.md');
-    assert.equal(parseFrontmatter(readFileSync(skillFile, 'utf8')).data.name, 'startup-visual-identity');
+    const skillFile = join(baseDir, adapter.skillsDir.project, 'color-system', 'SKILL.md');
+    assert.equal(parseFrontmatter(readFileSync(skillFile, 'utf8')).data.name, 'color-system');
+    assert.ok(existsSync(join(baseDir, adapter.skillsDir.project, 'color-system', 'scripts', 'contrast.mjs')), `${adapter.id}: scripts are copied`);
 
     assert.ok(applyInstall(operations).every((result) => result.status === 'exists'), `${adapter.id}: second run must not overwrite`);
   }
@@ -167,13 +169,13 @@ test('adapters render agents in each harness format', () => {
 
 test('osaurus: skills are global only and agents are skipped', () => {
   const components = loadAll();
-  const expanded = expand([resolveReference('stack/brand-starter', components)], components);
+  const expanded = expand([resolveReference('stack/brand-identity', components)], components);
   const osaurus = getAdapter('osaurus');
 
   const project = planInstall(expanded, osaurus, { scope: 'project', baseDir: '/unused' });
   assert.equal(project.operations.length, 0);
-  assert.equal(project.skipped.length, 2);
+  assert.equal(project.skipped.length, expanded.skills.length + expanded.agents.length);
 
   const global = planInstall(expanded, osaurus, { scope: 'global', baseDir: '/home/someone' });
-  assert.deepEqual(global.operations.map((operation) => operation.kind), ['skill']);
+  assert.ok(global.operations.length > 0 && global.operations.every((operation) => operation.kind === 'skill'));
 });

@@ -45,6 +45,8 @@ CI runs the last two and fails when generated files are stale.
 - **Do not add top-level frontmatter fields to skills.** The specification allows only `name`, `description`, `license`, `compatibility`, `metadata` and `allowed-tools`. Put extras under `metadata`.
 - **Skills are self-contained.** Never link to files in another skill's folder. If a skill needs another one, declare it in `metadata.requires` and refer to it by name.
 - **Agents declare skills with `requires`, never `skills`.** Claude Code reads a `skills` field as "preload the full content of these skills", which defeats progressive disclosure.
+- **Port only what the license allows.** Check the source's LICENSE file, keep its copyright notice in a `THIRD_PARTY_NOTICES.md` inside the skill, and note the origin at the top of each adapted file. No license means no porting.
+- **Skill scripts are dependency-free.** A script in a skill runs with the Node.js or Python standard library alone, or the skill states what it needs in `compatibility`.
 - **Stay inside the frontmatter subset** described in `docs/component-formats.md`. Quote any value that contains `: ` or ` #`.
 - **Names are lowercase-hyphenated** and must match the folder name (skills, stacks) or file name (agents).
 

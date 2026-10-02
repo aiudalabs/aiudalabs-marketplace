@@ -5,16 +5,23 @@
   "agents": [
     {
       "name": "brand-guardian",
-      "description": "Brand strategist and identity steward. Use when defining a brand from scratch, reviewing designs or copy for brand consistency, or deciding whether a new asset is on-brand.",
-      "version": "0.1.0",
+      "description": "Brand identity lead who builds and protects a company's visual identity. Use when creating a brand or rebrand, choosing brand colors or typefaces, producing design tokens or brand guidelines, or checking whether a design, page or asset is on-brand.",
+      "version": "0.2.0",
       "category": "design",
       "requires": [
-        "startup-visual-identity"
+        "visual-identity",
+        "brand-strategy-brief",
+        "color-system",
+        "typography-system",
+        "design-tokens",
+        "brand-guidelines"
       ],
       "tags": [
         "design",
         "brand",
-        "identity"
+        "identity",
+        "color",
+        "typography"
       ],
       "path": "agents/design/brand-guardian.md"
     },
@@ -40,6 +47,52 @@
   ],
   "skills": [
     {
+      "name": "brand-guidelines",
+      "description": "Assembles decided brand elements into a brand guidelines document that a team can apply without asking questions, covering attributes, color, typography, logo rules, imagery, do and do not examples, asset naming, versioning and an exceptions log. Use when the user asks for brand guidelines, a brand book, a style guide, brand rules or a brand manual, or wants to document or update an existing brand.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/brand-guidelines",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "assets/brand-guidelines-template.md",
+        "references/asset-naming.md",
+        "references/governance.md"
+      ]
+    },
+    {
+      "name": "brand-strategy-brief",
+      "description": "Turns a company or product idea into a brand brief that visual work can be built on, covering audience, positioning, three brand attributes with what each rules out, a visual audit of competitors, and the visual direction that follows. Use when the user is starting a brand or rebrand, asks for a brand brief, brand strategy, brand attributes or brand personality, or wants colors, fonts or a logo and has no written brief yet.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/brand-strategy-brief",
+      "files": [
+        "SKILL.md",
+        "assets/brand-brief-template.md",
+        "references/attributes-to-visual-decisions.md",
+        "references/visual-competitor-audit.md"
+      ]
+    },
+    {
+      "name": "color-system",
+      "description": "Builds a complete brand color system from one or two chosen colors, covering perceptually even tonal ramps, tinted neutrals, semantic and role colors, dark mode, and a WCAG 2.2 contrast check of every text and background pairing. Use when the user asks for a color palette, brand colors, color scheme, shades or tints of a color, dark mode colors, or wants to check the contrast or accessibility of colors.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/color-system",
+      "files": [
+        "SKILL.md",
+        "assets/palette.template.json",
+        "references/accessibility.md",
+        "references/color-roles.md",
+        "scripts/color-lib.mjs",
+        "scripts/color-ramp.mjs",
+        "scripts/contrast.mjs"
+      ]
+    },
+    {
       "name": "competitor-research",
       "description": "Maps the competitive landscape for a startup or B2B offer, covering direct, indirect and status-quo competitors, their messaging, pricing signals, vulnerabilities and white space, and delivers a sourced competitor brief. Use when the user asks who their competitors are, wants a competitor analysis, competitive intelligence, alternatives research, a pricing benchmark or a differentiation map.",
       "version": "0.1.0",
@@ -51,6 +104,24 @@
         "assets/competitor-research-brief.md",
         "references/competitor-analysis-framework.md",
         "scripts/perplexity_research.py"
+      ]
+    },
+    {
+      "name": "design-tokens",
+      "description": "Turns brand decisions on color, typography, spacing and radius into a design tokens file in the Design Tokens Community Group format (2025.10), validates it, and exports it to CSS custom properties or flat JSON for a codebase. Use when the user asks for design tokens, a tokens file, CSS variables for a brand or theme, a token structure or naming scheme, or wants to validate or convert an existing tokens file.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/design-tokens",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "assets/example.tokens.json",
+        "references/format-cheatsheet.md",
+        "references/token-architecture.md",
+        "scripts/export-tokens.mjs",
+        "scripts/tokens-lib.mjs",
+        "scripts/validate-tokens.mjs"
       ]
     },
     {
@@ -95,34 +166,56 @@
       ]
     },
     {
-      "name": "startup-visual-identity",
-      "description": "Builds a first visual identity for a startup or new product, covering brand attributes, color palette, typography, logo direction and design tokens, and delivers a short brand guide. Use when the user asks for a brand identity, visual identity, brand guide, color palette, font pairing or logo direction for a new company, product or side project.",
+      "name": "typography-system",
+      "description": "Chooses brand typefaces and builds the type system around them, covering selection against brand attributes, pairing, a modular type scale, weights, fallback stacks, language coverage and a license check for every font. Use when the user asks for brand fonts, a font pairing, a typeface recommendation, a type scale, heading and body sizes, or whether a font is licensed for their use.",
       "version": "0.1.0",
       "license": "MIT",
       "requires": [],
-      "path": "skills/startup-visual-identity",
+      "path": "skills/typography-system",
       "files": [
         "SKILL.md",
-        "assets/brand-brief-template.md",
-        "assets/design-tokens.template.json",
-        "references/color-systems.md",
-        "references/typography-pairing.md",
-        "scripts/contrast-check.mjs"
+        "THIRD_PARTY_NOTICES.md",
+        "references/font-licensing.md",
+        "references/font-pairings.csv",
+        "references/selection-and-pairing.md",
+        "scripts/type-scale.mjs"
+      ]
+    },
+    {
+      "name": "visual-identity",
+      "description": "Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, design tokens and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "brand-strategy-brief",
+        "color-system",
+        "typography-system",
+        "design-tokens",
+        "brand-guidelines"
+      ],
+      "path": "skills/visual-identity",
+      "files": [
+        "SKILL.md"
       ]
     }
   ],
   "stacks": [
     {
-      "name": "brand-starter",
-      "description": "Everything needed to define and protect a first brand identity: the Brand Guardian persona plus the visual identity procedure.",
+      "name": "brand-identity",
+      "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, design tokens, brand guidelines and the full end-to-end process.",
       "version": "0.1.0",
       "agents": [
         "brand-guardian"
       ],
       "skills": [
-        "startup-visual-identity"
+        "visual-identity",
+        "brand-strategy-brief",
+        "color-system",
+        "typography-system",
+        "design-tokens",
+        "brand-guidelines"
       ],
-      "path": "stacks/brand-starter/stack.json"
+      "path": "stacks/brand-identity/stack.json"
     },
     {
       "name": "launch-readiness",

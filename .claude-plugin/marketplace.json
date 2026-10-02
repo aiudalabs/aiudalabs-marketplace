@@ -9,13 +9,18 @@
   },
   "plugins": [
     {
-      "name": "brand-starter",
-      "description": "Everything needed to define and protect a first brand identity: the Brand Guardian persona plus the visual identity procedure.",
+      "name": "brand-identity",
+      "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, design tokens, brand guidelines and the full end-to-end process.",
       "version": "0.1.0",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/startup-visual-identity"
+        "./skills/visual-identity",
+        "./skills/brand-strategy-brief",
+        "./skills/color-system",
+        "./skills/typography-system",
+        "./skills/design-tokens",
+        "./skills/brand-guidelines"
       ],
       "agents": [
         "./agents/design/brand-guardian.md"
