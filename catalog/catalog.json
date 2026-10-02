@@ -242,7 +242,7 @@
     {
       "name": "visual-directions",
       "description": "Finds the look of a brand, new or existing, by collecting the owner's taste, building two or three complete visual directions as full-page mockups with real content, comparing them side by side against the best alternatives, and choosing one by eye before any system is built. Use when the user wants to see options for a brand's look, asks for a redesign, refresh, moodboard or stylescape, says a design looks bland, ugly or generic, or before fixing colors, fonts or tokens for a new identity.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "path": "skills/visual-directions",

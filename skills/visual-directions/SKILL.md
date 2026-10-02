@@ -4,7 +4,7 @@ description: Finds the look of a brand, new or existing, by collecting the owner
 license: MIT
 compatibility: The bundled script needs Node.js 18 or later and has no dependencies. Viewing the board needs a web browser.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: aiudalabs
 ---
 
@@ -53,6 +53,8 @@ One self-contained HTML file per direction, with the same real content in all of
 - one piece of proof or data
 - a contrasting section, such as a dark band or a color block
 - footer
+
+A practical way to keep the comparison fair is one shared content file and one stylesheet per direction. Let the stylesheets differ as much as they like, in layout as well as in color and type.
 
 Put effort into craft: type hierarchy, spacing, rhythm, one memorable element. A direction that is only a recolored template tells the user nothing. If a design skill is available in the environment, use it for this step.
 
