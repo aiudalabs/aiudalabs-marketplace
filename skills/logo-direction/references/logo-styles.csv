@@ -1,0 +1,56 @@
+style,category,keywords,typography,best_for,avoid_for,complexity
+Minimalist,General,"clean, simple, essential, whitespace, geometric, modern",Sans-serif thin weight,Tech startups SaaS apps professional services,Playful brands children entertainment,Low
+Wordmark,Typography,"logotype, text-only, custom lettering, brand name",Custom modified typeface,Established brands name recognition,Complex names visual-heavy industries,Low
+Lettermark,Typography,"monogram, initials, abbreviated, compact",Bold geometric sans-serif,Long company names professional firms,Consumer brands needing recognition,Medium
+Pictorial Mark,Symbol,"icon, image, symbol, standalone graphic",Paired with wordmark,Recognizable brands global companies,Startups unknown brands,Medium
+Abstract Mark,Symbol,"geometric, non-representational, unique shape",Modern sans-serif pairing,Tech companies differentiating brands,Traditional industries,Medium
+Mascot,Illustrated,"character, cartoon, friendly, approachable",Rounded friendly typeface,Food brands sports teams children products,Luxury finance professional services,High
+Emblem,Badge,"seal, crest, enclosed, official",Serif or gothic typeface,Universities government traditional brands,Modern tech startups,High
+Combination Mark,Hybrid,"icon + text, versatile, complete",Balanced with icon,New brands versatile applications,Simple recognition needs,Medium
+Vintage/Retro,Aesthetic,"nostalgic, heritage, classic, established",Serif script or slab serif,Craft brands heritage products artisan goods,Modern tech forward brands,Medium
+Art Deco,Aesthetic,"geometric, elegant, 1920s, glamorous",Geometric display typeface,Luxury hotels fashion high-end products,Budget casual brands,High
+Hand-Drawn,Illustrated,"organic, authentic, imperfect, artisan",Script or hand-lettered,Artisan products bakeries creative brands,Corporate tech professional,Medium
+Geometric,Modern,"shapes, mathematical, precise, structured",Geometric sans-serif,Tech architecture modern brands,Organic natural brands,Low
+Gradient,Modern,"color transition, vibrant, dynamic, dimensional",Modern sans-serif,Tech apps social media modern brands,Traditional conservative industries,Medium
+Flat Design,Modern,"2D, solid colors, no shadows, minimal",Clean sans-serif,Apps websites digital products,Luxury traditional premium,Low
+3D/Isometric,Modern,"dimensional, perspective, layered, technical",Modern geometric,Tech gaming architecture firms,Simple classic brands,High
+Negative Space,Clever,"hidden element, dual meaning, optical illusion",Clean readable font,Creative agencies clever brands,Straightforward industries,Medium
+Line Art,Minimal,"outline, single weight, continuous, elegant",Thin weight sans-serif,Fashion beauty boutique brands,Bold energetic brands,Low
+Neon/Glow,Aesthetic,"vibrant, electric, nightlife, digital",Bold display typeface,Entertainment nightlife gaming,Corporate healthcare traditional,Medium
+Brutalist,Bold,"raw, stark, bold, anti-design",Heavy bold sans-serif,Art creative counter-culture tech blogs,Conservative corporate healthcare,Low
+Luxury/Premium,Aesthetic,"elegant, sophisticated, high-end, refined",Elegant serif thin sans,Fashion jewelry luxury real estate,Budget mass-market casual,Medium
+Playful/Fun,Aesthetic,"colorful, whimsical, energetic, youthful",Rounded bubbly typeface,Children brands toys entertainment,Serious finance legal medical,Medium
+Corporate/Professional,Business,"trustworthy, stable, serious, established",Clean professional sans,Financial legal consulting corporate,Creative entertainment youth,Low
+Tech/Digital,Industry,"modern, innovative, forward, digital",Geometric modern sans,Technology startups software apps,Traditional handmade artisan,Medium
+Organic/Natural,Aesthetic,"flowing, nature, sustainable, eco",Organic flowing typeface,Eco brands wellness organic food,Industrial tech urban,Medium
+Swiss/International,Design,"grid-based, rational, clean, functional",Helvetica style sans-serif,Corporate design professional,Decorative playful brands,Low
+Bauhaus,Design,"geometric, functional, primary colors, modernist",Geometric sans-serif,Architecture design schools modern brands,Traditional ornate decorative,Medium
+Grunge,Aesthetic,"distressed, rough, textured, alternative",Distressed or stencil type,Music alternative fashion street brands,Luxury corporate clean,Medium
+Watercolor,Artistic,"soft, artistic, fluid, organic",Script or delicate serif,Art galleries wedding florists beauty,Tech corporate industrial,High
+Monogram Luxury,Typography,"intertwined initials, fashion, heritage",Custom serif letterforms,Fashion houses luxury brands hotels,Casual budget consumer,Medium
+Vintage Badge,Retro,"circular, heritage, authentic, craft",Serif or slab serif,Breweries coffee shops craft brands,Modern minimalist tech,High
+Responsive/Adaptive,Modern,"scalable, flexible, multi-format",Legible at all sizes,Digital-first brands multi-platform,Print-only traditional,Medium
+Motion-Ready,Digital,"animated, dynamic, kinetic, digital",Sans-serif legible in motion,Digital brands apps social media,Static print-only brands,High
+Duotone,Modern,"two-color, high contrast, bold, graphic",Bold sans-serif,Graphic design music modern brands,Multi-color needs complex imagery,Low
+Split/Fragmented,Experimental,"broken, deconstructed, modern, artistic",Modern experimental type,Creative agencies art design studios,Conservative traditional corporate,High
+Outline/Stroke,Minimal,"hollow, transparent, modern, light",Matching weight typeface,Fashion tech modern minimal brands,Bold impactful needs,Low
+Stamp/Seal,Vintage,"official, authentic, approved, certified",Bold condensed typeface,Artisan coffee postal craft brands,Modern digital tech,Medium
+Calligraphic,Typography,"flowing, elegant, hand-written, artistic",Custom calligraphy,Wedding luxury fashion beauty,Tech corporate industrial,High
+Pixel Art,Digital,"8-bit, retro gaming, nostalgic, digital",Pixel or blocky typeface,Gaming retro apps indie games,Luxury professional corporate,Medium
+Symmetrical,Balanced,"mirror, balanced, harmonious, stable",Centered balanced type,Corporate wellness balanced brands,Dynamic energetic brands,Low
+Asymmetrical,Dynamic,"unbalanced, modern, dynamic, interesting",Off-center experimental,Creative modern art fashion,Traditional stable corporate,Medium
+Mascot Modern,Character,"simplified mascot, flat character, friendly",Rounded friendly sans,Tech apps startups modern food brands,Serious luxury traditional,Medium
+Monoline,Minimal,"single line weight, consistent, clean",Matching weight typeface,Coffee shops boutiques craft brands,Bold impactful industrial,Low
+Letterform,Typography,"single letter, initial, bold statement",Custom letter design,Personal brands design studios agencies,Multi-initial brands corporations,Medium
+Wordmark Script,Typography,"handwritten, signature, personal, elegant",Custom script typeface,Fashion designers personal brands,Corporate tech industrial,Medium
+Crest/Heraldic,Traditional,"coat of arms, royal, established, heritage",Serif blackletter,Universities sports teams luxury brands,Modern casual startups,High
+Circular,Shape,"round, infinite, complete, unified",Curved or circular type,Global brands apps communities,Angular sharp brands,Medium
+Hexagonal,Shape,"modern, tech, honeycomb, structured",Modern geometric sans,Tech blockchain chemical science,Traditional organic natural,Medium
+Dynamic Mark,Motion,"movement, speed, progress, forward",Italic or forward-leaning,Sports logistics transportation,Static calm wellness,Medium
+Eco/Sustainable,Values,"green, sustainable, recycling, earth-friendly",Organic rounded typeface,Eco brands organic sustainable business,Luxury industrial chemical,Medium
+Healthcare/Medical,Industry,"trust, care, health, professional",Clean professional sans,Hospitals clinics health wellness,Entertainment gaming fashion,Medium
+Legal/Financial,Industry,"trust, stability, establishment, serious",Traditional serif,Law firms banks financial services,Playful creative casual,Low
+Food/Restaurant,Industry,"appetizing, warm, inviting, delicious",Friendly readable type,Restaurants cafes food delivery,Tech healthcare professional,Medium
+Real Estate,Industry,"home, trust, growth, property",Clean professional sans,Property agencies home services,Entertainment gaming tech,Medium
+Education,Industry,"knowledge, growth, trust, achievement",Clear readable typeface,Schools universities edtech,Entertainment luxury consumer,Medium
+Music/Entertainment,Industry,"dynamic, creative, expressive, bold",Bold display typeface,Labels studios streaming venues,Corporate healthcare financial,Medium

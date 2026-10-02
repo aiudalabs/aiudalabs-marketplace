@@ -5,16 +5,19 @@
   "agents": [
     {
       "name": "brand-guardian",
-      "description": "Brand identity lead who builds and protects a company's visual identity. Use when creating a brand or rebrand, choosing brand colors or typefaces, producing design tokens or brand guidelines, or checking whether a design, page or asset is on-brand.",
-      "version": "0.2.0",
+      "description": "Brand identity lead who builds and protects a company's visual identity. Use when creating a brand or rebrand, choosing brand colors or typefaces, developing a logo, producing design tokens, icons or brand guidelines, or checking whether a design, page or asset is on-brand.",
+      "version": "0.3.0",
       "category": "design",
       "requires": [
         "visual-identity",
         "brand-strategy-brief",
         "color-system",
         "typography-system",
+        "logo-direction",
         "design-tokens",
-        "brand-guidelines"
+        "brand-asset-kit",
+        "brand-guidelines",
+        "brand-review"
       ],
       "tags": [
         "design",
@@ -47,6 +50,23 @@
   ],
   "skills": [
     {
+      "name": "brand-asset-kit",
+      "description": "Produces the image files a brand needs from its logo and colors, such as favicon, web app and app store icons, maskable icons, Apple touch icon and social share images, at the exact pixel sizes each platform asks for, and verifies every file. Use when the user asks for a favicon, app icons, PWA icons, an Open Graph or social share image, logo exports in PNG, or a full set of brand assets.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/brand-asset-kit",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "assets/asset-manifest.template.json",
+        "assets/og-image.template.html",
+        "references/deliverables.csv",
+        "references/platform-sizes.md",
+        "scripts/render-assets.mjs"
+      ]
+    },
+    {
       "name": "brand-guidelines",
       "description": "Assembles decided brand elements into a brand guidelines document that a team can apply without asking questions, covering attributes, color, typography, logo rules, imagery, do and do not examples, asset naming, versioning and an exceptions log. Use when the user asks for brand guidelines, a brand book, a style guide, brand rules or a brand manual, or wants to document or update an existing brand.",
       "version": "0.1.0",
@@ -59,6 +79,23 @@
         "assets/brand-guidelines-template.md",
         "references/asset-naming.md",
         "references/governance.md"
+      ]
+    },
+    {
+      "name": "brand-review",
+      "description": "Reviews a design, web page, stylesheet, document or asset against a brand's guidelines and reports each problem with the rule it breaks, its severity and the fix, including a scan for off-palette colors and a contrast check. Use when the user asks whether something is on-brand, wants a brand audit, brand consistency check or brand QA, or wants a piece reviewed before it is published.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "color-system"
+      ],
+      "path": "skills/brand-review",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "assets/review-report-template.md",
+        "references/review-checklist.md",
+        "scripts/scan-colors.mjs"
       ]
     },
     {
@@ -139,6 +176,23 @@
       ]
     },
     {
+      "name": "logo-direction",
+      "description": "Develops a logo from brief to a tested concept, covering the choice of mark type, several simple SVG concepts to compare, a review sheet that tests each one small, in one color and reversed, and the usage rules for the chosen mark. Use when the user asks for a logo, logo ideas or concepts, a wordmark, monogram or symbol, a logo brief for a designer, or rules for how a logo may be used.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "path": "skills/logo-direction",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "assets/logo-brief-template.md",
+        "references/logo-styles.csv",
+        "references/mark-types.md",
+        "references/usage-rules.md",
+        "scripts/logo-sheet.mjs"
+      ]
+    },
+    {
       "name": "startup-positioning-audit",
       "description": "Runs a full adversarial positioning and launch-readiness audit of a startup, covering category, ICP, offer, claims, credibility, buyer objections, competitive risk and traction, and delivers a 21-section report with a 12-dimension score out of 60. Use when the user asks to audit, red team or pressure-test their startup positioning, messaging, value proposition, ICP or offer, or asks whether they are ready to launch. Built for B2B AI, SaaS, consulting and services companies.",
       "version": "0.1.0",
@@ -183,14 +237,16 @@
     },
     {
       "name": "visual-identity",
-      "description": "Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, design tokens and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.",
-      "version": "0.1.0",
+      "description": "Builds a complete visual identity for a company, startup or product from start to finish, running strategy brief, color system, typography system, logo, design tokens, asset kit and brand guidelines in order with an approval gate after each. Use when the user asks for a full brand identity, visual identity, branding for a new company or product, or a rebrand, and wants the whole thing and not one piece.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [
         "brand-strategy-brief",
         "color-system",
         "typography-system",
+        "logo-direction",
         "design-tokens",
+        "brand-asset-kit",
         "brand-guidelines"
       ],
       "path": "skills/visual-identity",
@@ -202,8 +258,8 @@
   "stacks": [
     {
       "name": "brand-identity",
-      "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, design tokens, brand guidelines and the full end-to-end process.",
-      "version": "0.1.0",
+      "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
+      "version": "0.2.0",
       "agents": [
         "brand-guardian"
       ],
@@ -212,8 +268,11 @@
         "brand-strategy-brief",
         "color-system",
         "typography-system",
+        "logo-direction",
         "design-tokens",
-        "brand-guidelines"
+        "brand-asset-kit",
+        "brand-guidelines",
+        "brand-review"
       ],
       "path": "stacks/brand-identity/stack.json"
     },

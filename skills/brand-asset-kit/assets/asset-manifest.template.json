@@ -1,0 +1,11 @@
+{
+  "outDir": "exports",
+  "assets": [
+    { "name": "favicon-32", "source": "logo/svg/brand-symbol-small.svg", "width": 32, "height": 32 },
+    { "name": "apple-touch-icon", "source": "logo/svg/brand-symbol-color.svg", "width": 180, "height": 180, "background": "#ffffff", "padding": 20 },
+    { "name": "icon-192", "source": "logo/svg/brand-symbol-color.svg", "width": 192, "height": 192 },
+    { "name": "icon-512", "source": "logo/svg/brand-symbol-color.svg", "width": 512, "height": 512 },
+    { "name": "icon-512-maskable", "source": "logo/svg/brand-symbol-color.svg", "width": 512, "height": 512, "background": "#ffffff", "padding": 112 },
+    { "name": "og-image", "source": "templates/og-image.html", "width": 1200, "height": 630 }
+  ]
+}

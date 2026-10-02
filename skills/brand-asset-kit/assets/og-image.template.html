@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<!--
+  Social share image, rendered at 1200 x 630 by render-assets.mjs.
+  Replace: the two colors, the font, the logo SVG and the text.
+  To use a web font, add its <link> here; the renderer waits for it to load.
+-->
+<style>
+  :root {
+    --background: #111111; /* replace with the brand background color */
+    --text: #ffffff;       /* replace with the brand text color */
+  }
+  html, body {
+    margin: 0;
+    width: 1200px;
+    height: 630px;
+    background: var(--background);
+    color: var(--text);
+    font-family: system-ui, sans-serif; /* replace with the brand typeface */
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 40px;
+    padding: 80px;
+    box-sizing: border-box;
+  }
+  .logo svg {
+    height: 96px;
+    width: auto;
+    display: block;
+  }
+  h1 {
+    margin: 0;
+    font-size: 64px;
+    line-height: 1.1;
+    font-weight: 700;
+    max-width: 18ch;
+  }
+</style>
+<div class="logo">
+  <!-- Paste the logo SVG markup here, in the variant made for this background. -->
+</div>
+<h1>Replace with the headline</h1>
+</html>

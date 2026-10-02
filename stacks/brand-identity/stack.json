@@ -1,7 +1,7 @@
 {
   "name": "brand-identity",
-  "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, design tokens, brand guidelines and the full end-to-end process.",
-  "version": "0.1.0",
+  "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
+  "version": "0.2.0",
   "agents": ["brand-guardian"],
-  "skills": ["visual-identity", "brand-strategy-brief", "color-system", "typography-system", "design-tokens", "brand-guidelines"]
+  "skills": ["visual-identity", "brand-strategy-brief", "color-system", "typography-system", "logo-direction", "design-tokens", "brand-asset-kit", "brand-guidelines", "brand-review"]
 }

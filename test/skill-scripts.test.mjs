@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -100,4 +100,48 @@ test('export-tokens: references become var() in CSS and resolved values in JSON'
   const flat = JSON.parse(run('design-tokens', 'export-tokens.mjs', example, '--format', 'json').stdout);
   assert.equal(flat['color.text.default'], flat['color.neutral.900']);
   assert.match(flat['color.text.default'], /^#[0-9a-f]{6}$/);
+});
+
+test('logo-sheet: builds a review sheet and strips script from the SVG', (t) => {
+  const svg = tempFile(t, 'concept.svg', '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" onload="alert(1)"><script>alert(2)</script><rect width="10" height="10"/></svg>');
+  const out = join(svg, '..', 'review.html');
+  const result = run('logo-direction', 'logo-sheet.mjs', svg, '--out', out);
+  assert.equal(result.status, 0);
+
+  const html = readFileSync(out, 'utf8');
+  assert.equal(html.match(/<figure/g).length, 7, 'four large views and three small sizes');
+  assert.ok(!html.includes('alert('), 'scripts and event handlers are removed');
+  assert.equal(run('logo-direction', 'logo-sheet.mjs').status, 2);
+});
+
+test('scan-colors: reports colors that are not in the allowed file', (t) => {
+  const allowed = tempFile(t, 'palette.json', { colors: { primary: '#2563EB', paper: '#ffffff' } });
+  const clean = tempFile(t, 'clean.css', 'a{color:#2563eb;background:#fff}');
+  const dirty = tempFile(t, 'dirty.css', 'a{color:#ff0000}\n.b{fill:rgb(1,2,3)}');
+
+  assert.equal(run('brand-review', 'scan-colors.mjs', '--allowed', allowed, clean).status, 0);
+  const result = run('brand-review', 'scan-colors.mjs', '--allowed', allowed, dirty);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /#ff0000 {2}used 1 time/);
+  assert.match(result.stdout, /dirty\.css:1/);
+  assert.match(result.stdout, /1 color function call/);
+  assert.equal(run('brand-review', 'scan-colors.mjs', clean).status, 2);
+});
+
+test('render-assets: validates the manifest and reports readiness without writing', (t) => {
+  const svg = tempFile(t, 'symbol.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>');
+  const dir = join(svg, '..');
+  const manifest = join(dir, 'manifest.json');
+  writeFileSync(manifest, JSON.stringify({ assets: [{ name: 'icon', source: 'symbol.svg', width: 64, height: 64 }] }));
+
+  // Whether a renderer exists depends on the machine: 0 means ready, 3 means none found.
+  const check = run('brand-asset-kit', 'render-assets.mjs', manifest, '--check');
+  assert.ok([0, 3].includes(check.status));
+  assert.match(check.stdout, /icon\.png {2}64x64 {2}from svg/);
+  assert.ok(!existsSync(join(dir, 'exports')), '--check writes nothing');
+
+  const missing = tempFile(t, 'bad.json', { assets: [{ name: 'icon', source: 'nope.svg', width: 64, height: 64 }] });
+  assert.equal(run('brand-asset-kit', 'render-assets.mjs', missing).status, 2);
+  const badSize = tempFile(t, 'bad2.json', { assets: [{ name: 'icon', source: 'bad2.json', width: 0, height: 64 }] });
+  assert.equal(run('brand-asset-kit', 'render-assets.mjs', badSize).status, 2);
 });

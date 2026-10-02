@@ -1,0 +1,51 @@
+deliverable,category,description,dimensions,file_format,logo_placement,best_practices,avoid
+Primary Logo,Core Identity,Main logo used as primary brand identifier,Vector scalable,SVG AI EPS PNG,Center prominent,Ensure clear space maintain proportions,Distortion crowding busy backgrounds
+Logo Variations,Core Identity,Alternative logo formats for different applications,Vector scalable,SVG AI EPS PNG,Context dependent,Create horizontal vertical stacked icon versions,Inconsistent modifications unauthorized changes
+Business Card,Stationery,Professional contact card with brand identity,3.5x2 inches 85x55mm,PDF AI print-ready,Front center or corner,Premium paper stock spot UV foil,Cluttered design too many fonts cheap paper
+Letterhead,Stationery,Branded document paper for official correspondence,A4 Letter size,PDF AI Word template,Top header or corner,Consistent margins proper hierarchy,Overpowering logo excessive graphics
+Envelope,Stationery,Branded envelopes for business mail,DL C4 C5 sizes,PDF AI print-ready,Flap or front corner,Match letterhead design system,Misaligned printing poor paper quality
+Folder,Stationery,Presentation folder for documents,A4 Letter pocket folder,PDF AI die-cut template,Front cover spine,Pockets die-cuts premium finish,Flimsy material poor construction
+Notebook,Stationery,Branded notebooks for employees or gifts,A5 A6 sizes,Print cover design,Front cover emboss,Quality binding emboss or deboss,Cheap paper poor binding
+Pen,Promotional,Branded pens for promotional use,Standard pen dimensions,Vector for print,Barrel clip,Quality mechanism smooth writing,Cheap mechanism poor print
+ID Badge,Security Access,Employee identification and access card,CR80 86x54mm,PDF AI template,Center or top,Clear photo area security features,Poor photo quality cluttered design
+Lanyard,Security Access,Neck strap for ID badges,20-25mm width,Vector repeat pattern,Continuous pattern,Quality material comfortable width,Scratchy material cheap clips
+Access Card,Security Access,Electronic access control card,CR80 standard,PDF AI template,One side or both,Functional design clear hierarchy,Security info visible cluttered
+Reception Signage,Office Environment,Main reception area brand signage,Custom based on wall,3D fabrication files,Center of wall,Backlit LED brushed metal acrylic,Poor lighting cheap materials dim
+Wayfinding Signage,Office Environment,Interior navigation and directional signs,Various sizes,AI vector templates,Consistent placement,Consistent system clear hierarchy,Inconsistent styles poor visibility
+Meeting Room Signs,Office Environment,Meeting room identification signs,A5 A6 custom,AI templates,Center or left,Digital or static consistent style,Hard to read small text
+Wall Graphics,Office Environment,Large scale wall murals and graphics,Wall dimensions,Large format print,Full wall coverage,Inspiring messaging quality install,Peeling edges poor resolution
+Window Graphics,Office Environment,Frosted or printed window graphics,Window dimensions,Vector cut files,Privacy zones branding,Privacy function brand presence,Blocking natural light cluttered
+Desk Accessories,Office Environment,Branded desk items for employees,Various sizes,Print-ready files,Product surface,Useful quality materials,Purely decorative poor quality
+Polo Shirt,Apparel,Branded polo shirts for staff,S M L XL XXL,Embroidery vector,Left chest back,Quality fabric embroidery,Cheap fabric poor embroidery
+T-Shirt,Apparel,Casual branded t-shirts,S M L XL XXL,Screen print vector,Center chest back,Quality cotton proper sizing,Cheap material design too large
+Cap Hat,Apparel,Branded caps and hats,One size adjustable,Embroidery vector,Front center,Quality embroidery structured cap,Cheap construction poor embroidery
+Jacket,Apparel,Branded jackets for outdoor staff,S M L XL XXL,Embroidery vector,Left chest back,Quality material practical design,Impractical poor quality
+Apron,Apparel,Branded aprons for service staff,Standard adjustable,Screen print embroidery,Center chest,Durable material functional pockets,Poor material impractical design
+Tote Bag,Promotional,Branded reusable shopping bags,Various sizes,Screen print vector,Center both sides,Quality canvas sturdy handles,Cheap material weak handles
+Paper Bag,Promotional,Retail paper shopping bags,Small medium large,Print template,Side and front,Quality paper rope or ribbon handles,Cheap paper weak handles
+Gift Box,Promotional,Premium gift packaging boxes,Various sizes,Die-cut templates,Lid or all sides,Quality board magnetic closure,Cheap cardboard poor construction
+USB Drive,Promotional,Branded USB flash drives,Standard USB size,Print area template,Drive surface,Quality drive sufficient storage,Cheap mechanism low storage
+Water Bottle,Promotional,Branded water bottles,500ml 750ml 1L,Print wrap template,Wrap or pad print,Quality insulated BPA-free,Cheap plastic leaking poor insulation
+Mug Cup,Promotional,Branded mugs and cups,Standard 11oz 15oz,Sublimation vector,Wrap or one side,Quality ceramic dishwasher safe,Cheap material poor print durability
+Umbrella,Promotional,Branded umbrellas,Standard compact golf,Panel print template,Panels or handle,Quality mechanism wind resistant,Cheap mechanism breaks easily
+Car Sedan,Vehicle,Sedan vehicle branding wrap,Vehicle template,Vehicle wrap template,Doors hood trunk,Professional installation quality vinyl,Amateur install bubbles peeling
+Van,Vehicle,Van and delivery vehicle branding,Vehicle template,Vehicle wrap template,All sides back,Maximum visibility contact info,Cluttered hard to read
+Truck,Vehicle,Large truck and lorry branding,Vehicle template,Large format wrap,Sides rear trailer,High visibility fleet consistency,Inconsistent fleet poor visibility
+Social Media Profile,Digital,Social media profile pictures,Various platform sizes,PNG JPG optimized,Center crop safe,Recognizable at small size,Too detailed loses clarity
+Social Media Cover,Digital,Social media cover and header images,Platform specific sizes,PNG JPG optimized,Safe zone placement,Platform-specific safe zones,Text in unsafe crop zones
+Email Signature,Digital,Professional email signature,600px max width,HTML responsive,Left aligned,Responsive clean links,Images blocked heavy files
+Website Favicon,Digital,Browser tab icon,16x16 32x32 ICO,ICO PNG SVG,Centered square,Recognizable at tiny size,Too complex loses form
+PowerPoint Template,Digital,Branded presentation templates,16:9 4:3 widescreen,PPTX template,Footer header title,Master slides consistent layouts,Inconsistent slides poor hierarchy
+Document Template,Digital,Branded document templates,A4 Letter,DOCX template,Header footer,Easy to use consistent,Hard to edit breaks formatting
+Invoice Template,Digital,Branded invoice templates,A4 Letter,PDF XLSX template,Header corner,Clear totals payment details,Confusing layout unclear totals
+Packaging Box,Product,Product packaging boxes,Product specific,Dieline templates,Principal display panel,Stand out shelf appeal,Lost among competitors bland
+Packaging Label,Product,Product labels and stickers,Various sizes,Vector dieline,Product surface,Regulatory compliant appealing,Missing required info poor adhesion
+Product Tag,Product,Hang tags and swing tags,Standard custom sizes,Die-cut template,Front centered,Quality card stock string,Cheap card tears easily
+Retail Display,Product,Point of purchase displays,Custom dimensions,Structural design,Display surfaces,Sturdy eye-catching,Flimsy unstable falls apart
+Trade Show Booth,Events,Trade show booth design,10x10 10x20 custom,Large format print,Backdrop walls,Professional portable modular,Cheap materials hard to assemble
+Banner Stand,Events,Retractable banner stands,80x200cm standard,Large format print,Full height center,Quality print mechanism,Flimsy curling edges poor mechanism
+Table Cover,Events,Branded table covers,6ft 8ft standard,Fabric print,Front and sides,Wrinkle-resistant fitted,Wrinkles cheap fabric poor fit
+Backdrop,Events,Event backdrops and media walls,Custom event size,Large format print,Repeat pattern logo,Photo-friendly repeat pattern,Random placement looks awkward
+Name Badge Event,Events,Event name badges,CR80 custom sizes,Template design,Top with logo,Clear name large enough,Name too small hard to read
+Lanyard Event,Events,Event branded lanyards,20-25mm width,Repeat pattern,Continuous or repeat,Quality material sponsor visibility,Scratchy poor print quality
+Certificate,Documents,Achievement and recognition certificates,A4 Letter,Print template,Top header,Premium paper emboss seal,Cheap paper looks unofficial
