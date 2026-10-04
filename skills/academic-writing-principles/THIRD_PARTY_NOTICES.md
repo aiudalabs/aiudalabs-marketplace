@@ -1,9 +1,10 @@
 # Third-party notices
 
-This skill is adapted from **academic-writing-agents**, https://github.com/andrehuang/academic-writing-agents, at commit `d4d9d3a21afbccd4aee9237a70611429e7df4fba`, by Haiwen Huang, used under the MIT license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
+Adapted from **academic-writing-agents**, https://github.com/andrehuang/academic-writing-agents, at commit `d4d9d3a21afbccd4aee9237a70611429e7df4fba`, by Haiwen Huang, used under the MIT license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
 
 Changes made here:
 
+- Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
 - Created as a skill from `principles/academic-writing.md` so agents can load it by name; upstream installs it as a loose file under `~/.claude/principles/`. The principles text is unchanged.
 
 License of the upstream project:

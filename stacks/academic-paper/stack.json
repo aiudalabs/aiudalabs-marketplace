@@ -1,0 +1,9 @@
+{
+  "name": "academic-paper",
+  "description": "Take a research idea to a submission-ready paper: framing, literature grounding, an IMRaD draft, an independent peer-review panel, a citation audit, revision, and the venue's LaTeX template with a submission checklist.",
+  "version": "0.1.0",
+  "workflows": [
+    "paper-author",
+    "paper-publisher"
+  ]
+}

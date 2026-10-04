@@ -9,6 +9,31 @@
   },
   "plugins": [
     {
+      "name": "academic-paper",
+      "description": "Take a research idea to a submission-ready paper: framing, literature grounding, an IMRaD draft, an independent peer-review panel, a citation audit, revision, and the venue's LaTeX template with a submission checklist.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./workflows/paper-author",
+        "./skills/citation-audit",
+        "./skills/humanizer",
+        "./skills/lit-review",
+        "./skills/manuscript-drafting",
+        "./skills/manuscript-revision",
+        "./workflows/paper-review",
+        "./skills/sciwrite",
+        "./skills/academic-writing-principles",
+        "./workflows/paper-publisher",
+        "./skills/manuscript-checks"
+      ],
+      "agents": [
+        "./agents/research/paper-review.md",
+        "./agents/research/paper-crawler.md",
+        "./agents/research/research-analyst.md"
+      ]
+    },
+    {
       "name": "brand-identity",
       "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, visual directions, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
       "version": "0.3.0",
@@ -31,6 +56,31 @@
       ]
     },
     {
+      "name": "edit-book",
+      "description": "Editorial and scientific review of a finished book manuscript: a publishability verdict, a panel of review agents, a citation audit, a writing-clarity pass, revision and a final line and copy edit.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./workflows/scientific-book-editor",
+        "./skills/citation-audit",
+        "./skills/line-and-copy-editor",
+        "./skills/manuscript-checks",
+        "./skills/manuscript-revision",
+        "./workflows/paper-review",
+        "./skills/sciwrite",
+        "./skills/academic-writing-principles"
+      ],
+      "agents": [
+        "./agents/research/paper-review.md",
+        "./agents/research/bibliography-auditor.md",
+        "./agents/writing/consistency-checker.md",
+        "./agents/writing/logic-reviewer.md",
+        "./agents/writing/technical-reviewer.md",
+        "./agents/writing/writing-reviewer.md"
+      ]
+    },
+    {
       "name": "launch-readiness",
       "description": "Pressure-test a startup before launch: the Positioning Red Team persona plus the positioning audit, homepage copy audit and competitor research skills.",
       "version": "0.1.0",
@@ -44,6 +94,23 @@
       "agents": [
         "./agents/strategy/positioning-red-team.md"
       ]
+    },
+    {
+      "name": "publish-book",
+      "description": "Turn a finished manuscript into upload-ready files: print interiors for paperback and hardcover, a validated EPUB for Kindle, a full-wrap cover, a KDP compliance audit and the store listing.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./workflows/production-book-publisher",
+        "./skills/book-typesetting",
+        "./skills/ebook-publishing",
+        "./skills/kdp-audit",
+        "./skills/kdp-listing",
+        "./skills/kindle-book",
+        "./skills/manuscript-checks"
+      ],
+      "agents": []
     },
     {
       "name": "research-and-citations",
@@ -72,10 +139,42 @@
         "./skills/line-and-copy-editor",
         "./workflows/article-author",
         "./skills/citation-audit",
-        "./skills/sciwrite",
-        "./skills/humanizer"
+        "./skills/humanizer",
+        "./skills/sciwrite"
       ],
       "agents": []
+    },
+    {
+      "name": "write-book",
+      "description": "Write a technical or scientific nonfiction book from an idea to a review-ready manuscript: outline, literature, chapter drafting with drafting and audit agents, cross-references and an optional executable-chapter method.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./workflows/book-author",
+        "./workflows/bookwright-iterator",
+        "./workflows/bookwright-reviewer",
+        "./workflows/bookwright-rewriter",
+        "./workflows/bookwright-writer",
+        "./skills/cross-reference-discipline",
+        "./skills/humanizer",
+        "./skills/lit-review",
+        "./skills/manuscript-drafting",
+        "./skills/notebook-paired-with-prose",
+        "./skills/textbook-methodology",
+        "./skills/academic-writing-principles"
+      ],
+      "agents": [
+        "./agents/book/cross-ref-auditor.md",
+        "./agents/book/math-auditor.md",
+        "./agents/book/quality-auditor.md",
+        "./agents/book/spec-auditor.md",
+        "./agents/book/section-writer.md",
+        "./agents/book/source-reformulator.md",
+        "./agents/writing/brainstormer.md",
+        "./agents/research/paper-crawler.md",
+        "./agents/research/research-analyst.md"
+      ]
     }
   ]
 }

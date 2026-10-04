@@ -2,7 +2,7 @@
 
 An open-source marketplace of AI agents, skills and stacks that installs into Claude Code, Cursor, OpenAI Codex CLI, Gemini CLI, OpenCode, GitHub Copilot and Osaurus from one canonical source.
 
-> Status: v0.1.0, not yet released. Four stacks are available. MCP definitions are a reserved folder with no installer support yet.
+> Status: v0.1.0, not yet released. Eight stacks are available. MCP definitions are a reserved folder with no installer support yet.
 
 ## The idea: agents are the "who", skills are the "how"
 
@@ -29,6 +29,10 @@ Install a whole stack, or any single piece in it. Run `npx github:aiudalabs/aiud
 | [`launch-readiness`](stacks/launch-readiness/stack.json) | Pressure-testing a startup's positioning before launch | Agent `positioning-red-team`; skills `startup-positioning-audit`, `homepage-copy-audit`, `competitor-research` |
 | [`research-and-citations`](stacks/research-and-citations/stack.json) | Literature reviews and checking that every reference is real and correctly used | Agents `bibliography-auditor`, `paper-crawler`, `research-analyst`; skills `lit-review`, `citation-audit` |
 | [`write-article`](stacks/write-article/stack.json) | A publish-ready piece for LinkedIn, Medium, a newsletter or a blog | Workflow `article-author`; skills `sciwrite`, `humanizer`, `line-and-copy-editor` |
+| [`academic-paper`](stacks/academic-paper/stack.json) | A paper for a journal, a conference or a preprint server | Workflows `paper-author`, `paper-publisher`, `paper-review`; skills `lit-review`, `citation-audit`, `sciwrite`; agents `research-analyst`, `paper-crawler` |
+| [`write-book`](stacks/write-book/stack.json) | A technical or scientific nonfiction book, from idea to review-ready manuscript | Workflows `book-author`, `bookwright-writer`, `bookwright-iterator`; drafting and audit agents |
+| [`edit-book`](stacks/edit-book/stack.json) | Editorial and scientific review of a finished manuscript | Workflow `scientific-book-editor`; a panel of review agents; skills `citation-audit`, `manuscript-checks`, `line-and-copy-editor` |
+| [`publish-book`](stacks/publish-book/stack.json) | Print interiors, a Kindle EPUB, a cover and the KDP listing | Workflow `production-book-publisher`; skills `book-typesetting`, `kindle-book`, `ebook-publishing`, `kdp-audit`, `kdp-listing`; external `kindle-cover` |
 
 The writing and research pieces come from [aimprenta](https://github.com/aiudalabs/aimprenta), which bundles open-source work from several authors. Each adapted skill carries a `THIRD_PARTY_NOTICES.md`, and each adapted agent names its source and license.
 

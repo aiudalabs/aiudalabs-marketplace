@@ -2,7 +2,7 @@
 name: "paper-crawler"
 description: "Collects and classifies research papers from DBLP and OpenAlex APIs for literature surveys"
 version: "0.1.0"
-tags: ["research", "literature"]
+tags: ["research"]
 source: "https://github.com/andrehuang/academic-writing-agents"
 license: "MIT"
 ---

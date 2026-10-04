@@ -1,10 +1,10 @@
 # Third-party notices
 
-This skill is adapted from **research-skills**, https://github.com/neuromechanist/research-skills, at commit `af4f609f395d825ea2d2dadddc223be70ae904da`, by Seyed (Yahya) Shirazi, used under the BSD-3-Clause license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
+Adapted from **research-skills**, https://github.com/neuromechanist/research-skills, at commit `af4f609f395d825ea2d2dadddc223be70ae904da`, by Seyed (Yahya) Shirazi, used under the BSD-3-Clause license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
 
 Changes made here:
 
-- Frontmatter converted to this marketplace format: `version` moved to `metadata.version`, `license` and `metadata.source` added.
+- Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
 
 License of the upstream project:
 

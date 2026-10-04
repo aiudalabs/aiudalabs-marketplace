@@ -1,0 +1,50 @@
+% Shared QR machinery — chapter-reference + tool QR codes, encapsulated.
+%
+% Each renders as a COMPACT tcbox MONOLITH (content-sized => the frame hugs the
+% QR instead of stretching to full column width; breakable=false => can never
+% split or orphan), CENTRED in the column. Equal QR size everywhere.
+% Reference = grey, tool = blue.
+%   \qrref{img}         or  \qrfig{img}     -> grey "Scan for chapter references"
+%   \qrtool{img}{caption}                   -> blue, custom caption
+% Resize every QR globally by editing \qrsize.  (tcolorbox + skins/breakable
+% are loaded in the master preamble before this file is \input.)
+
+\usepackage{needspace}                 % keep-together guard (input during preamble)
+
+\newcommand{\qrsize}{1.1in}            % QR image width (fixed; the box hugs it)
+
+% shared compact box: #1 colback  #2 colframe  #3 img  #4 caption.
+% \tcbox sizes to its content (QR + caption stacked in a centred tabular), so a
+% small QR no longer reserves a full-width band — it can tuck under a figure in
+% the same column.  \centerline centres the hugged box across the column.
+% NB: NO \needspace here. Inside multicol the column material is first collected
+% into one tall box and only then split into columns, so \needspace's page-
+% geometry test misfires and forces a SPURIOUS column break — that pushed the QR
+% into column B with column A half-empty. breakable=false already moves the whole
+% box to the next column if it genuinely doesn't fit; natural fill keeps it in A.
+\newcommand{\qrcompact}[4]{%
+  \par\addvspace{8pt}%
+  \centerline{\tcbox[enhanced, breakable=false, arc=3pt, boxrule=0.5pt,
+      colback=#1, colframe=#2, left=6pt, right=6pt, top=8pt, bottom=8pt]{%
+    \begin{tabular}{@{}c@{}}%
+      \includegraphics[width=\qrsize]{#3}\\[5pt]%
+      {\footnotesize\itshape #4}%
+    \end{tabular}}}%
+  \par\addvspace{6pt}}
+
+% reference QR — GREY
+\newcommand{\qrref}[1]{\qrcompact{black!5}{black!30}{#1}{Scan for chapter references}}
+
+% backward-compatible alias: every existing \qrfig{...} call site -> grey box
+\newcommand{\qrfig}[1]{\qrref{#1}}
+
+% tool QR — BLUE
+\newcommand{\qrtool}[2]{\qrcompact{varblue!8}{varblue!55}{#1}{#2}}
+
+% demo QR — GREEN  (matches the EPUB qr-demo box)
+\definecolor{qrgreen}{HTML}{97CCA6}
+\newcommand{\qrdemo}[2]{\qrcompact{qrgreen!18}{qrgreen!95}{#1}{#2}}
+
+% companion-site hub QR — NEUTRAL  (matches the EPUB qr-home box)
+\definecolor{qrhome}{HTML}{B0BEC5}
+\newcommand{\qrhome}[2]{\qrcompact{qrhome!18}{qrhome!95}{#1}{#2}}

@@ -3,7 +3,7 @@ name: "research-analyst"
 description: "Analyzes research papers, identifies gaps, suggests related work, evaluates novelty and positioning"
 version: "0.1.0"
 requires: ["academic-writing-principles"]
-tags: ["research", "literature", "novelty"]
+tags: ["research"]
 source: "https://github.com/andrehuang/academic-writing-agents"
 license: "MIT"
 ---

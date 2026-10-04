@@ -3,7 +3,7 @@ name: "bibliography-auditor"
 description: "Audits bibliography entries for completeness, consistency, and hygiene — checks .bib files, compiled PDF for unresolved references, arXiv-only citations, title capitalization, and venue consistency"
 version: "0.1.0"
 requires: ["academic-writing-principles"]
-tags: ["research", "citations", "bibliography"]
+tags: ["research"]
 source: "https://github.com/andrehuang/academic-writing-agents"
 license: "MIT"
 ---

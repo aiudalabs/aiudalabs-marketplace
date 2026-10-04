@@ -1,10 +1,10 @@
 # Third-party notices
 
-This skill is adapted from **claude-skills**, https://github.com/ghanemzadeh/claude-skills, at commit `3a8037ded4426cce93f6aa0a5fcc6c1f43f48cf8`, by Nasser Ghanemzadeh, used under the MIT license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
+Adapted from **claude-skills**, https://github.com/ghanemzadeh/claude-skills, at commit `3a8037ded4426cce93f6aa0a5fcc6c1f43f48cf8`, by Nasser Ghanemzadeh, used under the MIT license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
 
 Changes made here:
 
-- Frontmatter converted to this marketplace format: `metadata.version` and `metadata.source` added.
+- Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
 
 License of the upstream project:
 

@@ -7,7 +7,7 @@ metadata:
   author: "aiudalabs"
   source: "https://github.com/aiudalabs/aimprenta"
   argument-hint: "[angle-or-idea] [platform]"
-  requires: "citation-audit sciwrite humanizer"
+  requires: "citation-audit humanizer sciwrite"
 ---
 
 # Article Author — Angle to Publish-Ready Short-Form Piece

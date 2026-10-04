@@ -1,0 +1,8 @@
+{
+  "name": "write-book",
+  "description": "Write a technical or scientific nonfiction book from an idea to a review-ready manuscript: outline, literature, chapter drafting with drafting and audit agents, cross-references and an optional executable-chapter method.",
+  "version": "0.1.0",
+  "workflows": [
+    "book-author"
+  ]
+}

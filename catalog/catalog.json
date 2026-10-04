@@ -4,6 +4,97 @@
   "version": "0.1.0",
   "agents": [
     {
+      "name": "cross-ref-auditor",
+      "description": "Verifies cross-reference integrity: Cref targets, label collisions, and undefined-reference categorization. Internal specialist dispatched by the bookwright reviewer orchestrator and the integrate command via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/cross-ref-auditor.md"
+    },
+    {
+      "name": "math-auditor",
+      "description": "Recomputes arithmetic, derivations, and worked examples independently via Python. Internal specialist dispatched by the bookwright reviewer orchestrator via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/math-auditor.md"
+    },
+    {
+      "name": "notebook-author",
+      "description": "Drafts and executes a chapter's paired computational notebook against plan targets. Internal specialist dispatched by the bookwright writer orchestrator and the `/bookwright `/notebook` command (not included in this marketplace)` command via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/notebook-author.md"
+    },
+    {
+      "name": "quality-auditor",
+      "description": "Cold-reads a drafted section for pedagogical clarity and prose craft without consulting the plan. Internal specialist dispatched by the bookwright writer and reviewer orchestrators via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/quality-auditor.md"
+    },
+    {
+      "name": "section-writer",
+      "description": "Drafts a single textbook prose section per the chapter plan spec, builds the book, and commits on success. Internal specialist dispatched by the bookwright writer orchestrator via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/section-writer.md"
+    },
+    {
+      "name": "source-reformulator",
+      "description": "Reformulates source-paper content into fresh pedagogical prose as input for section drafting. Internal specialist dispatched by the bookwright writer orchestrator via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/source-reformulator.md"
+    },
+    {
+      "name": "spec-auditor",
+      "description": "Verifies a drafted section against the chapter plan checklist, page budget, and label requirements. Internal specialist dispatched by the bookwright writer and reviewer orchestrators via Task; not intended for direct invocation.",
+      "version": "0.1.0",
+      "category": "book",
+      "requires": [],
+      "tags": [
+        "book"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/queelius/claude-anvil",
+      "path": "agents/book/spec-auditor.md"
+    },
+    {
       "name": "brand-guardian",
       "description": "Brand identity lead who builds and protects a company's visual identity. Use when creating a brand or rebrand, choosing brand colors or typefaces, developing a logo, producing design tokens, icons or brand guidelines, or checking whether a design, page or asset is on-brand.",
       "version": "0.4.0",
@@ -30,6 +121,34 @@
       "path": "agents/design/brand-guardian.md"
     },
     {
+      "name": "latex-figure-specialist",
+      "description": "Creates and adjusts TikZ/pgfplots figures, manages figure placement and layout, ensures proper label/ref wiring and figure-text-caption consistency",
+      "version": "0.1.0",
+      "category": "latex",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "latex"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/latex/latex-figure-specialist.md"
+    },
+    {
+      "name": "latex-layout-auditor",
+      "description": "Audits compiled PDF output for figure and table layout issues, checking float placement, alignment, sizing, and caption consistency",
+      "version": "0.1.0",
+      "category": "latex",
+      "requires": [],
+      "tags": [
+        "latex"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/latex/latex-layout-auditor.md"
+    },
+    {
       "name": "bibliography-auditor",
       "description": "Audits bibliography entries for completeness, consistency, and hygiene — checks .bib files, compiled PDF for unresolved references, arXiv-only citations, title capitalization, and venue consistency",
       "version": "0.1.0",
@@ -38,9 +157,7 @@
         "academic-writing-principles"
       ],
       "tags": [
-        "research",
-        "citations",
-        "bibliography"
+        "research"
       ],
       "license": "MIT",
       "source": "https://github.com/andrehuang/academic-writing-agents",
@@ -53,12 +170,24 @@
       "category": "research",
       "requires": [],
       "tags": [
-        "research",
-        "literature"
+        "research"
       ],
       "license": "MIT",
       "source": "https://github.com/andrehuang/academic-writing-agents",
       "path": "agents/research/paper-crawler.md"
+    },
+    {
+      "name": "paper-review",
+      "description": "Independent fresh-context academic manuscript peer reviewer. Invoked by the paper-review skill (single or panel mode); not triggered directly by the user.",
+      "version": "0.1.0",
+      "category": "research",
+      "requires": [],
+      "tags": [
+        "research"
+      ],
+      "license": "BSD-3-Clause",
+      "source": "https://github.com/neuromechanist/research-skills",
+      "path": "agents/research/paper-review.md"
     },
     {
       "name": "research-analyst",
@@ -69,9 +198,7 @@
         "academic-writing-principles"
       ],
       "tags": [
-        "research",
-        "literature",
-        "novelty"
+        "research"
       ],
       "license": "MIT",
       "source": "https://github.com/andrehuang/academic-writing-agents",
@@ -95,6 +222,109 @@
         "b2b"
       ],
       "path": "agents/strategy/positioning-red-team.md"
+    },
+    {
+      "name": "brainstormer",
+      "description": "Generates creative ideas, alternative framings, connections between concepts, and novel research directions",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/brainstormer.md"
+    },
+    {
+      "name": "consistency-checker",
+      "description": "Checks terminology consistency, cross-references, figure-text-caption alignment, and structural coherence across sections",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/consistency-checker.md"
+    },
+    {
+      "name": "logic-reviewer",
+      "description": "Reviews logical flow, argument structure, transitions between sections, and narrative coherence",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/logic-reviewer.md"
+    },
+    {
+      "name": "prose-polisher",
+      "description": "Rewrites existing text to improve clarity, conciseness, flow, and adherence to academic writing principles. Unlike writing-reviewer (which reports issues), this agent makes the edits.",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/prose-polisher.md"
+    },
+    {
+      "name": "section-drafter",
+      "description": "Drafts new LaTeX sections, paragraphs, transitions, captions, and abstracts following project conventions and academic writing principles",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/section-drafter.md"
+    },
+    {
+      "name": "technical-reviewer",
+      "description": "Reviews technical accuracy, mathematical notation, methodology soundness, and citation quality",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/technical-reviewer.md"
+    },
+    {
+      "name": "writing-reviewer",
+      "description": "Reviews prose quality, clarity, conciseness, grammar, and academic tone",
+      "version": "0.1.0",
+      "category": "writing",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "writing"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/writing/writing-reviewer.md"
     }
   ],
   "skills": [
@@ -109,6 +339,57 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md"
+      ]
+    },
+    {
+      "name": "book-typesetting",
+      "description": "Use when typesetting a book for print or ebook with Quarto/LaTeX — building a print interior, converting a PDF to press-ready CMYK PDF/X-1a for IngramSpark, KDP or another print-on-demand service, laying out a wraparound cover, turning chapter markdown into a galley proof, or when a print uploader rejects a file over trim size, safety area, TrimBox, annotations, or unembedded fonts.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [
+        "quarto",
+        "pandoc",
+        "xelatex",
+        "gs",
+        "python3"
+      ],
+      "path": "skills/book-typesetting",
+      "files": [
+        "LICENSE",
+        "NOTICE.md",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "VERSION",
+        "assets/filters/chapterend.lua",
+        "assets/filters/chapternum.lua",
+        "assets/filters/figurize-mc.lua",
+        "assets/filters/multicolize.lua",
+        "assets/filters/table-fullwidth.lua",
+        "assets/filters/table-mc.lua",
+        "assets/filters/tblheading.lua",
+        "assets/filters/themebreak.lua",
+        "assets/filters/var-filter.lua",
+        "assets/pdfx-swop.ps.tmpl",
+        "assets/qr.tex",
+        "assets/templates/book-print.qmd.tmpl",
+        "assets/templates/chapter-proof.qmd.tmpl",
+        "assets/templates/example-chapter.md",
+        "assets/templates/quarto.yml.tmpl",
+        "reference/cover-geometry.md",
+        "reference/galley-recipe.md",
+        "reference/getting-started.md",
+        "reference/input-contract.md",
+        "reference/press-pdfx.md",
+        "reference/print-basics.md",
+        "reference/quarto-layout.md",
+        "scripts/cover-render.sh",
+        "scripts/doctor.sh",
+        "scripts/import-docx.py",
+        "scripts/init-book.sh",
+        "scripts/pdfx-normalize.py",
+        "scripts/press-pdf.sh",
+        "scripts/verify-pdfx.py"
       ]
     },
     {
@@ -266,6 +547,19 @@
       ]
     },
     {
+      "name": "cross-reference-discipline",
+      "description": "Use when writing cross-referenced sections in a bookwright project. Covers the header comment block template, label-naming conventions, when to use prose-only vs Cref, forward-reference documentation, and the integration-check baseline.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/cross-reference-discipline",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ]
+    },
+    {
       "name": "design-tokens",
       "description": "Turns brand decisions on color, typography, spacing and radius into a design tokens file in the Design Tokens Community Group format (2025.10), validates it, and exports it to CSS custom properties or flat JSON for a codebase. Use when the user asks for design tokens, a tokens file, CSS variables for a brand or theme, a token structure or naming scheme, or wants to validate or convert an existing tokens file.",
       "version": "0.1.0",
@@ -282,6 +576,26 @@
         "scripts/export-tokens.mjs",
         "scripts/tokens-lib.mjs",
         "scripts/validate-tokens.mjs"
+      ]
+    },
+    {
+      "name": "ebook-publishing",
+      "description": "The complete ebook and audiobook self-publishing skill — write, format, convert, and publish across all major platforms. Use this skill whenever the user asks about Amazon KDP, Apple Books, Gumroad, Payhip, Kobo, Draft2Digital, IngramSpark, Barnes & Noble Press, Google Play Books, PublishDrive, StreetLib, ACX, ElevenLabs audiobooks, KDP Virtual Voice, INaudio (formerly Findaway Voices), EPUB formatting, HTML-to-PDF Puppeteer workflow, book cover design specs, ISBN strategy, KDP Select vs wide distribution, permafree strategy, BookBub, series pricing, royalty calculations, book descriptions, Amazon A+ content, keyword research, ARC readers, or any launch strategy. Also trigger for lead magnet ebooks, digital downloads, online courses packaged as ebooks, audiobook production with AI narration, print-on-demand, or any content intended for digital or print distribution and sale. MCP available for Gumroad only (rmarescu/gumroad-mcp). All other platforms require manual upload.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/ebook-publishing",
+      "files": [
+        "LICENSE",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "references/audiobooks.md",
+        "references/cover-specs.md",
+        "references/formatting.md",
+        "references/isbn-strategy.md",
+        "references/platforms.md",
+        "references/promotion.md"
       ]
     },
     {
@@ -311,6 +625,64 @@
         "LICENSE",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md"
+      ]
+    },
+    {
+      "name": "kdp-audit",
+      "description": "Audit a book manuscript against Amazon KDP requirements: interior formatting, cover specs, metadata, and genre-specific checks. Handles technical books (LaTeX, math), fiction, and nonfiction. Produces a structured gap report with Critical and Warnings sections plus automation suggestions.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/kdp-audit",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "docs/audit-report-template.md",
+        "docs/kdp-exemplars.md",
+        "docs/kdp-reference.md",
+        "docs/superpowers/plans/2026-03-18-kdp-cover-mcp-impl.md",
+        "docs/superpowers/specs/2026-03-18-kdp-cover-mcp-design.md",
+        "docs/user-config-template.md"
+      ]
+    },
+    {
+      "name": "kdp-listing",
+      "description": "Craft the four marketing artifacts for an Amazon KDP listing: blurb (with HTML formatting), keywords, BISAC categories, and author bio. Reads manuscript context to generate variants, then saves outputs to the user config. These four artifacts determine discoverability and conversion on Amazon.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/kdp-listing",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "docs/audit-report-template.md",
+        "docs/kdp-exemplars.md",
+        "docs/kdp-reference.md",
+        "docs/superpowers/plans/2026-03-18-kdp-cover-mcp-impl.md",
+        "docs/superpowers/specs/2026-03-18-kdp-cover-mcp-design.md",
+        "docs/user-config-template.md"
+      ]
+    },
+    {
+      "name": "kindle-book",
+      "description": "Convert markdown (.md) or plain text (.txt) files into Amazon KDP-ready book files: EPUB3 for Kindle digital publishing and a print-ready PDF for KDP paperback (6×9\", 5×8\", or custom trim). Use this skill whenever the user wants to: publish a book on Amazon Kindle, create an ebook from markdown, generate a KDP-ready EPUB or print PDF, self-publish a book, convert a manuscript to Kindle format, or make digital + print book files. Trigger even for partial phrases like \"make it a Kindle book\", \"publish this as an ebook\", \"KDP files\", \"format my book for Amazon\", or \"I want to sell this on Kindle\".",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [
+        "python3"
+      ],
+      "path": "skills/kindle-book",
+      "files": [
+        "LICENSE",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "assets/epub-styles.css",
+        "assets/print-template.tex",
+        "references/trim-sizes.md",
+        "scripts/build_kindle.py"
       ]
     },
     {
@@ -370,6 +742,66 @@
       ]
     },
     {
+      "name": "manuscript-checks",
+      "description": "Deterministic checks for a book or paper manuscript that an LLM reviewer can be talked out of: stub and truncation markers, empty sections and broken markdown; readability outliers between chapters; and re-running each chapter's tests to confirm the numbers in its claim ledger still hold. Use before an editorial review, before production, or when a workflow asks for the manuscript checks.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [
+        "python3"
+      ],
+      "path": "skills/manuscript-checks",
+      "files": [
+        "SKILL.md",
+        "scripts/check_claims.py",
+        "scripts/check_readability.py",
+        "scripts/check_structure.py"
+      ]
+    },
+    {
+      "name": "manuscript-drafting",
+      "description": "Use this skill for \"write a paper\", \"draft manuscript\", \"write introduction\", \"write methods section\", \"write results\", \"write discussion\", \"write abstract\", \"structure a paper\", \"academic writing\", \"write for journal\", or when the user wants to draft or revise sections of an academic manuscript.",
+      "version": "0.2.1",
+      "license": "BSD-3-Clause",
+      "requires": [],
+      "tools": [],
+      "path": "skills/manuscript-drafting",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "references/revision-response.md",
+        "references/section-templates.md"
+      ]
+    },
+    {
+      "name": "manuscript-revision",
+      "description": "Use when revising or reviewing scientific, technical, or academic manuscripts, proposals, abstracts, reports, or related writing for precision, concision, logical cohesion, citation support, evidence alignment, and objective scholarly tone.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/manuscript-revision",
+      "files": [
+        "LICENSE",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "references/revision-checklist.md"
+      ]
+    },
+    {
+      "name": "notebook-paired-with-prose",
+      "description": "Use when drafting or executing a paired notebook for a bookwright chapter. Covers when notebooks are required vs optional, numerical-sanity-target convention, exec-from-fresh-kernel requirement, and stack-specific execution commands (Jupyter/R Markdown/Quarto).",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/notebook-paired-with-prose",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ]
+    },
+    {
       "name": "sciwrite",
       "description": "Use this skill when asked to review, edit, or improve the writing quality of a scientific or engineering manuscript. Triggers include: \"review my writing,\" \"check my manuscript,\" \"improve clarity,\" \"clean up the prose,\" \"edit for journal submission,\" \"writing review,\" or any request to evaluate sentence-level quality, eliminate clutter, fix passive voice, or enforce keyword consistency in a research paper draft. Also triggers when asked to prepare a manuscript for submission to a specific journal. Do NOT use for content/technical review of methods or results, statistical analysis, or citation formatting.",
       "version": "0.1.0",
@@ -411,6 +843,19 @@
         "references/sample-output.md",
         "references/scoring-rubric.md",
         "references/traction-hypotheses-framework.md"
+      ]
+    },
+    {
+      "name": "textbook-methodology",
+      "description": "Use when drafting prose sections for a bookwright (technical non-fiction) project. Encodes the Bernoulli-textbook workflow: atom-outward design, deferral discipline, running threads, page budgets, Path A subagent pattern, header comment block convention.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/textbook-methodology",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
       ]
     },
     {
@@ -479,8 +924,8 @@
       "license": "MIT",
       "requires": [
         "citation-audit",
-        "sciwrite",
-        "humanizer"
+        "humanizer",
+        "sciwrite"
       ],
       "tools": [],
       "path": "workflows/article-author",
@@ -488,10 +933,257 @@
         "SKILL.md"
       ],
       "agents": []
+    },
+    {
+      "name": "book-author",
+      "description": "Phase 0 of the book pipeline: take a book from idea to a review-ready manuscript. Orchestrates ideation, literature gathering, outline design, chapter drafting (with optional executable-chapter methodology), AI-tell removal, cross-reference discipline, and the metadata/ISBN checklist. Use when the user says \"/book-author\", \"start a new book\", \"draft my book\", \"write a book about X\", or \"new book project\". Hands off to scientific-book-editor (editorial QA) and then production-book-publisher (formats/publishing). Do NOT use for reviewing or producing an existing manuscript — those are the other two orchestrators.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "bookwright-iterator",
+        "bookwright-writer",
+        "cross-reference-discipline",
+        "humanizer",
+        "lit-review",
+        "manuscript-drafting",
+        "notebook-paired-with-prose",
+        "textbook-methodology"
+      ],
+      "tools": [],
+      "path": "workflows/book-author",
+      "files": [
+        "SKILL.md"
+      ],
+      "agents": [
+        "brainstormer",
+        "math-auditor",
+        "paper-crawler",
+        "quality-auditor",
+        "research-analyst",
+        "section-writer"
+      ]
+    },
+    {
+      "name": "bookwright-iterator",
+      "description": "Drives drafted book content to clean by looping the bookwright-reviewer and bookwright-rewriter workflows until no findings remain at the chosen threshold, progress stalls or the round cap is reached, then reports a truthful recount. Use when a chapter or the whole book should be reviewed and fixed repeatedly without supervision.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "bookwright-reviewer",
+        "bookwright-rewriter"
+      ],
+      "tools": [],
+      "path": "workflows/bookwright-iterator",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ],
+      "agents": []
+    },
+    {
+      "name": "bookwright-reviewer",
+      "description": "Reviews a section, a chapter or a whole technical book by running four auditors in parallel (spec-auditor, quality-auditor, math-auditor, cross-ref-auditor) and merging their findings into one dated report. It reports and does not fix. Use when drafted book content needs an editorial review.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "workflows/bookwright-reviewer",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ],
+      "agents": [
+        "cross-ref-auditor",
+        "math-auditor",
+        "quality-auditor",
+        "spec-auditor"
+      ]
+    },
+    {
+      "name": "bookwright-rewriter",
+      "description": "Fixes the findings of a book review report: sends each finding to the right drafting agent, verifies the fix with the auditor that owns that kind of finding, and writes a revision report paired with the review. Use after a review report exists and its findings need to be applied.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "workflows/bookwright-rewriter",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ],
+      "agents": [
+        "cross-ref-auditor",
+        "math-auditor",
+        "quality-auditor",
+        "section-writer",
+        "spec-auditor"
+      ]
+    },
+    {
+      "name": "bookwright-writer",
+      "description": "Drafts textbook chapters section by section from a chapter plan: dispatches the right drafting agent per section (section-writer, notebook-author or source-reformulator), then has spec-auditor and quality-auditor check each one and re-dispatches fixes. Use when a planned chapter or section of a technical book needs to be written.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "workflows/bookwright-writer",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ],
+      "agents": [
+        "quality-auditor",
+        "section-writer",
+        "source-reformulator",
+        "spec-auditor"
+      ]
+    },
+    {
+      "name": "paper-author",
+      "description": "Idea to a review-ready single-document academic manuscript (journal article, conference paper, preprint) — the paper-length sibling of book-author, reusing the same underlying research/writing skills without book-author's multi-chapter machinery. Orchestrates framing, mandatory literature grounding, a single-pass IMRaD draft, an independent review pass (paper-review + citation-audit + sciwrite), and gated revision. Use when the user says \"/paper-author\", \"write a paper about X\", \"draft a manuscript for submission\", \"start a new paper\", or wants a paper (not a book, not a short article) taken from idea to revised, review-ready prose. Hands off to paper-publisher for venue formatting and submission prep. Do NOT use for a multi-chapter book (book-author) or a short-form piece meant for a blog/LinkedIn/newsletter (article-author).",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "citation-audit",
+        "humanizer",
+        "lit-review",
+        "manuscript-drafting",
+        "manuscript-revision",
+        "paper-review",
+        "sciwrite"
+      ],
+      "tools": [],
+      "path": "workflows/paper-author",
+      "files": [
+        "SKILL.md"
+      ],
+      "agents": [
+        "paper-crawler",
+        "paper-review",
+        "research-analyst"
+      ]
+    },
+    {
+      "name": "paper-publisher",
+      "description": "Venue formatting and submission preparation for a reviewed, revised paper manuscript. Applies the target venue's LaTeX template (arXiv-style default, or a named venue's own class fetched live — never vendored, see references/venue-templates.md), builds the submission PDF, and runs a submission-readiness checklist (page limit, anonymization if double-blind, bibliography style, supplementary materials, reproducibility). Use when the user says \"/paper-publisher\", \"format this for submission\", \"prepare my paper for arXiv/a conference/a journal\", or after paper-author has produced an approved, revised manuscript. Editorial review is NOT this skill — use paper-author for that.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "manuscript-checks"
+      ],
+      "tools": [
+        "latexmk",
+        "python3"
+      ],
+      "path": "workflows/paper-publisher",
+      "files": [
+        "SKILL.md",
+        "assets/templates/arxiv-article.tex.tmpl",
+        "references/venue-templates.md"
+      ],
+      "agents": []
+    },
+    {
+      "name": "paper-review",
+      "description": "Use this skill for \"review this paper\", \"review this manuscript\", \"peer review\", \"review my paper\", \"critique this manuscript\", \"review this submission\", \"give me feedback on my paper\", \"check my methods\", \"review my statistics\", \"review as a peer reviewer\", \"evaluate this manuscript\", \"review this PDF\", or mentions manuscript review, peer review, paper critique, or methodological review.",
+      "version": "0.1.0",
+      "license": "BSD-3-Clause",
+      "requires": [],
+      "tools": [],
+      "path": "workflows/paper-review",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "examples/sample-manuscript-excerpt.md",
+        "examples/sample-manuscript-review.md",
+        "references/figure-review-guide.md",
+        "references/methodology-checklist.md",
+        "references/review-output-template.md",
+        "references/review-principles.md",
+        "references/review-procedure.md",
+        "references/statistical-review-guide.md"
+      ],
+      "agents": [
+        "paper-review"
+      ]
+    },
+    {
+      "name": "production-book-publisher",
+      "description": "Production and publishing pipeline for a finished book manuscript. Takes a canonical markdown/Quarto book source and produces print-ready interiors (paperback + hardcover PDF via Quarto/LaTeX), a validated EPUB3 for Kindle, full-wrap covers with computed spine width, a KDP compliance audit, and multi-platform distribution checklists. Use when the user says \"/production-book-publisher\", \"build the book formats\", \"make the epub and print PDF\", \"prepare for KDP\", \"publish my book\", or after scientific-book-editor has produced an approved revised-book/. Editorial QA is NOT this skill — use scientific-book-editor for that.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "book-typesetting",
+        "ebook-publishing",
+        "kdp-audit",
+        "kdp-listing",
+        "kindle-book",
+        "kindle-cover",
+        "manuscript-checks"
+      ],
+      "tools": [
+        "quarto",
+        "python3",
+        "pdfinfo"
+      ],
+      "path": "workflows/production-book-publisher",
+      "files": [
+        "SKILL.md"
+      ],
+      "agents": []
+    },
+    {
+      "name": "scientific-book-editor",
+      "description": "End-to-end editorial and scientific QA pipeline for book-length manuscripts (scientific, technical, nonfiction). Orchestrates seven phases: global editorial assessment with a publishability verdict, scientific peer review, citation and evidence audit, scientific-writing improvement (sciwrite), manuscript revision, a final line/copy edit, and a mandatory whole-manuscript coherence read that no chapter-sharded phase can substitute for. Use when the user says \"/scientific-book-editor\", \"edit my book\", \"editorial pipeline\", \"review this book for publication\", \"run the editorial QA\", or wants a publish / major-revision / don't-publish verdict on a full manuscript. Report-only until the user approves revisions. For production (PDF/EPUB/covers/KDP) use production-book-publisher instead.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "citation-audit",
+        "line-and-copy-editor",
+        "manuscript-checks",
+        "manuscript-revision",
+        "paper-review",
+        "sciwrite"
+      ],
+      "tools": [],
+      "path": "workflows/scientific-book-editor",
+      "files": [
+        "SKILL.md"
+      ],
+      "agents": [
+        "bibliography-auditor",
+        "consistency-checker",
+        "logic-reviewer",
+        "paper-review",
+        "technical-reviewer",
+        "writing-reviewer"
+      ]
     }
   ],
-  "externals": [],
+  "externals": [
+    {
+      "name": "kindle-cover",
+      "description": "Generates a full-wrap paperback cover PDF for Amazon KDP, front, spine and back in one file, with the spine width computed from the page count. Use when a book needs a KDP paperback cover.",
+      "version": "0.1.0",
+      "license": "none",
+      "repo": "https://github.com/nikmcfly/kindle-cover-skill",
+      "commit": "954eb8efc270397a635b92088c5a6eea815bf938",
+      "path": "externals/kindle-cover/external.json"
+    }
+  ],
   "stacks": [
+    {
+      "name": "academic-paper",
+      "description": "Take a research idea to a submission-ready paper: framing, literature grounding, an IMRaD draft, an independent peer-review panel, a citation audit, revision, and the venue's LaTeX template with a submission checklist.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [],
+      "workflows": [
+        "paper-author",
+        "paper-publisher"
+      ],
+      "path": "stacks/academic-paper/stack.json"
+    },
     {
       "name": "brand-identity",
       "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, visual directions, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
@@ -515,6 +1207,17 @@
       "path": "stacks/brand-identity/stack.json"
     },
     {
+      "name": "edit-book",
+      "description": "Editorial and scientific review of a finished book manuscript: a publishability verdict, a panel of review agents, a citation audit, a writing-clarity pass, revision and a final line and copy edit.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [],
+      "workflows": [
+        "scientific-book-editor"
+      ],
+      "path": "stacks/edit-book/stack.json"
+    },
+    {
       "name": "launch-readiness",
       "description": "Pressure-test a startup before launch: the Positioning Red Team persona plus the positioning audit, homepage copy audit and competitor research skills.",
       "version": "0.1.0",
@@ -528,6 +1231,17 @@
       ],
       "workflows": [],
       "path": "stacks/launch-readiness/stack.json"
+    },
+    {
+      "name": "publish-book",
+      "description": "Turn a finished manuscript into upload-ready files: print interiors for paperback and hardcover, a validated EPUB for Kindle, a full-wrap cover, a KDP compliance audit and the store listing.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [],
+      "workflows": [
+        "production-book-publisher"
+      ],
+      "path": "stacks/publish-book/stack.json"
     },
     {
       "name": "research-and-citations",
@@ -557,6 +1271,17 @@
         "article-author"
       ],
       "path": "stacks/write-article/stack.json"
+    },
+    {
+      "name": "write-book",
+      "description": "Write a technical or scientific nonfiction book from an idea to a review-ready manuscript: outline, literature, chapter drafting with drafting and audit agents, cross-references and an optional executable-chapter method.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [],
+      "workflows": [
+        "book-author"
+      ],
+      "path": "stacks/write-book/stack.json"
     }
   ]
 }

@@ -1,0 +1,11 @@
+# Deliberately minimal. This is NOT a Quarto "book" project: each master file is
+# rendered on its own, which keeps full control of the LaTeX preamble.
+project:
+  output-dir: _output
+  # Only the master is a project input. Without this allowlist Quarto resolves
+  # includes across EVERY .qmd in this directory, so one stale {{< include >}}
+  # anywhere (a galley-proof wrapper still pointing at a deleted chapter, say)
+  # fails the master's render with a confusing error naming the other file.
+  # Render the galley proof explicitly:  quarto render chapter-proof.qmd --to pdf
+  render:
+    - book-print.qmd

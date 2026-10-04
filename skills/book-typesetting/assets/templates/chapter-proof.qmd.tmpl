@@ -1,0 +1,112 @@
+---
+# Single-chapter galley proof — one chapter, standalone, for proofreading.
+#
+# To use: copy this file per chapter and change the TWO marked lines below
+# (the running header, and the include at the bottom).
+#
+# The chapter's own "# N. Title" heading supplies the title, so no `title:`
+# field is set here -- setting one would print the title twice.
+#
+# Render: quarto render chapter-proof.qmd --to pdf
+lang: en-US
+toc: false
+filters:
+@@FILTERS@@
+format:
+  pdf:
+    documentclass: scrartcl
+    classoption: [10pt]
+    papersize: letter
+    geometry:
+      - paperwidth=@@W@@in
+      - paperheight=@@H@@in
+      - top=0.75in
+      - bottom=0.9in
+      - left=0.6in
+      - right=0.6in
+      - columnsep=0.3in
+      - headheight=14pt
+      - headsep=14pt
+    fontsize: 10pt
+    linestretch: 1.12
+    colorlinks: true
+    linkcolor: black
+    urlcolor: black
+    fig-pos: "H"
+    fig-cap-location: bottom
+    number-sections: false
+    pdf-engine-opts:
+      - "-interaction=nonstopmode"
+    crossref: {fig-title: "", fig-prefix: "Figure", title-delim: ""}
+    include-in-header:
+      text: |
+        \usepackage[T1]{fontenc}
+        \usepackage{lmodern}
+        \usepackage{iftex}
+        \ifPDFTeX\else
+          \setmainfont{Latin Modern Roman}[Ligatures=TeX]
+        \fi
+        \usepackage{microtype}
+        \usepackage{xcolor}
+        \definecolor{BookAccent}{HTML}{@@ACCENT@@}
+        \definecolor{varblue}{HTML}{1F3A93}
+        \usepackage{float}
+        \usepackage{fancyhdr}
+        %% titlesec must be given an explicit format for every sectioning command
+        %% it governs, or KOMA classes raise "No format for this command".
+        \usepackage{titlesec}
+        \titleformat{\section}{\sffamily\bfseries\fontsize{20}{24}\selectfont\color{BookAccent}}{}{0pt}{}
+        \titleformat{\subsection}{\sffamily\bfseries\fontsize{14}{17}\selectfont\color{black!85}}{}{0pt}{}
+        \titleformat{\subsubsection}{\sffamily\bfseries\fontsize{12}{14.5}\selectfont\color{black!85}}{}{0pt}{}
+        \titleformat{\paragraph}[runin]{\sffamily\bfseries\small}{}{0pt}{}[.]
+        \titlespacing{\section}{0pt}{0pt}{12pt}
+        \titlespacing{\subsection}{0pt}{14pt}{6pt}
+        \titlespacing{\subsubsection}{0pt}{10pt}{4pt}
+        \titlespacing{\paragraph}{0pt}{8pt}{0.6em}
+        \usepackage{enumitem}
+        \usepackage{ragged2e}
+        \usepackage{xurl}
+        \usepackage{tcolorbox}
+        \tcbuselibrary{skins,breakable}
+        \usepackage{caption}
+        \usepackage{graphicx}
+        \usepackage[normalem]{ulem}
+        \usepackage{array}
+        \usepackage{booktabs}
+        \usepackage{tabularx}
+        \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+        \usepackage{etoolbox}
+        \AtBeginEnvironment{tabular}{\footnotesize}
+        \AtBeginEnvironment{tabularx}{\footnotesize}
+@@MULTICOL_PACKAGES@@
+        \newcommand{\var}[1]{\ifmmode\textcolor{varblue}{\mathit{#1}}\else\textcolor{varblue}{\textit{#1}}\fi}
+        \setkeys{Gin}{width=\linewidth,keepaspectratio}
+        \DeclareCaptionFont{figcap}{\fontsize{7.5pt}{9.5pt}\selectfont}
+        \captionsetup[figure]{font=figcap,labelformat=empty,labelsep=none,%
+                              justification=raggedright,singlelinecheck=false,skip=7pt}
+        \pagestyle{fancy}
+        \fancyhf{}
+        \fancyhead[RO,LE]{\small\sffamily\itshape Ch.\,1~---~The First Chapter}  % <-- EDIT 1
+        \fancyfoot[C]{\small\sffamily\thepage}
+        \renewcommand{\headrulewidth}{0.4pt}
+        \raggedbottom
+        \setlength{\parskip}{3pt plus 1pt minus 1pt}
+        \setlength{\emergencystretch}{2em}
+        \tcbset{callout/.style={colback=black!4,colframe=black!25,boxrule=0.4pt,arc=2pt,
+                left=6pt,right=6pt,top=4pt,bottom=4pt,before skip=6pt,after skip=6pt}}
+        \providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}}
+        \input{qr.tex}
+        \newcommand{\thematicrule}{%
+          \par\addvspace{10pt}%
+          {\centering\textcolor{black!40}{\rule{0.30\linewidth}{0.6pt}}\par}%
+          \addvspace{10pt}\nopagebreak[4]}
+        \newcommand{\chapterend}{%
+          \par\addvspace{12pt}%
+          {\centering\normalsize\color{BookAccent}\textasteriskcentered\quad\textasteriskcentered\quad\textasteriskcentered\par}%
+          \addvspace{8pt}}
+        \widowpenalty=10000
+        \clubpenalty=10000
+---
+
+<!-- EDIT 2: point this at the chapter you want to proof -->
+{{< include ../chapters/Chapter-1-Example.print.md >}}

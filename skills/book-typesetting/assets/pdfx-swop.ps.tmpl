@@ -1,0 +1,47 @@
+%!
+% PDF/X-1a:2001 Ghostscript prologue.
+% Output intent: U.S. Web Coated (SWOP) v2 — IngramSpark's and KDP's recommended
+% CMYK profile. Used with:
+%   gs -dPDFX -sColorConversionStrategy=CMYK -sProcessColorModel=DeviceCMYK ...
+%
+% This is a TEMPLATE. scripts/press-pdf.sh substitutes:
+%   @@TITLE@@  -> the document title (parens must be escaped as \( \))
+%   @@ICC@@    -> absolute path to the CMYK ICC profile
+% Do not run this file directly; run press-pdf.sh.
+
+% PDF/X permits only Gray or CMYK in the output; guard against a bad invocation.
+systemdict /ColorConversionStrategy known {
+  systemdict /ColorConversionStrategy get cvn dup /Gray ne exch /CMYK ne and
+} {
+  (\nERROR: ColorConversionStrategy not set.)=
+  true
+} ifelse
+{ (ERROR: ColorConversionStrategy must be /DeviceGray or /DeviceCMYK.)=
+  /ColorConversionStrategy cvx /rangecheck signalerror
+} if
+
+% Force PDF/X-1a:2001, regardless of the -dPDFX level.
+[ /GTS_PDFXVersion (PDF/X-1a:2001)
+  /Title (@@TITLE@@)
+  /Trapped /False
+/DOCINFO pdfmark
+
+% Embed the CMYK ICC profile.
+/ICCProfile (@@ICC@@) def
+
+[/_objdef {icc_PDFX} /type /stream /OBJ pdfmark
+[{icc_PDFX} << /N 4 >> /PUT pdfmark
+[{icc_PDFX} ICCProfile (r) file /PUT pdfmark
+
+% Output intent dictionary referencing the profile.
+[/_objdef {OutputIntent_PDFX} /type /dict /OBJ pdfmark
+[{OutputIntent_PDFX} <<
+  /Type /OutputIntent
+  /S /GTS_PDFX
+  /OutputCondition (U.S. Web Coated \(SWOP\) v2)
+  /Info (U.S. Web Coated \(SWOP\) v2)
+  /OutputConditionIdentifier (CGATS TR001)
+  /RegistryName (http://www.color.org)
+  /DestOutputProfile {icc_PDFX}
+>> /PUT pdfmark
+[{Catalog} <</OutputIntents [ {OutputIntent_PDFX} ]>> /PUT pdfmark

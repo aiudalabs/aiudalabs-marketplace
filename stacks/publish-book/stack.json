@@ -1,0 +1,8 @@
+{
+  "name": "publish-book",
+  "description": "Turn a finished manuscript into upload-ready files: print interiors for paperback and hardcover, a validated EPUB for Kindle, a full-wrap cover, a KDP compliance audit and the store listing.",
+  "version": "0.1.0",
+  "workflows": [
+    "production-book-publisher"
+  ]
+}

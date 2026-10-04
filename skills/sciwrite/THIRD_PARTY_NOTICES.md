@@ -1,11 +1,11 @@
 # Third-party notices
 
-This skill is adapted from **sciwrite**, https://github.com/labarba/sciwrite, at commit `64b128b88fdaadfd1eb312f42c2ae1475f91b512`, by Lorena A. Barba, used under the CC-BY-4.0 license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
+Adapted from **sciwrite**, https://github.com/labarba/sciwrite, at commit `64b128b88fdaadfd1eb312f42c2ae1475f91b512`, by Lorena A. Barba, used under the CC-BY-4.0 license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
 
 Changes made here:
 
+- Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
 - Renamed from `manuscript-writing-review` to `sciwrite`, the name the workflows use to call it.
-- Frontmatter converted to this marketplace format: `license`, `metadata.version` and `metadata.source` added.
 
 License of the upstream project:
 

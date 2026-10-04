@@ -1,0 +1,11 @@
+{
+  "name": "kindle-cover",
+  "description": "Generates a full-wrap paperback cover PDF for Amazon KDP, front, spine and back in one file, with the spine width computed from the page count. Use when a book needs a KDP paperback cover.",
+  "version": "0.1.0",
+  "kind": "skill",
+  "repo": "https://github.com/nikmcfly/kindle-cover-skill",
+  "commit": "954eb8efc270397a635b92088c5a6eea815bf938",
+  "path": "",
+  "license": "none",
+  "notes": "The upstream repository has no license file, so the skill is cloned from it when installed instead of being copied here. aimprenta also patches it to add a 7x10 inch trim size; that patch is not applied by this marketplace."
+}

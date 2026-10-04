@@ -1,0 +1,54 @@
+% Generic arXiv-style single-column article template.
+% aimprenta original content (MIT, see repository LICENSE) — not a vendored
+% venue class. arXiv itself does not mandate a specific document class for
+% most categories (cs.*, math.*, stat.*, physics sub-areas without a required
+% society format); this is the safe default when the user has not named a
+% venue with its own required class. If the target venue requires a specific
+% class (IEEEtran, acmart, llncs, ...), see ../../references/venue-templates.md
+% instead of adapting this file.
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{natbib}
+
+\title{ {{TITLE}} }
+\author{ {{AUTHORS}} \\ {{AFFILIATIONS}} }
+\date{ {{DATE}} }
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+{{ABSTRACT}}
+\end{abstract}
+
+\section{Introduction}
+{{INTRODUCTION}}
+
+\section{Related Work}
+{{RELATED_WORK}}
+
+\section{Methods}
+{{METHODS}}
+
+\section{Results}
+{{RESULTS}}
+
+\section{Discussion}
+{{DISCUSSION}}
+
+\section{Limitations}
+{{LIMITATIONS}}
+
+\section{Conclusion}
+{{CONCLUSION}}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

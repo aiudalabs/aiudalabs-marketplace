@@ -1,12 +1,12 @@
 # Third-party notices
 
-This skill is adapted from **academic-human-in-the-loop**, https://github.com/OpenGHz/academic-human-in-the-loop, at commit `444bdaefd9d3ebb23cfabf3b4acafc15475ae8eb`, by wanshuiyin, used under the MIT license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
+Adapted from **academic-human-in-the-loop**, https://github.com/OpenGHz/academic-human-in-the-loop, at commit `444bdaefd9d3ebb23cfabf3b4acafc15475ae8eb`, by wanshuiyin, used under the MIT license. It reached this marketplace through aimprenta (https://github.com/aiudalabs/aimprenta), which vendors it.
 
 Changes made here:
 
+- Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
 - Each reviewer call runs as a fresh subagent instead of the OpenAI Codex MCP; an adaptation note at the top of SKILL.md explains the substitution, and `allowed-tools` lists `Agent` instead of `mcp__codex__codex`.
 - `shared-references/` and the two scripts in `tools/` are bundled inside the skill folder (upstream keeps them at the repository root), and links to them are rewritten.
-- Frontmatter converted to this marketplace format: `argument-hint` moved to `metadata`, `license`, `compatibility` and `metadata.source` added.
 
 License of the upstream project:
 
