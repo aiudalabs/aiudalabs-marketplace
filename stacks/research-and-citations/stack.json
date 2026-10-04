@@ -1,0 +1,14 @@
+{
+  "name": "research-and-citations",
+  "description": "Find, read and verify academic sources: a citation-grounded literature review, a check that every reference is real and correctly used, and agents that audit bibliographies, collect papers and assess novelty.",
+  "version": "0.1.0",
+  "agents": [
+    "bibliography-auditor",
+    "paper-crawler",
+    "research-analyst"
+  ],
+  "skills": [
+    "lit-review",
+    "citation-audit"
+  ]
+}

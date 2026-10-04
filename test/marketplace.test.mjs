@@ -81,6 +81,9 @@ test('validateSkill: enforces the Agent Skills naming and field rules', () => {
 
   const brokenLink = skillFixture({ name: 'demo-skill', description: 'x', metadata: { version: '1.0.0' } }, 'See [ref](references/missing-file.md).');
   assert.match(errorsOf(validateSkill(brokenLink, new Set())).join(), /missing file/);
+
+  const examples = skillFixture({ name: 'demo-skill', description: 'x', metadata: { version: '1.0.0' } }, 'Cite as [slug](../research/<strand>/card.md).\n\n```md\n[a](b/missing.md)\n```\n\nOr `[c](d/missing.md)`.');
+  assert.deepEqual(errorsOf(validateSkill(examples, new Set())), [], 'placeholders and code are not checked');
 });
 
 test('validateSkill: metadata.requires must name other existing skills', () => {

@@ -30,6 +30,54 @@
       "path": "agents/design/brand-guardian.md"
     },
     {
+      "name": "bibliography-auditor",
+      "description": "Audits bibliography entries for completeness, consistency, and hygiene — checks .bib files, compiled PDF for unresolved references, arXiv-only citations, title capitalization, and venue consistency",
+      "version": "0.1.0",
+      "category": "research",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "research",
+        "citations",
+        "bibliography"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/research/bibliography-auditor.md"
+    },
+    {
+      "name": "paper-crawler",
+      "description": "Collects and classifies research papers from DBLP and OpenAlex APIs for literature surveys",
+      "version": "0.1.0",
+      "category": "research",
+      "requires": [],
+      "tags": [
+        "research",
+        "literature"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/research/paper-crawler.md"
+    },
+    {
+      "name": "research-analyst",
+      "description": "Analyzes research papers, identifies gaps, suggests related work, evaluates novelty and positioning",
+      "version": "0.1.0",
+      "category": "research",
+      "requires": [
+        "academic-writing-principles"
+      ],
+      "tags": [
+        "research",
+        "literature",
+        "novelty"
+      ],
+      "license": "MIT",
+      "source": "https://github.com/andrehuang/academic-writing-agents",
+      "path": "agents/research/research-analyst.md"
+    },
+    {
       "name": "positioning-red-team",
       "description": "Adversarial positioning advisor for startups. Use when a founder wants their positioning, homepage, offer or launch plan pressure-tested by someone who will not be polite about it, or wants to know why their site is not converting.",
       "version": "0.1.0",
@@ -50,6 +98,19 @@
     }
   ],
   "skills": [
+    {
+      "name": "academic-writing-principles",
+      "description": "The full principle set behind the academic writing agents: evidence and citation rules (E1 to E3), figures, structure, limitations and style, each with an identifier the agents cite. Use when an academic writing or review agent asks for its principles, or when reviewing or drafting academic prose and a specific principle such as E2 or D4 needs to be checked.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/academic-writing-principles",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ]
+    },
     {
       "name": "brand-asset-kit",
       "description": "Produces the image files a brand needs from its logo and colors, such as favicon, web app and app store icons, maskable icons, Apple touch icon and social share images, at the exact pixel sizes each platform asks for, and verifies every file. Use when the user asks for a favicon, app icons, PWA icons, an Open Graph or social share image, logo exports in PNG, or a full set of brand assets.",
@@ -115,6 +176,58 @@
         "assets/brand-brief-template.md",
         "references/attributes-to-visual-decisions.md",
         "references/visual-competitor-audit.md"
+      ]
+    },
+    {
+      "name": "citation-audit",
+      "description": "Zero-context verification that every bibliographic entry in the paper is real, correctly attributed, and used in a context the cited paper actually supports — catching hallucinated authors, wrong years, fabricated venues, version mismatches, and wrong-context citations. Use when user says \"审查引用\", \"check citations\", \"citation audit\", \"verify references\", \"引用核对\", or before submission to ensure bibliography integrity.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [
+        "python3",
+        "bash"
+      ],
+      "path": "skills/citation-audit",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "shared-references/acceptance-gate.md",
+        "shared-references/assurance-contract.md",
+        "shared-references/capture-antipatterns.md",
+        "shared-references/citation-discipline.md",
+        "shared-references/compute-env-contract.md",
+        "shared-references/effort-contract.md",
+        "shared-references/evidence-precheck.md",
+        "shared-references/experiment-integrity.md",
+        "shared-references/external-cadence.md",
+        "shared-references/fan-out-pattern.md",
+        "shared-references/icra-keywords.md",
+        "shared-references/injection-hygiene.md",
+        "shared-references/integration-contract.md",
+        "shared-references/output-composition.md",
+        "shared-references/output-language.md",
+        "shared-references/output-manifest.md",
+        "shared-references/output-versioning.md",
+        "shared-references/page-shrink-heuristic.md",
+        "shared-references/paper-preferences.md",
+        "shared-references/patent-format-cn.md",
+        "shared-references/patent-format-ep.md",
+        "shared-references/patent-format-us.md",
+        "shared-references/patent-writing-principles.md",
+        "shared-references/prior-art-databases.md",
+        "shared-references/resumable-runs.md",
+        "shared-references/review-scope-limits.md",
+        "shared-references/review-tracing.md",
+        "shared-references/reviewer-independence.md",
+        "shared-references/reviewer-routing.md",
+        "shared-references/skill-governance.md",
+        "shared-references/taste-calibration.md",
+        "shared-references/venue-checklists.md",
+        "shared-references/wiki-helper-resolution.md",
+        "shared-references/writing-principles.md",
+        "tools/refresh_audit_hashes.py",
+        "tools/verify_paper_audits.sh"
       ]
     },
     {
@@ -187,6 +300,58 @@
       ]
     },
     {
+      "name": "humanizer",
+      "description": "Use this skill for \"humanize this text\", \"remove AI tells\", \"make this less AI-sounding\", \"strip AI patterns\", \"de-AI my writing\", \"reduce AI-isms\", \"final natural-writing pass\", \"check for AI vocabulary\", \"em dash overuse\", \"rule of three overuse\", \"AI vocabulary\", \"signs of AI writing\", or when polishing prose (papers, grants, lit reviews, abstracts, cover letters, responses to reviewers) to remove signs of AI-generated text while preserving meaning and discipline-appropriate conventions.",
+      "version": "0.1.0",
+      "license": "BSD-3-Clause",
+      "requires": [],
+      "tools": [],
+      "path": "skills/humanizer",
+      "files": [
+        "LICENSE",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
+      ]
+    },
+    {
+      "name": "line-and-copy-editor",
+      "description": "Combined line and copy editing for nonfiction manuscripts: sentence-level prose work plus grammar, consistency, and factual cross-checks in one pass. Use for a line edit, copy edit, combined or stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, removing AI-drafting and humanizer artifacts from a manuscript, or editing AI-assisted text toward genuinely human prose. Produces real Word tracked changes, a running style sheet, and an editorial cover letter.",
+      "version": "2.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/line-and-copy-editor",
+      "files": [
+        "README.md",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "references/ai-prose-patterns.md",
+        "references/pre-delivery-checklist.md",
+        "references/style-guide-template.md"
+      ]
+    },
+    {
+      "name": "lit-review",
+      "description": "Use this skill for \"literature review workflow\", \"multi-phase lit review\", \"direction paper\", \"review paper protocol\", \"strand-based literature review\", \"citation-grounded review\", \"systematic lit review with paper cards\", \"build a lit review corpus\", \"lit review pipeline\", \"orchestrate a literature review\", \"research directions document\", \"write a literature review\", \"synthesize papers\", \"thematic review\", \"narrative review\", \"systematic review\", \"scoping review\", \"gap analysis\", or when the user wants either a rigorous multi-phase citation-traceable lit review or a single-pass thematic synthesis for an Introduction/Background section.",
+      "version": "0.2.2",
+      "license": "BSD-3-Clause",
+      "requires": [],
+      "tools": [],
+      "path": "skills/lit-review",
+      "files": [
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md",
+        "references/brief-template.md",
+        "references/direction-paper-template.md",
+        "references/license-rules.md",
+        "references/paper-card-schema.md",
+        "references/review-frameworks.md",
+        "references/rigor-checklist.md",
+        "references/single-pass-synthesis.md",
+        "references/synthesis-templates.md"
+      ]
+    },
+    {
       "name": "logo-direction",
       "description": "Develops a logo from brief to a tested concept, covering the choice of mark type, several simple SVG concepts to compare, a review sheet that tests each one small, in one color and reversed, and the usage rules for the chosen mark. Use when the user asks for a logo, logo ideas or concepts, a wordmark, monogram or symbol, a logo brief for a designer, or rules for how a logo may be used.",
       "version": "0.2.0",
@@ -202,6 +367,22 @@
         "references/mark-types.md",
         "references/usage-rules.md",
         "scripts/logo-sheet.mjs"
+      ]
+    },
+    {
+      "name": "sciwrite",
+      "description": "Use this skill when asked to review, edit, or improve the writing quality of a scientific or engineering manuscript. Triggers include: \"review my writing,\" \"check my manuscript,\" \"improve clarity,\" \"clean up the prose,\" \"edit for journal submission,\" \"writing review,\" or any request to evaluate sentence-level quality, eliminate clutter, fix passive voice, or enforce keyword consistency in a research paper draft. Also triggers when asked to prepare a manuscript for submission to a specific journal. Do NOT use for content/technical review of methods or results, statistical analysis, or citation formatting.",
+      "version": "0.1.0",
+      "license": "CC-BY-4.0",
+      "requires": [],
+      "tools": [],
+      "path": "skills/sciwrite",
+      "files": [
+        "HOW-TO-USE.md",
+        "LICENSE",
+        "README.md",
+        "SKILL.md",
+        "THIRD_PARTY_NOTICES.md"
       ]
     },
     {
@@ -290,7 +471,25 @@
       ]
     }
   ],
-  "workflows": [],
+  "workflows": [
+    {
+      "name": "article-author",
+      "description": "Idea to a published-ready short-form piece — a LinkedIn article, a Medium post, a newsletter piece, or plain markdown for any blog. The lightest of the three authoring orchestrators in this repo: one command, internal phases, a single gate, reusing the same editorial skills as book-author and paper-author at a fraction of the ceremony. Use when the user says \"/article-author\", \"write a LinkedIn post about X\", \"draft a blog post\", \"write an article for Medium\", or wants a short technical/opinion piece (roughly 600–2000 words) taken from an angle to a publish-ready, platform- formatted draft. Do NOT use for a multi-chapter book (book-author) or an academic manuscript headed to a journal/conference (paper-author).",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "citation-audit",
+        "sciwrite",
+        "humanizer"
+      ],
+      "tools": [],
+      "path": "workflows/article-author",
+      "files": [
+        "SKILL.md"
+      ],
+      "agents": []
+    }
+  ],
   "externals": [],
   "stacks": [
     {
@@ -329,6 +528,35 @@
       ],
       "workflows": [],
       "path": "stacks/launch-readiness/stack.json"
+    },
+    {
+      "name": "research-and-citations",
+      "description": "Find, read and verify academic sources: a citation-grounded literature review, a check that every reference is real and correctly used, and agents that audit bibliographies, collect papers and assess novelty.",
+      "version": "0.1.0",
+      "agents": [
+        "bibliography-auditor",
+        "paper-crawler",
+        "research-analyst"
+      ],
+      "skills": [
+        "lit-review",
+        "citation-audit"
+      ],
+      "workflows": [],
+      "path": "stacks/research-and-citations/stack.json"
+    },
+    {
+      "name": "write-article",
+      "description": "Take an idea to a publish-ready short piece for LinkedIn, Medium, a newsletter or a blog: angle, targeted fact-check, draft, an editing pass that removes AI tells, and platform formatting.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [
+        "line-and-copy-editor"
+      ],
+      "workflows": [
+        "article-author"
+      ],
+      "path": "stacks/write-article/stack.json"
     }
   ]
 }

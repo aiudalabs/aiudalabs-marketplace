@@ -44,6 +44,38 @@
       "agents": [
         "./agents/strategy/positioning-red-team.md"
       ]
+    },
+    {
+      "name": "research-and-citations",
+      "description": "Find, read and verify academic sources: a citation-grounded literature review, a check that every reference is real and correctly used, and agents that audit bibliographies, collect papers and assess novelty.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/academic-writing-principles",
+        "./skills/lit-review",
+        "./skills/citation-audit"
+      ],
+      "agents": [
+        "./agents/research/bibliography-auditor.md",
+        "./agents/research/paper-crawler.md",
+        "./agents/research/research-analyst.md"
+      ]
+    },
+    {
+      "name": "write-article",
+      "description": "Take an idea to a publish-ready short piece for LinkedIn, Medium, a newsletter or a blog: angle, targeted fact-check, draft, an editing pass that removes AI tells, and platform formatting.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/line-and-copy-editor",
+        "./workflows/article-author",
+        "./skills/citation-audit",
+        "./skills/sciwrite",
+        "./skills/humanizer"
+      ],
+      "agents": []
     }
   ]
 }

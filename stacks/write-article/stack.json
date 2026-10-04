@@ -1,0 +1,11 @@
+{
+  "name": "write-article",
+  "description": "Take an idea to a publish-ready short piece for LinkedIn, Medium, a newsletter or a blog: angle, targeted fact-check, draft, an editing pass that removes AI tells, and platform formatting.",
+  "version": "0.1.0",
+  "workflows": [
+    "article-author"
+  ],
+  "skills": [
+    "line-and-copy-editor"
+  ]
+}

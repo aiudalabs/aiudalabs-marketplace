@@ -2,7 +2,7 @@
 
 An open-source marketplace of AI agents, skills and stacks that installs into Claude Code, Cursor, OpenAI Codex CLI, Gemini CLI, OpenCode, GitHub Copilot and Osaurus from one canonical source.
 
-> Status: v0.1.0, not yet released. Two stacks are available: brand identity and launch readiness. Workflows and MCP definitions are reserved folders with no installer support yet.
+> Status: v0.1.0, not yet released. Four stacks are available. MCP definitions are a reserved folder with no installer support yet.
 
 ## The idea: agents are the "who", skills are the "how"
 
@@ -21,25 +21,16 @@ Skills follow progressive disclosure: a harness loads only `name` and `descripti
 
 ## What is in the catalog
 
-| Type | Name | Description |
+Install a whole stack, or any single piece in it. Run `npx github:aiudalabs/aiudalabs-marketplace list` for every agent, skill, workflow and external with its description.
+
+| Stack | For | Main pieces |
 | --- | --- | --- |
-| Agent | [`brand-guardian`](agents/design/brand-guardian.md) | Brand identity lead who builds and protects a visual identity |
-| Agent | [`positioning-red-team`](agents/strategy/positioning-red-team.md) | Adversarial positioning advisor for startups |
-| Skill | [`visual-identity`](skills/visual-identity/SKILL.md) | The full identity process: find the look first, then build the system behind it |
-| Skill | [`brand-strategy-brief`](skills/brand-strategy-brief/SKILL.md) | Brand brief: audience, attributes, visual audit of competitors, visual direction |
-| Skill | [`visual-directions`](skills/visual-directions/SKILL.md) | Whole-page directions compared by eye, from the owner's taste, before any system is built |
-| Skill | [`color-system`](skills/color-system/SKILL.md) | Tonal ramps, color roles, dark mode and a WCAG 2.2 contrast check of every pairing |
-| Skill | [`typography-system`](skills/typography-system/SKILL.md) | Typeface selection, pairing, type scale and font license check |
-| Skill | [`logo-direction`](skills/logo-direction/SKILL.md) | Mark type, SVG concepts, a review sheet that tests them small and in one color, usage rules |
-| Skill | [`design-tokens`](skills/design-tokens/SKILL.md) | A validated tokens file in the DTCG 2025.10 format, exported to CSS |
-| Skill | [`brand-asset-kit`](skills/brand-asset-kit/SKILL.md) | Favicon, app icons and share images at verified platform sizes |
-| Skill | [`brand-guidelines`](skills/brand-guidelines/SKILL.md) | The brand guidelines document, with versioning and an exceptions log |
-| Skill | [`brand-review`](skills/brand-review/SKILL.md) | Reviews a piece against the guidelines, with an off-palette color scan |
-| Skill | [`startup-positioning-audit`](skills/startup-positioning-audit/SKILL.md) | Full adversarial positioning and launch-readiness audit, scored out of 60 |
-| Skill | [`homepage-copy-audit`](skills/homepage-copy-audit/SKILL.md) | Audits a homepage for clarity and conversion and delivers replacement copy |
-| Skill | [`competitor-research`](skills/competitor-research/SKILL.md) | Maps the competitive landscape and delivers a sourced competitor brief |
-| Stack | [`brand-identity`](stacks/brand-identity/stack.json) | `brand-guardian` with the ten identity skills |
-| Stack | [`launch-readiness`](stacks/launch-readiness/stack.json) | `positioning-red-team` with the three audit and research skills |
+| [`brand-identity`](stacks/brand-identity/stack.json) | Building a visual identity, from brief to guidelines | Agent `brand-guardian`; skills `visual-identity`, `visual-directions`, `color-system`, `typography-system`, `logo-direction`, `design-tokens`, `brand-asset-kit`, `brand-guidelines`, `brand-review` |
+| [`launch-readiness`](stacks/launch-readiness/stack.json) | Pressure-testing a startup's positioning before launch | Agent `positioning-red-team`; skills `startup-positioning-audit`, `homepage-copy-audit`, `competitor-research` |
+| [`research-and-citations`](stacks/research-and-citations/stack.json) | Literature reviews and checking that every reference is real and correctly used | Agents `bibliography-auditor`, `paper-crawler`, `research-analyst`; skills `lit-review`, `citation-audit` |
+| [`write-article`](stacks/write-article/stack.json) | A publish-ready piece for LinkedIn, Medium, a newsletter or a blog | Workflow `article-author`; skills `sciwrite`, `humanizer`, `line-and-copy-editor` |
+
+The writing and research pieces come from [aimprenta](https://github.com/aiudalabs/aimprenta), which bundles open-source work from several authors. Each adapted skill carries a `THIRD_PARTY_NOTICES.md`, and each adapted agent names its source and license.
 
 The machine-readable index is [`catalog/catalog.json`](catalog/catalog.json). It is generated, and CI fails when it is stale.
 
