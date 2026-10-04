@@ -62,7 +62,8 @@ export default {
 
 - Use `null` for a scope the harness does not support. Set `agentsDir` and `renderAgent` to `null` when the harness has no file-based agents.
 - `agent` has `id`, `category`, `data` (the parsed frontmatter) and `body` (the Markdown after the frontmatter).
-- `markdownAgent` in [`shared.mjs`](shared.mjs) covers the common case of Markdown with `name` and `description` frontmatter.
+- `markdownAgent` in [`shared.mjs`](shared.mjs) covers the common case of Markdown with `name` and `description` frontmatter. Use `agentBody(agent)` for the instructions in any custom format: it appends the attribution of agents adapted from other projects.
+- `skillFrontmatter(data)` is optional. It receives a skill's or workflow's parsed frontmatter and returns the frontmatter to install, for fields a harness reads at the top level. Return `data` unchanged when there is nothing to do. The Claude Code adapter uses it to lift `metadata.argument-hint`.
 
 ## Adding a harness
 

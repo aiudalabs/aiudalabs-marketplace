@@ -1,6 +1,8 @@
 // OpenAI Codex CLI: skills live in `.agents/skills`, agents are TOML files
 // with `name`, `description` and `developer_instructions`.
 
+import { agentBody } from './shared.mjs';
+
 const tomlString = (value) => JSON.stringify(value);
 
 // Multi-line basic string: only backslashes and triple quotes need escaping.
@@ -15,7 +17,7 @@ export default {
     const content = [
       `name = ${tomlString(agent.id)}`,
       `description = ${tomlString(agent.data.description)}`,
-      `developer_instructions = ${tomlMultiline(agent.body)}`,
+      `developer_instructions = ${tomlMultiline(agentBody(agent))}`,
       '',
     ].join('\n');
     return { fileName: `${agent.id}.toml`, content };

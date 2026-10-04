@@ -56,6 +56,7 @@
       "version": "0.2.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/brand-asset-kit",
       "files": [
         "SKILL.md",
@@ -73,6 +74,7 @@
       "version": "0.1.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/brand-guidelines",
       "files": [
         "SKILL.md",
@@ -90,6 +92,7 @@
       "requires": [
         "color-system"
       ],
+      "tools": [],
       "path": "skills/brand-review",
       "files": [
         "SKILL.md",
@@ -105,6 +108,7 @@
       "version": "0.2.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/brand-strategy-brief",
       "files": [
         "SKILL.md",
@@ -119,6 +123,7 @@
       "version": "0.3.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/color-system",
       "files": [
         "SKILL.md",
@@ -138,6 +143,7 @@
       "version": "0.1.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/competitor-research",
       "files": [
         "SKILL.md",
@@ -152,6 +158,7 @@
       "version": "0.1.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/design-tokens",
       "files": [
         "SKILL.md",
@@ -170,6 +177,7 @@
       "version": "0.1.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/homepage-copy-audit",
       "files": [
         "SKILL.md",
@@ -184,6 +192,7 @@
       "version": "0.2.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/logo-direction",
       "files": [
         "SKILL.md",
@@ -204,6 +213,7 @@
         "homepage-copy-audit",
         "competitor-research"
       ],
+      "tools": [],
       "path": "skills/startup-positioning-audit",
       "files": [
         "SKILL.md",
@@ -228,6 +238,7 @@
       "version": "0.3.0",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/typography-system",
       "files": [
         "SKILL.md",
@@ -245,6 +256,7 @@
       "version": "0.1.1",
       "license": "MIT",
       "requires": [],
+      "tools": [],
       "path": "skills/visual-directions",
       "files": [
         "SKILL.md",
@@ -270,6 +282,7 @@
         "brand-asset-kit",
         "brand-guidelines"
       ],
+      "tools": [],
       "path": "skills/visual-identity",
       "files": [
         "SKILL.md",
@@ -277,6 +290,8 @@
       ]
     }
   ],
+  "workflows": [],
+  "externals": [],
   "stacks": [
     {
       "name": "brand-identity",
@@ -297,6 +312,7 @@
         "brand-guidelines",
         "brand-review"
       ],
+      "workflows": [],
       "path": "stacks/brand-identity/stack.json"
     },
     {
@@ -311,6 +327,7 @@
         "homepage-copy-audit",
         "competitor-research"
       ],
+      "workflows": [],
       "path": "stacks/launch-readiness/stack.json"
     }
   ]

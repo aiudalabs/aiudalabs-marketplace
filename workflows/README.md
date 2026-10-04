@@ -1,9 +1,5 @@
 # Workflows
 
-Reserved for multi-step processes that coordinate several agents and skills, such as "idea to launch-ready brand".
+Multi-step processes that coordinate skills and agents, such as "idea to published article". A workflow has the skill format and installs like a skill; it also declares the skills it requires and the agents it dispatches, so installing it brings everything.
 
-The format is not defined yet. The validator and the CLI ignore this folder.
-
-Until it is defined, model a workflow as a skill whose `SKILL.md` sequences other skills, and bundle the pieces in a [stack](../stacks/).
-
-Open question for the design: whether a workflow needs its own manifest, or whether a skill plus a stack already covers it.
+Format: [docs/component-formats.md](../docs/component-formats.md#workflows).

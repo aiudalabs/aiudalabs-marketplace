@@ -87,7 +87,7 @@ test('validateSkill: metadata.requires must name other existing skills', () => {
   const withRequires = (requires) => skillFixture({ name: 'demo-skill', description: 'x', metadata: { version: '1.0.0', requires } });
   const known = new Set(['demo-skill', 'other-skill']);
   assert.deepEqual(validateSkill(withRequires('other-skill'), known), []);
-  assert.match(errorsOf(validateSkill(withRequires('missing-skill'), known)).join(), /unknown skill "missing-skill"/);
+  assert.match(errorsOf(validateSkill(withRequires('missing-skill'), known)).join(), /unknown skill, workflow or external "missing-skill"/);
   assert.match(errorsOf(validateSkill(withRequires('demo-skill'), known)).join(), /cannot list the skill itself/);
 });
 
@@ -103,7 +103,7 @@ test('validateAgent: requires known skills and a matching file name', () => {
     type: 'agent', id: 'demo-agent', category: 'design', path: 'agents/design/demo-agent.md', error: null, body: 'Persona.',
     data: { name: 'demo-agent', description: 'A persona.', version: '0.1.0', requires: ['missing-skill'] },
   };
-  assert.match(errorsOf(validateAgent(agent, new Set())).join(), /unknown skill "missing-skill"/);
+  assert.match(errorsOf(validateAgent(agent, new Set())).join(), /unknown skill, workflow or external "missing-skill"/);
   assert.match(errorsOf(validateAgent(agent, new Set(['missing-skill']))).join(), /not named in the body/);
   assert.deepEqual(validateAgent({ ...agent, body: 'Persona. Load `missing-skill` when needed.' }, new Set(['missing-skill'])), []);
 });

@@ -12,6 +12,8 @@ Agents and skills are different things, and they stay separate.
 
 - An **agent** (`agents/<category>/<name>.md`) is a persona: identity, expertise, working principles, communication style, success metrics. It names the skills it uses.
 - A **skill** (`skills/<name>/`) is a procedure that follows the [Agent Skills specification](https://agentskills.io/specification): `SKILL.md` plus optional `scripts/`, `references/`, `assets/`.
+- A **workflow** (`workflows/<name>/`) has the skill format and coordinates skills and agents in phases. An agent that dispatches other agents through phases is a workflow.
+- An **external** (`externals/<name>/external.json`) points to a skill in another repository at a pinned commit.
 
 Do not put step-by-step procedures in an agent. Do not put personality in a skill. When asked to add "an agent that does X", the usual answer is a short persona plus a skill that holds the steps.
 
@@ -63,7 +65,9 @@ CI runs the last two and fails when generated files are stale.
 | `lib/install.mjs` | Resolves names, expands dependencies, plans and applies installs |
 | `bin/cli.mjs` | CLI entry point |
 | `test/` | Tests, run with `node --test` |
-| `workflows/`, `mcps/` | Reserved. No format yet, ignored by tooling |
+| `workflows/` | Workflows: skills that coordinate other skills and agents |
+| `externals/` | Skills cloned from other repositories at a pinned commit |
+| `mcps/` | Reserved. No format yet, ignored by tooling |
 
 ## Code style
 
@@ -79,6 +83,10 @@ CI runs the last two and fails when generated files are stale.
 
 **Add an agent**: create `agents/<category>/<name>.md`, list its skills in `requires` and name them in the body's "Skills" section, keep the body a persona.
 
-**Add a stack**: create `stacks/<name>/stack.json` listing existing agents and skills.
+**Add a stack**: create `stacks/<name>/stack.json` listing existing agents, skills and workflows.
+
+**Add a workflow**: create `workflows/<name>/SKILL.md`, list the skills in `metadata.requires` and the agents in `metadata.agents`, and name each agent in the body.
+
+**Add an external**: only when the skill cannot be copied here. Create `externals/<name>/external.json` with the repository, the full commit hash and the license as it actually is.
 
 **Add a harness**: follow "Adding a harness" in [adapters/README.md](adapters/README.md).

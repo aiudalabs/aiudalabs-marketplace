@@ -23,7 +23,8 @@ if (!hasErrors) {
 
 for (const issue of issues) console.log(`${issue.level.toUpperCase().padEnd(7)} ${issue.path}: ${issue.message}`);
 
-const { agents, skills, stacks } = components;
+const { agents, skills, workflows, externals, stacks } = components;
 const errors = issues.filter((issue) => issue.level === 'error').length;
-console.log(`\nChecked ${agents.length} agent(s), ${skills.length} skill(s), ${stacks.length} stack(s): ${errors} error(s), ${issues.length - errors} warning(s).`);
+const counts = `${agents.length} agent(s), ${skills.length} skill(s), ${workflows.length} workflow(s), ${externals.length} external(s), ${stacks.length} stack(s)`;
+console.log(`\nChecked ${counts}: ${errors} error(s), ${issues.length - errors} warning(s).`);
 process.exit(errors > 0 ? 1 : 0);

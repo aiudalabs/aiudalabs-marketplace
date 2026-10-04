@@ -121,7 +121,8 @@ node bin/cli.mjs add brand-identity --harness cursor --dir /path/to/your/project
 agents/            Personas, one Markdown file each, grouped by category
 skills/            Agent Skills folders (SKILL.md + scripts/ references/ assets/)
 stacks/            Curated bundles of agents and skills
-workflows/         Reserved: multi-step processes (format not defined yet)
+workflows/         Multi-step processes that coordinate skills and agents
+externals/         Skills cloned from other repositories at a pinned commit
 mcps/              Reserved: MCP server definitions (format not defined yet)
 adapters/          One module per harness: where files go and how agents are rendered
 catalog/           Generated machine-readable index

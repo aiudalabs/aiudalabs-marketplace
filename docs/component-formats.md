@@ -95,9 +95,13 @@ An agent is one Markdown file at `agents/<category>/<name>.md`. It describes a p
 | `description` | Yes | 1 to 1024 characters. Who the agent is and when to delegate to it. |
 | `version` | Yes | Semver. |
 | `requires` | No | List of skill names from this repository that the agent uses. The installer copies them with the agent. |
+| `source` | With `license` | https URL of the project the agent was adapted from |
+| `license` | With `source` | License of that project, such as `MIT` |
 | `tags` | No | List of free-form tags for the catalog. |
 
 Any other field is an error.
+
+An agent is installed as one file, so an agent adapted from another project cannot carry a separate notice file. Give `source` and `license`, and every adapter appends the attribution to the installed agent.
 
 ### Body
 
@@ -134,15 +138,81 @@ A stack is a curated bundle at `stacks/<name>/stack.json`.
 | `description` | Yes | 1 to 1024 characters. |
 | `version` | Yes | Semver. |
 | `agents` | No | Names of agents in this repository. |
-| `skills` | No | Names of skills in this repository. |
+| `skills` | No | Names of skills or externals in this repository. |
+| `workflows` | No | Names of workflows in this repository. |
 
-A stack needs at least one agent or skill. Skills used by a listed agent are installed automatically, so listing them again is optional.
+A stack needs at least one agent, skill or workflow. Skills used by a listed agent are installed automatically, so listing them again is optional.
 
 Each stack is also published as a plugin in the generated `.claude-plugin/marketplace.json`.
 
-## Workflows and MCPs
+## Workflows
 
-`workflows/` and `mcps/` are reserved. Their formats are not defined yet, and the validator and CLI ignore them. See the README in each folder.
+A workflow coordinates several skills and agents through phases, with gates where a person decides: "idea to published article", "manuscript to print-ready book". It lives at `workflows/<name>/` and has exactly the skill format: a `SKILL.md` that follows the Agent Skills specification, with optional `scripts/`, `references/` and `assets/`. It installs into the harness's skills folder like any skill, so every harness that supports skills can run it.
+
+What makes it a workflow:
+
+| Field | Required | Rule |
+| --- | --- | --- |
+| `metadata.requires` | One of the two | Space-delimited skills, workflows or externals it uses |
+| `metadata.agents` | One of the two | Space-delimited agents it dispatches. Each must be named in the body as `` `agent-name` `` |
+
+Installing a workflow installs everything it requires and every agent it dispatches. Workflows that dispatch agents need a harness with subagents; say so in `compatibility`.
+
+Keep the procedure in the workflow and the identities in the agents. An agent whose body is a sequence of phases that dispatches other agents is a workflow, not an agent.
+
+## Externals
+
+An external is a skill kept in another repository and cloned when it is installed, because its license does not allow copying it here, or because it has no license at all. It lives at `externals/<name>/external.json`:
+
+```json
+{
+  "name": "sciwrite",
+  "description": "What the skill does and when to use it.",
+  "version": "0.1.0",
+  "kind": "skill",
+  "repo": "https://github.com/owner/repository",
+  "commit": "64b128b88fdaadfd1eb312f42c2ae1475f91b512",
+  "path": "",
+  "license": "none",
+  "notes": "Why it is external, and anything the user should know."
+}
+```
+
+| Field | Rule |
+| --- | --- |
+| `name` | Same naming rule. Must equal the folder name. Shares the namespace of skills and workflows. |
+| `kind` | `skill`, the only kind supported |
+| `repo` | https URL of the git repository |
+| `commit` | Full 40-character hash. Installs are pinned; update it deliberately, after reading what changed. |
+| `path` | Folder of the skill inside the repository, `""` for the root. It must contain `SKILL.md`. |
+| `license` | SPDX identifier, `none`, or a short description of a custom license. Shown to the user before installing. |
+
+The CLI installs externals with the system's `git`. The Claude Code plugin marketplace cannot include them, because they have no files in this repository.
+
+## Tools a skill needs
+
+When a skill's scripts need a program on the machine, list it in `metadata.requires-tools`, space-delimited, and explain versions and installation in `compatibility`:
+
+```yaml
+compatibility: Needs Python 3.10 or later with the pypdf package, and Quarto 1.4 or later.
+metadata:
+  version: "0.1.0"
+  requires-tools: python3 quarto
+```
+
+`add` and `doctor` report any tool that is not on the PATH, with the skills that need it. Nothing is installed automatically.
+
+## Fields for one harness
+
+Some harnesses read extra frontmatter fields. Canonical files keep those fields under `metadata`, and the harness's adapter moves them where the harness expects them at install time.
+
+| Field | Harness | Purpose |
+| --- | --- | --- |
+| `metadata.argument-hint` | Claude Code | Hint shown when a skill is run as a slash command, such as `"<topic or idea>"` |
+
+## MCPs
+
+`mcps/` is reserved. The format is not defined yet, and the validator and CLI ignore it.
 
 ## Generated files
 

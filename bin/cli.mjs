@@ -6,15 +6,16 @@ import { relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { adapters, getAdapter } from '../adapters/index.mjs';
 import { loadAll } from '../lib/components.mjs';
-import { InstallError, applyInstall, expand, planInstall, resolveReference } from '../lib/install.mjs';
+import { InstallError, applyInstall, expand, missingTools, planInstall, resolveReference } from '../lib/install.mjs';
 import { validateAll } from '../lib/validate.mjs';
 
 const HELP = `aiudalabs-marketplace <command>
 
 Commands:
-  list                      Show available agents, skills and stacks
+  list                      Show available agents, skills, workflows, externals and stacks
   harnesses                 Show supported harnesses and where they install
   add <name...>             Install components into a harness
+  doctor <name...>          Check that the tools the components need are installed
 
 Options for add:
   --harness, -a <id>        Target harness (required), see \`harnesses\`
@@ -27,8 +28,13 @@ Options for list:
   --json                    Print the listing as JSON
 
 Names can be bare (brand-guardian) or qualified (agent/brand-guardian,
-skill/startup-visual-identity, stack/brand-starter). Installing an agent
-also installs the skills it uses.`;
+skill/color-system, workflow/visual-identity, external/sciwrite,
+stack/brand-identity). Installing anything also installs what it uses:
+an agent brings its skills, a workflow brings its skills and agents.
+
+Externals are skills kept in another repository. They are cloned with git
+at a pinned commit, and the listing shows their license, which may be
+"none".`;
 
 function loadComponents() {
   const components = loadAll();
@@ -38,16 +44,36 @@ function loadComponents() {
 }
 
 function list({ json }) {
-  const { agents, skills, stacks } = loadComponents();
+  const { agents, skills, workflows, externals, stacks } = loadComponents();
+  const groups = { agents, skills, workflows, externals, stacks };
   if (json) {
     const pick = (component) => ({ name: component.id, description: component.data.description });
-    console.log(JSON.stringify({ agents: agents.map(pick), skills: skills.map(pick), stacks: stacks.map(pick) }, null, 2));
+    console.log(JSON.stringify(Object.fromEntries(Object.entries(groups).map(([key, items]) => [key, items.map(pick)])), null, 2));
     return;
   }
-  for (const [title, items] of [['Agents', agents], ['Skills', skills], ['Stacks', stacks]]) {
-    console.log(`\n${title}`);
-    for (const item of items) console.log(`  ${item.type}/${item.id}\n      ${item.data.description}`);
+  for (const [title, items] of Object.entries(groups)) {
+    if (items.length === 0) continue;
+    console.log(`\n${title[0].toUpperCase()}${title.slice(1)}`);
+    for (const item of items) {
+      const license = item.type === 'external' ? `  [license: ${item.data.license}]` : '';
+      console.log(`  ${item.type}/${item.id}${license}\n      ${item.data.description}`);
+    }
   }
+}
+
+function printMissingTools(skills) {
+  const missing = missingTools(skills);
+  for (const { tool, neededBy } of missing) console.log(`missing    ${tool} (needed by ${neededBy.join(', ')})`);
+  return missing;
+}
+
+function doctor(references) {
+  if (references.length === 0) throw new InstallError('doctor needs at least one component name');
+  const components = loadComponents();
+  const { skills } = expand(references.map((reference) => resolveReference(reference, components)), components);
+  const missing = printMissingTools(skills);
+  if (missing.length === 0) console.log('All required tools are installed.');
+  else process.exitCode = 1;
 }
 
 function harnesses() {
@@ -79,12 +105,18 @@ function add(references, options) {
     for (const operation of operations) console.log(`would add  ${operation.kind}/${operation.id} -> ${display(operation.target)}`);
     return;
   }
-  for (const result of applyInstall(operations, { force: options.force })) {
-    const label = result.status === 'installed' ? 'installed ' : 'exists    ';
-    const hint = result.status === 'exists' ? '  (use --force to overwrite)' : '';
+  for (const operation of operations.filter((op) => op.kind === 'external')) {
+    console.log(`external   ${operation.id}: cloning ${operation.repo} at ${operation.commit.slice(0, 7)} (license: ${operation.license})`);
+  }
+  const results = applyInstall(operations, { force: options.force });
+  for (const result of results) {
+    const label = { installed: 'installed ', exists: 'exists    ', failed: 'FAILED    ' }[result.status];
+    const hint = result.status === 'exists' ? '  (use --force to overwrite)' : result.error ? `  ${result.error}` : '';
     console.log(`${label} ${result.kind}/${result.id} -> ${display(result.target)}${hint}`);
   }
+  printMissingTools(expand(roots, components).skills);
   if (operations.length === 0) throw new InstallError(`nothing could be installed for ${adapter.label} at ${scope} level`);
+  if (results.some((result) => result.status === 'failed')) process.exitCode = 1;
 }
 
 function main() {
@@ -106,6 +138,7 @@ function main() {
   if (command === 'list') return list(values);
   if (command === 'harnesses') return harnesses();
   if (command === 'add') return add(rest, values);
+  if (command === 'doctor') return doctor(rest);
   throw new InstallError(`unknown command "${command}"\n\n${HELP}`);
 }
 
