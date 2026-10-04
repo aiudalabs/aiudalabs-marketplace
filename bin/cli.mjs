@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 // aiudalabs-marketplace CLI: list components and install them into a harness.
 
+import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { relative, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { adapters, getAdapter } from '../adapters/index.mjs';
-import { loadAll } from '../lib/components.mjs';
+import { ROOT, loadAll, requiredTools, skillRequires, workflowAgents } from '../lib/components.mjs';
 import { InstallError, applyInstall, expand, missingTools, planInstall, resolveReference } from '../lib/install.mjs';
 import { validateAll } from '../lib/validate.mjs';
+import { banner, colorEnabled, itemLines, makePainter, sectionHeader, table } from './ui.mjs';
 
 const HELP = `aiudalabs-marketplace <command>
 
 Commands:
-  list                      Show available agents, skills, workflows, externals and stacks
+  list [kind]               Show the catalog; kind is agents, skills, workflows, externals or stacks
   harnesses                 Show supported harnesses and where they install
   add <name...>             Install components into a harness
   doctor <name...>          Check that the tools the components need are installed
@@ -25,6 +27,9 @@ Options for add:
   --force                   Overwrite components that are already installed
 
 Options for list:
+  --search, -s <text>       Only show components whose name or description contains the text
+  --full                    Show full descriptions instead of the first sentence
+  --plain                   No colors (also when NO_COLOR is set or output is not a terminal)
   --json                    Print the listing as JSON
 
 Names can be bare (brand-guardian) or qualified (agent/brand-guardian,
@@ -43,22 +48,69 @@ function loadComponents() {
   return components;
 }
 
-function list({ json }) {
-  const { agents, skills, workflows, externals, stacks } = loadComponents();
-  const groups = { agents, skills, workflows, externals, stacks };
+const KINDS = ['agents', 'skills', 'workflows', 'externals', 'stacks'];
+const TYPE_OF = { agents: 'agent', skills: 'skill', workflows: 'workflow', externals: 'external', stacks: 'stack' };
+
+const plural = (n, word) => (n ? `${n} ${word}${n === 1 ? '' : 's'}` : null);
+
+function listDetails(item, components, paint) {
+  const count = plural;
+  const version = paint.dim(`v${item.data.metadata?.version ?? item.data.version ?? '?'}`);
+  if (item.type === 'agent') return [paint.dim(item.category), count((item.data.requires ?? []).length, 'skill'), version];
+  if (item.type === 'skill') return [requiredTools(item).length ? paint.warn(`needs ${requiredTools(item).join(', ')}`) : null, version];
+  if (item.type === 'workflow') return [paint.dim([count(skillRequires(item).length, 'skill'), count(workflowAgents(item).length, 'agent')].filter(Boolean).join(', ')), version];
+  if (item.type === 'external') {
+    const license = item.data.license === 'none' ? paint.warn('no license') : paint.dim(item.data.license);
+    return [license, paint.dim(`@${item.data.commit.slice(0, 7)}`), version];
+  }
+  return [];
+}
+
+function list(kindArg, { json, search, full, plain }) {
+  const components = loadComponents();
+  if (kindArg && !KINDS.includes(kindArg)) throw new InstallError(`unknown kind "${kindArg}"; use one of: ${KINDS.join(', ')}`);
+  const needle = search?.toLowerCase();
+  const matches = (item) => !needle || item.id.includes(needle) || String(item.data.description ?? '').toLowerCase().includes(needle);
+  const groups = KINDS.filter((kind) => !kindArg || kind === kindArg).map((kind) => [kind, components[kind].filter(matches)]);
+
   if (json) {
-    const pick = (component) => ({ name: component.id, description: component.data.description });
-    console.log(JSON.stringify(Object.fromEntries(Object.entries(groups).map(([key, items]) => [key, items.map(pick)])), null, 2));
+    const pick = (item) => ({ name: item.id, type: item.type, description: item.data.description });
+    console.log(JSON.stringify(Object.fromEntries(groups.map(([kind, items]) => [kind, items.map(pick)])), null, 2));
     return;
   }
-  for (const [title, items] of Object.entries(groups)) {
+
+  const paint = makePainter(colorEnabled({ plain }));
+  const width = Math.min(process.stdout.columns || 100, 110);
+  const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
+  const counts = KINDS.map((kind) => [kind, components[kind].length, TYPE_OF[kind]]);
+  const out = banner({ name: pkg.name, version: pkg.version, description: pkg.description, counts }, paint, width);
+
+  for (const [kind, items] of groups) {
     if (items.length === 0) continue;
-    console.log(`\n${title[0].toUpperCase()}${title.slice(1)}`);
+    out.push(...sectionHeader(kind, items.length, TYPE_OF[kind], paint, width));
+    if (kind === 'stacks') {
+      const rows = items.map((stack) => {
+        const { agents, skills } = expand([stack], components);
+        const installs = [plural(skills.length, 'skill'), plural(agents.length, 'agent')].filter(Boolean).join(' · ');
+        return [paint.bold(paint.type('stack')(stack.id)), installs, stack.data.description];
+      });
+      out.push('', ...table([{ title: 'Stack' }, { title: 'Installs' }, { title: 'For' }], rows, paint, width));
+      continue;
+    }
     for (const item of items) {
-      const license = item.type === 'external' ? `  [license: ${item.data.license}]` : '';
-      console.log(`  ${item.type}/${item.id}${license}\n      ${item.data.description}`);
+      out.push(...itemLines({ type: item.type, name: item.id, details: listDetails(item, components, paint), description: item.data.description }, paint, width, full));
     }
   }
+
+  if (groups.every(([, items]) => items.length === 0)) out.push('', `  ${paint.warn('Nothing matches')} ${paint.dim(search ? `"${search}"` : '')}`);
+  out.push(
+    '',
+    `  ${paint.dim('Install one piece or a whole stack:')}`,
+    `  ${paint.accent('npx github:aiudalabs/aiudalabs-marketplace add')} ${paint.bold('<name>')} ${paint.accent('--harness')} ${paint.bold('<id>')}`,
+    `  ${paint.dim('Harnesses:')} ${adapters.map((adapter) => adapter.id).join(paint.dim(', '))}`,
+    '',
+  );
+  console.log(out.join('\n'));
 }
 
 function printMissingTools(skills) {
@@ -129,13 +181,16 @@ function main() {
       'dry-run': { type: 'boolean' },
       force: { type: 'boolean' },
       json: { type: 'boolean' },
+      search: { type: 'string', short: 's' },
+      full: { type: 'boolean' },
+      plain: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
     },
   });
   const [command, ...rest] = positionals;
 
   if (values.help || !command || command === 'help') return console.log(HELP);
-  if (command === 'list') return list(values);
+  if (command === 'list') return list(rest[0], values);
   if (command === 'harnesses') return harnesses();
   if (command === 'add') return add(rest, values);
   if (command === 'doctor') return doctor(rest);

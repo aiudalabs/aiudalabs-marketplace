@@ -51,7 +51,9 @@ npx github:aiudalabs/aiudalabs-marketplace harnesses
 npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-code
 ```
 
-Useful flags: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, and installing a skill also installs the skills it requires.
+`list` takes a kind (`agents`, `skills`, `workflows`, `externals`, `stacks`), `--search <text>` to filter and `--full` for whole descriptions. Output is colored in a terminal; `--plain` or `NO_COLOR` turns colors off, and `--json` prints it for scripts.
+
+Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, and installing a skill also installs the skills it requires.
 
 ### Claude Code
 
