@@ -32,4 +32,9 @@ mkdirSync(out, { recursive: true });
 cpSync(join(ROOT, 'site'), out, { recursive: true });
 // A script, not JSON, so the page also works when opened from disk.
 writeFileSync(join(out, 'data.js'), `window.MARKETPLACE = ${JSON.stringify(data)};\n`);
+// Each component's own text, fetched by its page: content/<kind>/<name>.md.
+for (const item of [...components.skills, ...components.workflows, ...components.agents]) {
+  mkdirSync(join(out, 'content', item.type), { recursive: true });
+  writeFileSync(join(out, 'content', item.type, `${item.id}.md`), item.body.trim() + '\n');
+}
 console.log(`Wrote ${out} (${data.items.length} components)`);
