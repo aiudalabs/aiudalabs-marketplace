@@ -3,6 +3,7 @@
 // generated from the components. GitHub Pages serves that folder.
 // Usage: node scripts/build-site.mjs [output-dir]
 
+import { createHash } from 'node:crypto';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { adapters } from '../adapters/index.mjs';
@@ -32,6 +33,15 @@ mkdirSync(out, { recursive: true });
 cpSync(join(ROOT, 'site'), out, { recursive: true });
 // A script, not JSON, so the page also works when opened from disk.
 writeFileSync(join(out, 'data.js'), `window.MARKETPLACE = ${JSON.stringify(data)};\n`);
+// Browsers keep a file for ten minutes after a deploy. A version in each URL, taken
+// from the file's content, makes a changed file a new URL, so a deploy shows at once.
+const page = join(out, 'index.html');
+const versioned = readFileSync(page, 'utf8').replace(/(href|src)="(styles\.css|app\.js|data\.js)"/g, (_, attribute, file) => {
+  const hash = createHash('sha256').update(readFileSync(join(out, file))).digest('hex').slice(0, 10);
+  return `${attribute}="${file}?v=${hash}"`;
+});
+writeFileSync(page, versioned);
+
 // Each component's own text, fetched by its page: content/<kind>/<name>.md.
 for (const item of [...components.skills, ...components.workflows, ...components.agents]) {
   mkdirSync(join(out, 'content', item.type), { recursive: true });
