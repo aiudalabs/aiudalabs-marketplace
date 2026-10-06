@@ -13,6 +13,7 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "catalog": "node scripts/build-catalog.mjs",
+    "site": "node scripts/build-site.mjs",
     "test": "node --test"
   }
 }

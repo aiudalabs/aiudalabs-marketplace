@@ -65,8 +65,8 @@ export function summarize(text, width, maxLines = 2) {
 
 const padEnd = (text, width) => text + ' '.repeat(Math.max(0, width - visibleLength(text)));
 
-// Block letters for the banner, five rows high.
-const LETTERS = {
+// Block letters for the banner, five rows high. The website draws the same logo.
+export const LETTERS = {
   a: [' ███ ', '█   █', '█████', '█   █', '█   █'],
   i: ['███', ' █ ', ' █ ', ' █ ', '███'],
   u: ['█   █', '█   █', '█   █', '█   █', ' ███ '],
@@ -75,7 +75,7 @@ const LETTERS = {
   b: ['████ ', '█   █', '████ ', '█   █', '████ '],
   s: [' ████', '█    ', ' ███ ', '    █', '████ '],
 };
-const GRADIENT = [214, 215, 216, 217, 218, 219, 183, 147, 111];
+export const GRADIENT = [214, 215, 216, 217, 218, 219, 183, 147, 111];
 
 export function blockWord(word, paint) {
   const rows = ['', '', '', '', ''];

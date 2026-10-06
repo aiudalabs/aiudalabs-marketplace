@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aiuda Labs Marketplace</title>
+  <meta name="description" content="Agents, skills, workflows and stacks for Claude Code, Cursor, Codex, Gemini CLI, OpenCode, GitHub Copilot and Osaurus. Search the catalog and copy the install command.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2315181e'/%3E%3Cpath d='M4 5l3 3-3 3M9 11h3' fill='none' stroke='%23ffaf5f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <aside class="sidebar" aria-label="Catalog">
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true">&gt;_</span>
+      <span>Aiuda Labs <span class="brand-sub">marketplace</span></span>
+    </a>
+    <nav>
+      <p class="nav-title">Browse</p>
+      <ul id="nav-kinds" class="nav-list"></ul>
+      <p class="nav-title">Learn</p>
+      <ul class="nav-list">
+        <li><a href="#/" data-route="home">How it works</a></li>
+        <li><a id="link-contribute" href="#">Contribute</a></li>
+        <li><a id="link-github" href="#">GitHub</a></li>
+      </ul>
+    </nav>
+    <p class="sidebar-foot" id="version"></p>
+  </aside>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="brand-mark topbar-brand" href="#/" aria-label="Aiuda Labs marketplace, home">&gt;_</a>
+      <label class="search">
+        <span class="search-prompt" aria-hidden="true">&gt;</span>
+        <span class="visually-hidden">Search the catalog</span>
+        <input id="search" type="search" placeholder="Search skills, agents, workflows, stacks..." autocomplete="off" spellcheck="false">
+        <kbd>/</kbd>
+      </label>
+      <label class="harness-pick">
+        <span>Install for</span>
+        <select id="harness" aria-label="Harness to install for"></select>
+      </label>
+      <button id="theme" class="icon-button" type="button" aria-label="Switch between dark and light theme">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7z" fill="currentColor"/></svg>
+      </button>
+    </header>
+
+    <main id="main">
+      <!-- Home: what the marketplace is and how its pieces fit. Static, so it reads without JavaScript. -->
+      <section id="view-home" class="view">
+        <div class="hero">
+          <pre id="logo" class="logo" aria-label="aiudalabs"></pre>
+          <h1>Agents, skills and workflows for the AI coding tool you already use</h1>
+          <p class="hero-sub">One source, written once, installed into Claude Code, Cursor, Codex, Gemini CLI, OpenCode, GitHub Copilot or Osaurus with one command.</p>
+          <div id="stats" class="stats"></div>
+          <div class="command-box hero-command">
+            <code id="hero-command"></code>
+            <button class="copy" type="button" data-copy-from="hero-command">Copy</button>
+          </div>
+          <p class="hero-links"><a class="button primary" href="#/browse">Browse the catalog</a> <a class="button" href="#how">How it works</a></p>
+        </div>
+
+        <div class="prose-wrap" id="how">
+          <h2>How it works</h2>
+          <p class="lede">Five kinds of component. Each one has one job, and the installer knows which ones need which.</p>
+
+          <div class="kinds">
+            <article class="kind-card k-skill"><h3>Skill</h3><p class="kind-role">A how</p><p>Steps, templates and scripts for one task. A folder with a <code>SKILL.md</code>, in the open Agent Skills format.</p></article>
+            <article class="kind-card k-agent"><h3>Agent</h3><p class="kind-role">A who</p><p>A persona: expertise, judgment and working style. One Markdown file that names the skills it uses.</p></article>
+            <article class="kind-card k-workflow"><h3>Workflow</h3><p class="kind-role">A process</p><p>Phases that call skills and dispatch agents, with gates where you approve before it goes on.</p></article>
+            <article class="kind-card k-stack"><h3>Stack</h3><p class="kind-role">A bundle</p><p>Everything for one job, installed together. It is only a list, and does nothing at run time.</p></article>
+            <article class="kind-card k-external"><h3>External</h3><p class="kind-role">A pointer</p><p>A skill that lives in another repository, cloned at a pinned commit because its license does not allow a copy here.</p></article>
+          </div>
+
+          <h3 class="section-title">Who uses whom</h3>
+          <p>Installing any piece brings everything it depends on. The arrows below are real dependencies from the catalog.</p>
+          <figure>
+            <div class="scroll">
+              <svg viewBox="0 0 1040 470" role="img" aria-label="The academic-paper stack installs the paper-author workflow. The workflow follows the steps of the lit-review skill and dispatches the research-analyst agent as a subagent; the agent loads the academic-writing-principles skill. In other stacks, the brand-review skill requires color-system, and the production-book-publisher workflow requires the external kindle-cover, which is cloned from another GitHub repository at install time.">
+                <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+                <rect class="container" x="16" y="16" width="544" height="438" rx="14"/>
+                <text x="38" y="46" class="lab"><tspan class="stack-word">STACK</tspan><tspan class="name sm" dx="10">academic-paper</tspan><tspan class="note" dx="10">installs all of it</tspan></text>
+
+                <g class="k-workflow"><rect class="box" x="178" y="70" width="220" height="76" rx="8"/>
+                  <text x="288" y="94" class="kind" text-anchor="middle">WORKFLOW</text>
+                  <text x="288" y="116" class="name" text-anchor="middle">paper-author</text>
+                  <text x="288" y="135" class="note" text-anchor="middle">runs the phases and gates</text></g>
+                <g class="k-agent"><rect class="box" x="40" y="236" width="210" height="76" rx="8"/>
+                  <text x="145" y="260" class="kind" text-anchor="middle">AGENT</text>
+                  <text x="145" y="282" class="name" text-anchor="middle">research-analyst</text>
+                  <text x="145" y="301" class="note" text-anchor="middle">identity and judgment</text></g>
+                <g class="k-skill"><rect class="box" x="326" y="236" width="210" height="76" rx="8"/>
+                  <text x="431" y="260" class="kind" text-anchor="middle">SKILL</text>
+                  <text x="431" y="282" class="name" text-anchor="middle">lit-review</text>
+                  <text x="431" y="301" class="note" text-anchor="middle">steps, templates, scripts</text></g>
+                <g class="k-skill"><rect class="box" x="40" y="366" width="210" height="76" rx="8"/>
+                  <text x="145" y="390" class="kind" text-anchor="middle">SKILL</text>
+                  <text x="145" y="411" class="name sm" text-anchor="middle">academic-writing-principles</text>
+                  <text x="145" y="430" class="note" text-anchor="middle">reference knowledge</text></g>
+
+                <line class="edge" x1="230" y1="146" x2="160" y2="232" marker-end="url(#arrow)"/>
+                <text x="176" y="180" class="lab" text-anchor="end">dispatches</text>
+                <text x="176" y="195" class="lab muted" text-anchor="end">as a subagent</text>
+                <line class="edge" x1="346" y1="146" x2="416" y2="232" marker-end="url(#arrow)"/>
+                <text x="394" y="186" class="lab">follows its steps</text>
+                <line class="edge" x1="145" y1="312" x2="145" y2="362" marker-end="url(#arrow)"/>
+                <text x="155" y="342" class="lab">loads</text>
+
+                <text x="600" y="46" class="lab strong">Other relations</text>
+                <text x="600" y="64" class="note">from other stacks</text>
+                <g class="k-skill"><rect class="box" x="600" y="86" width="176" height="60" rx="8"/>
+                  <text x="688" y="108" class="kind" text-anchor="middle">SKILL</text>
+                  <text x="688" y="130" class="name sm" text-anchor="middle">brand-review</text></g>
+                <g class="k-skill"><rect class="box" x="834" y="86" width="190" height="60" rx="8"/>
+                  <text x="929" y="108" class="kind" text-anchor="middle">SKILL</text>
+                  <text x="929" y="130" class="name sm" text-anchor="middle">color-system</text></g>
+                <line class="edge" x1="776" y1="116" x2="830" y2="116" marker-end="url(#arrow)"/>
+                <text x="805" y="104" class="lab" text-anchor="middle">requires</text>
+
+                <g class="k-workflow"><rect class="box" x="600" y="206" width="176" height="60" rx="8"/>
+                  <text x="688" y="228" class="kind" text-anchor="middle">WORKFLOW</text>
+                  <text x="688" y="250" class="name xs" text-anchor="middle">production-book-publisher</text></g>
+                <g class="k-external"><rect class="box" x="834" y="206" width="190" height="60" rx="8"/>
+                  <text x="929" y="228" class="kind" text-anchor="middle">EXTERNAL</text>
+                  <text x="929" y="250" class="name sm" text-anchor="middle">kindle-cover</text></g>
+                <line class="edge" x1="776" y1="236" x2="830" y2="236" marker-end="url(#arrow)"/>
+                <text x="805" y="224" class="lab" text-anchor="middle">requires</text>
+
+                <g class="k-plain"><rect class="box" x="834" y="346" width="190" height="60" rx="8"/>
+                  <text x="929" y="368" class="kind" text-anchor="middle">GITHUB</text>
+                  <text x="929" y="390" class="note" text-anchor="middle">another repo, pinned commit</text></g>
+                <line class="edge dash" x1="929" y1="346" x2="929" y2="270" marker-end="url(#arrow)"/>
+                <text x="919" y="312" class="lab muted" text-anchor="end">cloned at install</text>
+              </svg>
+            </div>
+            <figcaption>A stack is only the list of what installs together. At run time, the workflow is what coordinates, and the agent is what brings an independent look.</figcaption>
+          </figure>
+
+          <h3 class="section-title">What happens when you ask for something</h3>
+          <p>A real run of the <a href="#/stack/write-article"><code>write-article</code></a> stack in Claude Code. Skills load into your main conversation. Agents work apart, each in its own context.</p>
+          <figure>
+            <div class="scroll">
+              <svg viewBox="0 0 1100 420" role="img" aria-label="Sequence: you ask for an article; the main model reads names and descriptions and picks article-author; it loads article-author; if the piece has figures it loads citation-audit, which dispatches a fresh reviewer per reference as a subagent; then it loads sciwrite and humanizer; you approve; the model writes the files.">
+                <defs><marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+                <rect class="lane" x="0" y="0" width="1100" height="90"/>
+                <rect class="lane alt" x="0" y="90" width="1100" height="100"/>
+                <rect class="lane" x="0" y="190" width="1100" height="120"/>
+                <rect class="lane alt" x="0" y="310" width="1100" height="110"/>
+                <line class="lane-line" x1="0" y1="90" x2="1100" y2="90"/>
+                <line class="lane-line" x1="0" y1="190" x2="1100" y2="190"/>
+                <line class="lane-line" x1="0" y1="310" x2="1100" y2="310"/>
+
+                <text x="16" y="44" class="lab strong">You</text>
+                <text x="16" y="136" class="lab strong">Main model</text>
+                <text x="16" y="154" class="note">your tool</text>
+                <text x="16" y="242" class="lab strong">Main context</text>
+                <text x="16" y="260" class="note">loaded skills and workflows</text>
+                <text x="16" y="356" class="lab strong">Subagents</text>
+                <text x="16" y="374" class="note">a clean context each</text>
+
+                <polyline class="edge" points="236,62 300,140" marker-end="url(#arrow2)"/>
+                <polyline class="edge" points="344,166 410,226" marker-end="url(#arrow2)"/>
+                <polyline class="edge" points="456,252 520,252" marker-end="url(#arrow2)"/>
+                <polyline class="edge" points="566,280 630,340" marker-end="url(#arrow2)"/>
+                <text x="604" y="300" class="lab">dispatches</text>
+                <polyline class="edge" points="680,340 744,280" marker-end="url(#arrow2)"/>
+                <text x="720" y="326" class="lab">returns</text>
+                <polyline class="edge" points="790,226 856,62" marker-end="url(#arrow2)"/>
+                <text x="834" y="150" class="lab">gate</text>
+                <polyline class="edge" points="904,62 970,140" marker-end="url(#arrow2)"/>
+
+                <g class="k-plain"><rect class="step" x="180" y="22" width="104" height="54" rx="8"/><circle class="num" cx="180" cy="22" r="10"/><text x="180" y="26" class="num-t" text-anchor="middle">1</text>
+                  <text x="232" y="45" class="lab" text-anchor="middle">You ask for</text><text x="232" y="61" class="lab" text-anchor="middle">an article</text></g>
+                <g class="k-plain"><rect class="step" x="290" y="114" width="108" height="54" rx="8"/><circle class="num" cx="290" cy="114" r="10"/><text x="290" y="118" class="num-t" text-anchor="middle">2</text>
+                  <text x="344" y="137" class="lab" text-anchor="middle">Reads names and</text><text x="344" y="153" class="lab" text-anchor="middle">descriptions</text></g>
+                <g class="k-workflow"><rect class="step" x="400" y="226" width="112" height="54" rx="8"/><circle class="num" cx="400" cy="226" r="10"/><text x="400" y="230" class="num-t" text-anchor="middle">3</text>
+                  <text x="456" y="249" class="lab" text-anchor="middle">Loads</text><text x="456" y="266" class="name sm" text-anchor="middle">article-author</text></g>
+                <g class="k-skill"><rect class="step" x="514" y="226" width="112" height="54" rx="8"/><circle class="num" cx="514" cy="226" r="10"/><text x="514" y="230" class="num-t" text-anchor="middle">4</text>
+                  <text x="570" y="249" class="lab" text-anchor="middle">Loads</text><text x="570" y="266" class="name sm" text-anchor="middle">citation-audit</text></g>
+                <g class="k-agent"><rect class="step" x="604" y="336" width="112" height="54" rx="8"/><circle class="num" cx="604" cy="336" r="10"/><text x="604" y="340" class="num-t" text-anchor="middle">5</text>
+                  <text x="660" y="359" class="lab" text-anchor="middle">A fresh reviewer</text><text x="660" y="375" class="lab" text-anchor="middle">per reference</text></g>
+                <g class="k-skill"><rect class="step" x="728" y="226" width="112" height="54" rx="8"/><circle class="num" cx="728" cy="226" r="10"/><text x="728" y="230" class="num-t" text-anchor="middle">6</text>
+                  <text x="784" y="249" class="name sm" text-anchor="middle">sciwrite +</text><text x="784" y="266" class="name sm" text-anchor="middle">humanizer</text></g>
+                <g class="k-plain"><rect class="step" x="850" y="22" width="104" height="54" rx="8"/><circle class="num" cx="850" cy="22" r="10"/><text x="850" y="26" class="num-t" text-anchor="middle">7</text>
+                  <text x="902" y="45" class="lab" text-anchor="middle">You approve</text><text x="902" y="61" class="lab" text-anchor="middle">the piece</text></g>
+                <g class="k-plain"><rect class="step" x="962" y="114" width="112" height="54" rx="8"/><circle class="num" cx="962" cy="114" r="10"/><text x="962" y="118" class="num-t" text-anchor="middle">8</text>
+                  <text x="1018" y="137" class="lab" text-anchor="middle">Writes the</text><text x="1018" y="153" class="lab" text-anchor="middle">files</text></g>
+              </svg>
+            </div>
+            <figcaption>Step 4 only happens when the piece has figures or citations to check. The reviewer in step 5 is a subagent on purpose: it did not see the text being written, so it does not defend it. That independence is the reason to make something an agent and not a skill.</figcaption>
+          </figure>
+
+          <h3 class="section-title">What takes up context, and when</h3>
+          <p>You can install many skills without filling the conversation, because each one loads in layers. This is the progressive disclosure the Agent Skills standard defines.</p>
+          <figure>
+            <div class="scroll">
+              <svg viewBox="0 0 960 250" role="img" aria-label="Always in context: only the name and description of each installed skill and workflow. When one is triggered, its full SKILL.md loads. When its instructions ask for them, its references are read or its scripts run.">
+                <defs><marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+                <text x="16" y="38" class="lab strong">Always</text>
+                <text x="16" y="55" class="note">name + description</text>
+                <g id="cells"></g>
+                <text x="16" y="128" class="lab strong">When triggered</text>
+                <text x="16" y="145" class="note">the full SKILL.md</text>
+                <text x="16" y="208" class="lab strong">If needed</text>
+                <text x="16" y="225" class="note">references and scripts</text>
+                <rect class="bar" x="408" y="104" width="300" height="44" rx="6"/>
+                <text x="558" y="131" class="lab" text-anchor="middle">step-by-step instructions</text>
+                <rect class="bar soft" x="408" y="186" width="120" height="40" rx="6"/>
+                <text x="468" y="211" class="name sm" text-anchor="middle">references/</text>
+                <rect class="bar soft" x="540" y="186" width="120" height="40" rx="6"/>
+                <text x="600" y="211" class="name sm" text-anchor="middle">assets/</text>
+                <rect class="bar soft" x="672" y="186" width="120" height="40" rx="6"/>
+                <text x="732" y="211" class="name sm" text-anchor="middle">scripts/</text>
+                <text x="804" y="211" class="note">run, not read</text>
+                <line class="edge" x1="457" y1="62" x2="457" y2="100" marker-end="url(#arrow3)"/>
+                <text x="466" y="86" class="lab">your request matches</text>
+                <line class="edge" x1="558" y1="148" x2="558" y2="182" marker-end="url(#arrow3)"/>
+                <text x="567" y="170" class="lab">the skill asks for it</text>
+              </svg>
+            </div>
+            <figcaption>Each cell in the top row is one skill or workflow in this catalog. The model only ever sees the name and description of all of them. Agents work the same way: the main model sees an agent's description, and its body loads only inside the subagent.</figcaption>
+          </figure>
+
+          <h3 class="section-title">How it reaches your project</h3>
+          <p>The marketplace keeps one version of each component. At install time, an adapter per tool puts it where that tool looks.</p>
+          <figure>
+            <div class="scroll">
+              <svg viewBox="0 0 960 380" role="img" aria-label="From the marketplace repository there are two routes. The CLI, with add and --harness, resolves dependencies, copies skills and workflows as they are, converts agents to each tool's format and clones externals, then writes into the folders of Claude Code, Cursor, Codex and four more. The Claude Code plugin installs a whole stack, without externals.">
+                <defs><marker id="arrow4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+                <rect class="frame" x="16" y="20" width="230" height="300" rx="10"/>
+                <text x="32" y="46" class="lab strong">Marketplace repo</text>
+                <g class="k-agent"><rect class="box" x="32" y="62" width="198" height="40" rx="6"/><text x="46" y="87" class="name sm">agents/*.md</text></g>
+                <g class="k-skill"><rect class="box" x="32" y="110" width="198" height="40" rx="6"/><text x="46" y="135" class="name sm">skills/*/SKILL.md</text></g>
+                <g class="k-workflow"><rect class="box" x="32" y="158" width="198" height="40" rx="6"/><text x="46" y="183" class="name sm">workflows/*/SKILL.md</text></g>
+                <g class="k-external"><rect class="box" x="32" y="206" width="198" height="40" rx="6"/><text x="46" y="231" class="name sm">externals/*.json</text></g>
+                <g class="k-stack"><rect class="box" x="32" y="254" width="198" height="40" rx="6"/><text x="46" y="279" class="name sm">stacks/*.json</text></g>
+
+                <g class="k-plain"><rect class="box" x="330" y="40" width="250" height="168" rx="8"/>
+                  <text x="346" y="66" class="name">add --harness X</text>
+                  <text x="346" y="92" class="note">1. brings every dependency</text>
+                  <text x="346" y="114" class="note">2. copies skills and workflows as is</text>
+                  <text x="346" y="136" class="note">3. converts each agent to that</text>
+                  <text x="360" y="153" class="note">tool's format</text>
+                  <text x="346" y="175" class="note">4. clones externals from GitHub</text>
+                  <text x="346" y="197" class="note">5. warns if a program is missing</text></g>
+                <g class="k-plain"><rect class="box" x="330" y="262" width="250" height="76" rx="8"/>
+                  <text x="346" y="288" class="name">/plugin install</text>
+                  <text x="346" y="310" class="note">a whole stack, Claude Code only</text>
+                  <text x="346" y="328" class="note">without externals</text></g>
+
+                <line class="edge" x1="246" y1="124" x2="326" y2="124" marker-end="url(#arrow4)"/>
+                <text x="286" y="114" class="lab muted" text-anchor="middle">CLI</text>
+                <line class="edge" x1="246" y1="290" x2="326" y2="298" marker-end="url(#arrow4)"/>
+                <text x="286" y="284" class="lab muted" text-anchor="middle">plugin</text>
+
+                <g class="k-plain">
+                  <rect class="box" x="680" y="40" width="264" height="58" rx="8"/>
+                  <text x="696" y="63" class="lab strong">Claude Code</text>
+                  <text x="696" y="84" class="name sm">.claude/skills/ · agents/*.md</text>
+                  <rect class="box" x="680" y="110" width="264" height="58" rx="8"/>
+                  <text x="696" y="133" class="lab strong">Cursor</text>
+                  <text x="696" y="154" class="name sm">.cursor/skills/ · agents/*.md</text>
+                  <rect class="box" x="680" y="180" width="264" height="58" rx="8"/>
+                  <text x="696" y="203" class="lab strong">Codex</text>
+                  <text x="696" y="224" class="name sm">.agents/skills/ · .codex/*.toml</text>
+                  <text x="696" y="264" class="note">and Gemini CLI, OpenCode,</text>
+                  <text x="696" y="282" class="note">GitHub Copilot and Osaurus</text>
+                </g>
+                <line class="edge" x1="580" y1="100" x2="676" y2="70" marker-end="url(#arrow4)"/>
+                <line class="edge" x1="580" y1="124" x2="676" y2="139" marker-end="url(#arrow4)"/>
+                <line class="edge" x1="580" y1="148" x2="676" y2="208" marker-end="url(#arrow4)"/>
+                <text x="628" y="76" class="lab muted" text-anchor="middle">writes</text>
+                <line class="edge dash" x1="580" y1="292" x2="676" y2="84" marker-end="url(#arrow4)"/>
+              </svg>
+            </div>
+            <figcaption>Skills and workflows work the same in all seven tools, because they all read the same standard format. The one thing that changes is the agent file: Markdown in most, <code>.agent.md</code> in Copilot and TOML in Codex.</figcaption>
+          </figure>
+
+          <h3 class="section-title">The five kinds, side by side</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th></th><th>What it is</th><th>Shape</th><th>Who triggers it</th><th>Where it works</th></tr></thead>
+              <tbody>
+                <tr><th class="t-skill">Skill</th><td>A how: steps, templates, scripts</td><td>A folder with <code>SKILL.md</code></td><td>The model, when your request matches its description</td><td>In your main conversation</td></tr>
+                <tr><th class="t-agent">Agent</th><td>A who: identity, judgment, voice</td><td>One <code>.md</code> file</td><td>The main model or a workflow dispatches it; you can also call it by name</td><td>In its own context, as a subagent</td></tr>
+                <tr><th class="t-workflow">Workflow</th><td>A process: phases, gates, coordination</td><td>A <code>SKILL.md</code> folder that declares its skills and agents</td><td>The same as a skill</td><td>In your main conversation, dispatching agents</td></tr>
+                <tr><th class="t-stack">Stack</th><td>A bundle for one job</td><td>A <code>stack.json</code> with a list</td><td>Nobody: it only exists at install time</td><td>It does not run</td></tr>
+                <tr><th class="t-external">External</th><td>A skill we cannot copy, for license reasons</td><td>An <code>external.json</code> with a repo and a commit</td><td>The same as a skill, once installed</td><td>In your main conversation</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-title">Start with a stack</h3>
+          <p>A stack is the quickest way in: one command installs everything for the job.</p>
+          <div id="home-stacks" class="grid"></div>
+          <p class="hero-links"><a class="button primary" href="#/browse">Browse everything</a></p>
+        </div>
+      </section>
+
+      <section id="view-browse" class="view" hidden></section>
+      <section id="view-detail" class="view" hidden></section>
+    </main>
+
+    <footer class="footer">
+      <p><span id="footer-name"></span> is open source under the MIT license. Ported components keep the license of their source, shown on each one.</p>
+    </footer>
+  </div>
+
+  <div id="tray" class="tray" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

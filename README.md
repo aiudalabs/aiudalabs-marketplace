@@ -131,6 +131,7 @@ workflows/         Multi-step processes that coordinate skills and agents
 externals/         Skills cloned from other repositories at a pinned commit
 stacks/            Curated bundles of agents, skills and workflows
 templates/         One skeleton per kind of component, filled in by `new`
+site/              The website: a searchable catalog, built into _site/ by `npm run site`
 mcps/              Reserved: MCP server definitions (format not defined yet)
 adapters/          One module per harness: where files go and how agents are rendered
 catalog/           Generated machine-readable index

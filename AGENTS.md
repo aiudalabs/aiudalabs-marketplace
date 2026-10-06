@@ -25,6 +25,7 @@ Formats and field rules are in [docs/component-formats.md](docs/component-format
 npm run validate   # validate all components and check generated files are current
 npm run catalog    # regenerate catalog/catalog.json and .claude-plugin/marketplace.json
 npm test           # run the test suite
+npm run site       # build the website into _site/ (open _site/index.html to preview)
 node bin/cli.mjs list
 node bin/cli.mjs add <name> --harness <id> --dir <project> --dry-run
 node bin/cli.mjs new <kind> <name>   # skeleton of a skill, agent, workflow, stack or external
@@ -44,6 +45,7 @@ CI runs the last two and fails when generated files are stale.
 
 - **Do not add dependencies.** The tooling is dependency-free on purpose so `npx` installs are fast and auditable. Ask the maintainers first if you believe one is needed.
 - **Do not edit generated files by hand**: `catalog/catalog.json` and `.claude-plugin/marketplace.json`.
+- **The website has no component data of its own.** Cards, counts and install commands come from `lib/site.mjs` at build time. Only the "How it works" text and diagrams in `site/index.html` are written by hand; update them when a kind of component or a harness changes.
 - **Do not invent harness paths or config fields.** Adapter paths come from vendor documentation, with the link recorded in the adapter file and in `adapters/README.md`.
 - **Do not add top-level frontmatter fields to skills.** The specification allows only `name`, `description`, `license`, `compatibility`, `metadata` and `allowed-tools`. Put extras under `metadata`.
 - **Skills are self-contained.** Never link to files in another skill's folder. If a skill needs another one, declare it in `metadata.requires` and refer to it by name.
@@ -66,6 +68,9 @@ CI runs the last two and fails when generated files are stale.
 | `lib/install.mjs` | Resolves names, expands dependencies, plans and applies installs |
 | `lib/scaffold.mjs` | Plans the skeleton of a new component from `templates/` |
 | `templates/` | One skeleton per kind of component, filled in by `new` |
+| `site/` | The website: static HTML, CSS and JavaScript, no build tools |
+| `lib/site.mjs` | Builds the data the website reads, from the components |
+| `scripts/build-site.mjs` | Writes `_site/`, which `.github/workflows/site.yml` deploys to GitHub Pages |
 | `bin/cli.mjs` | CLI entry point |
 | `test/` | Tests, run with `node --test` |
 | `workflows/` | Workflows: skills that coordinate other skills and agents |
