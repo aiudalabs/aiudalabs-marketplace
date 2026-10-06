@@ -84,18 +84,23 @@
     toastTimer = setTimeout(() => node.classList.remove('show'), 1600);
   }
 
-  async function copy(text) {
+  // Confirms on the button itself, where the eye already is, and in the live region for screen readers.
+  async function copy(text, button) {
     try {
       await navigator.clipboard.writeText(text);
-      toast('Copied');
     } catch {
-      toast('Select the command and copy it');
+      return toast('Select the command and copy it');
     }
+    toast('Copied to the clipboard');
+    if (!button || button.dataset.label) return;
+    button.dataset.label = button.textContent;
+    button.textContent = 'Copied';
+    setTimeout(() => { button.textContent = button.dataset.label; delete button.dataset.label; }, 1400);
   }
 
   const commandBox = (text, slash = false) => h('div', { class: `command-box${slash ? ' slash' : ''}` },
     h('code', {}, text),
-    h('button', { class: 'copy', type: 'button', onclick: () => copy(text) }, 'Copy'));
+    h('button', { class: 'copy', type: 'button', onclick: (event) => copy(text, event.currentTarget) }, 'Copy'));
 
   // --- Selection tray: several components in one install command.
   function toggleSelected(item) {
@@ -116,7 +121,7 @@
     tray.replaceChildren(
       h('span', { class: 'tray-label' }, `${plural(items.length, 'component')} selected`),
       commandBox(command(items.map((item) => item.ref))),
-      h('button', { class: 'mini', type: 'button', onclick: clear }, 'Clear'));
+      h('button', { class: 'button small', type: 'button', onclick: clear }, 'Clear'));
   }
 
   // --- Cards
@@ -136,6 +141,16 @@
     return nodes;
   }
 
+  // "follows a, b · dispatches x": the relations a card can show next to its counts.
+  function relations(item) {
+    const names = (kinds) => item.uses.filter((used) => kinds.includes(used.kind)).map((used) => used.name);
+    const skills = names(['skill', 'workflow', 'external']);
+    const agents = names(['agent']);
+    const verb = { workflow: 'follows', agent: 'loads', skill: 'requires', stack: 'includes' }[item.kind];
+    if (item.kind === 'stack') return `${verb} ${[...skills, ...agents].join(', ')}`;
+    return [skills.length ? `${verb} ${skills.join(', ')}` : null, agents.length ? `dispatches ${agents.join(', ')}` : null].filter(Boolean).join(' · ');
+  }
+
   function card(item) {
     const selected = state.selection.has(`${item.kind}/${item.name}`);
     return h('article', { class: `card k-${item.kind}` },
@@ -145,11 +160,12 @@
           h('h3', { class: 'card-title' }, h('a', { href: link(item) }, item.name)),
           h('p', { class: 'card-kind' }, item.kind))),
       h('p', { class: 'card-text' }, summary(item.description)),
+      relations(item) ? h('p', { class: 'card-rel' }, relations(item)) : null,
       h('div', { class: 'card-foot' },
         chips(item),
         h('div', { class: 'card-actions' },
-          h('button', { class: 'mini', type: 'button', 'aria-label': `Copy the install command for ${item.name}`, onclick: () => copy(command([item.ref])) }, 'Copy install'),
-          h('button', { class: 'mini', type: 'button', 'aria-pressed': String(selected), 'aria-label': `${selected ? 'Remove' : 'Add'} ${item.name} ${selected ? 'from' : 'to'} the combined command`, onclick: () => toggleSelected(item) }, selected ? 'Added' : '+ Add'))));
+          h('button', { class: 'button small', type: 'button', 'aria-label': `Copy the install command for ${item.name}`, onclick: (event) => copy(command([item.ref]), event.currentTarget) }, 'Copy install'),
+          h('button', { class: 'button small', type: 'button', 'aria-pressed': String(selected), title: 'Install several components with one command', 'aria-label': `${selected ? 'Remove' : 'Add'} ${item.name} ${selected ? 'from' : 'to'} the combined install command`, onclick: () => toggleSelected(item) }, selected ? 'Added' : '+ Add'))));
   }
 
   // --- Routing
@@ -159,18 +175,19 @@
     const params = new URLSearchParams(query);
     if (parts[0] === 'browse') {
       const kind = KINDS.find((entry) => entry.plural === parts[1]);
-      return { view: 'browse', kind: kind?.id ?? null, query: params.get('q') ?? '', stack: params.get('stack') ?? '' };
+      return { view: 'browse', kind: kind?.id ?? null, query: params.get('q') ?? '', stack: params.get('stack') ?? '', sort: params.get('sort') === 'name' ? 'name' : 'kind' };
     }
     const item = parts.length === 2 ? byKey.get(`${parts[0]}/${parts[1]}`) : null;
     if (item) return { view: 'detail', item };
     return { view: 'home' };
   }
 
-  function browseHash({ kind, query, stack }) {
+  function browseHash({ kind, query, stack, sort }) {
     const segment = KINDS.find((entry) => entry.id === kind)?.plural;
     const params = new URLSearchParams();
     if (query) params.set('q', query);
     if (stack) params.set('stack', stack);
+    if (sort === 'name') params.set('sort', 'name');
     const suffix = params.toString();
     return `#/browse${segment ? `/${segment}` : ''}${suffix ? `?${suffix}` : ''}`;
   }
@@ -196,6 +213,10 @@
       h('option', { value: '' }, 'Any stack'),
       DATA.items.filter((item) => item.kind === 'stack').map((stack) => h('option', { value: stack.name, selected: stack.name === route.stack }, `In ${stack.name}`)));
 
+    const sortSelect = h('select', { 'aria-label': 'Sort', onchange: (event) => { location.hash = browseHash({ ...route, sort: event.target.value }); } },
+      h('option', { value: 'kind', selected: route.sort === 'kind' }, 'Grouped by kind'),
+      h('option', { value: 'name', selected: route.sort === 'name' }, 'A to Z'));
+
     const pills = h('nav', { class: 'pills', 'aria-label': 'Kinds' },
       h('a', { class: 'pill', href: browseHash({ ...route, kind: null }), 'aria-current': route.kind ? null : 'page' }, 'All'),
       KINDS.map((entry) => h('a', { class: `pill k-${entry.id}`, href: browseHash({ ...route, kind: entry.id }), 'aria-current': route.kind === entry.id ? 'page' : null }, entry.label)));
@@ -203,9 +224,10 @@
     const head = h('div', { class: 'browse-head' },
       h('h1', {}, kind ? kind.label : 'Everything'),
       h('span', { class: 'browse-count' }, plural(results.length, 'component')),
-      h('div', { class: 'browse-tools' }, stackSelect));
+      h('div', { class: 'browse-tools' }, stackSelect, sortSelect));
 
-    const groups = KINDS.filter((entry) => results.some((item) => item.kind === entry.id)).flatMap((entry) => [
+    const byName = [...results].sort((a, b) => a.name.localeCompare(b.name));
+    const groups = route.sort === 'name' ? [h('div', { class: 'grid' }, byName.map(card))] : KINDS.filter((entry) => results.some((item) => item.kind === entry.id)).flatMap((entry) => [
       route.kind ? null : h('h2', { class: `group-title k-${entry.id}` }, `${entry.label} (${results.filter((item) => item.kind === entry.id).length})`),
       h('div', { class: 'grid' }, results.filter((item) => item.kind === entry.id).map(card)),
     ]).filter(Boolean);
@@ -246,8 +268,10 @@
     return h('section', { class: 'panel' }, h('h2', {}, `Install for ${target.label}`), commandBox(command([item.ref])), notes, plugin);
   }
 
+  const sourceUrl = (item) => `https://github.com/${DATA.repository}/${item.kind === 'skill' || item.kind === 'workflow' ? 'tree' : 'blob'}/main/${item.path}`;
+
   function factsPanel(item) {
-    const source = `https://github.com/${DATA.repository}/${item.kind === 'skill' || item.kind === 'workflow' ? 'tree' : 'blob'}/main/${item.path}`;
+    const source = sourceUrl(item);
     const rows = [
       ['Version', item.version],
       item.category ? ['Category', item.category] : null,
@@ -265,6 +289,24 @@
       item.files?.length ? [h('p', { class: 'sub-label' }, plural(item.files.length, 'file')), h('div', { class: 'files' }, item.files.map((file) => h('div', {}, file)))] : null);
   }
 
+  // Most descriptions say what the component does, then when to use it. Show them as two paragraphs.
+  function describe(text) {
+    const match = text.match(/^(.+?[.!?])\s+((?:Use|Trigger|Invoke|Do NOT)\b.+)$/s);
+    return (match ? [match[1], match[2]] : [text]).map((part) => h('p', {}, part));
+  }
+
+  // The component's own instructions, fetched when its page opens. Opened from disk there is nothing to fetch, so link to the source.
+  function contentPanel(item) {
+    if (!['skill', 'workflow', 'agent'].includes(item.kind)) return null;
+    const title = item.kind === 'agent' ? 'The persona' : 'The instructions (SKILL.md)';
+    const body = h('pre', { class: 'doc', tabindex: '0', 'aria-label': title }, 'Loading...');
+    fetch(`content/${item.kind}/${item.name}.md`)
+      .then((response) => (response.ok ? response.text() : Promise.reject(new Error(response.status))))
+      .then((text) => { body.textContent = text; })
+      .catch(() => { body.replaceWith(h('p', { class: 'hint' }, 'Read it in the repository: ', h('a', { href: sourceUrl(item) }, item.path))); });
+    return h('section', { class: 'panel' }, h('h2', {}, title), body);
+  }
+
   function renderDetail(item) {
     const kind = KINDS.find((entry) => entry.id === item.kind);
     const selected = state.selection.has(`${item.kind}/${item.name}`);
@@ -272,6 +314,7 @@
       installPanel(item),
       item.installs.length ? h('section', { class: 'panel' }, h('h2', {}, item.kind === 'stack' ? `What is inside (${item.installs.length})` : `Installs with it (${item.installs.length})`), refGroups(item.installs)) : null,
       item.usedBy.length ? h('section', { class: 'panel' }, h('h2', {}, 'Used by'), refGroups(item.usedBy)) : null,
+      contentPanel(item),
     ];
     $('view-detail').replaceChildren(
       h('p', { class: 'crumbs' }, h('a', { href: '#/browse' }, 'catalog'), ' / ', h('a', { href: browseHash({ kind: item.kind }) }, kind.plural), ' / ', item.name),
@@ -281,8 +324,8 @@
           h('h1', {}, item.name),
           h('div', { class: 'detail-meta' },
             h('span', { class: 'chip' }, item.kind), h('span', { class: 'chip' }, `v${item.version}`), chips(item),
-            h('button', { class: 'mini', type: 'button', 'aria-pressed': String(selected), onclick: () => toggleSelected(item) }, selected ? 'Added to command' : '+ Add to command')))),
-      h('p', { class: 'detail-desc' }, item.description),
+            h('button', { class: 'button small', type: 'button', 'aria-pressed': String(selected), title: 'Install several components with one command', onclick: () => toggleSelected(item) }, selected ? 'Added to the command' : '+ Add to a combined command')))),
+      h('div', { class: 'detail-desc' }, describe(item.description)),
       h('div', { class: 'detail-grid' }, h('div', {}, left), h('div', {}, factsPanel(item))));
   }
 
@@ -335,7 +378,7 @@
 
   $('search').addEventListener('input', (event) => {
     const route = parseRoute();
-    const next = browseHash({ kind: route.view === 'browse' ? route.kind : null, stack: route.view === 'browse' ? route.stack : '', query: event.target.value });
+    const next = browseHash({ ...(route.view === 'browse' ? route : {}), query: event.target.value });
     // Typing replaces the entry, so Back leaves the search in one step.
     history.replaceState(null, '', next);
     render();
@@ -351,11 +394,19 @@
     document.documentElement.dataset.theme = next;
     store.set('theme', next);
   });
-  document.documentElement.dataset.theme = store.get('theme', 'dark');
+
+  // The sidebar is a drawer on narrow screens.
+  function setMenu(open) {
+    document.body.classList.toggle('menu-open', open);
+    $('menu').setAttribute('aria-expanded', String(open));
+  }
+  $('menu').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+  $('scrim').addEventListener('click', () => setMenu(false));
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setMenu(false); });
 
   document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-copy-from]');
-    if (button) copy($(button.dataset.copyFrom).textContent);
+    if (button) copy($(button.dataset.copyFrom).textContent, button);
   });
 
   $('link-github').href = `https://github.com/${DATA.repository}`;
@@ -363,7 +414,7 @@
   $('version').textContent = `v${DATA.version}`;
   $('footer-name').textContent = DATA.name;
 
-  window.addEventListener('hashchange', () => { render(); if (!location.hash.includes('how')) window.scrollTo(0, 0); });
+  window.addEventListener('hashchange', () => { setMenu(false); render(); if (!location.hash.includes('how')) window.scrollTo(0, 0); });
   const initial = parseRoute();
   if (initial.view === 'browse') $('search').value = initial.query;
   renderTray();

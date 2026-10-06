@@ -45,7 +45,7 @@ CI runs the last two and fails when generated files are stale.
 
 - **Do not add dependencies.** The tooling is dependency-free on purpose so `npx` installs are fast and auditable. Ask the maintainers first if you believe one is needed.
 - **Do not edit generated files by hand**: `catalog/catalog.json` and `.claude-plugin/marketplace.json`.
-- **The website has no component data of its own.** Cards, counts and install commands come from `lib/site.mjs` at build time. Only the "How it works" text and diagrams in `site/index.html` are written by hand; update them when a kind of component or a harness changes.
+- **The website has no component data of its own.** Cards, counts and install commands come from `lib/site.mjs` at build time. Only the "How it works" text and diagrams in `site/index.html` are written by hand; update them when a kind of component or a harness changes. Every color, size and spacing goes through the tokens in `site/styles.css`; the rules are in [site/README.md](site/README.md), and a test checks contrast and the type scale.
 - **Do not invent harness paths or config fields.** Adapter paths come from vendor documentation, with the link recorded in the adapter file and in `adapters/README.md`.
 - **Do not add top-level frontmatter fields to skills.** The specification allows only `name`, `description`, `license`, `compatibility`, `metadata` and `allowed-tools`. Put extras under `metadata`.
 - **Skills are self-contained.** Never link to files in another skill's folder. If a skill needs another one, declare it in `metadata.requires` and refer to it by name.
