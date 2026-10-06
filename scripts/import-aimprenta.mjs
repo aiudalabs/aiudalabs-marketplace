@@ -204,7 +204,17 @@ const WORKFLOWS = [
     changes: ['Imported as a workflow, because it dispatches the `paper-review` agent; the agent is imported alongside it.'],
   },
   {
-    name: 'paper-author', from: 'skills/paper-author', notRequired: ['scientific-book-editor'],
+    name: 'paper-author', from: 'skills/paper-author', notRequired: ['scientific-book-editor'], version: '0.2.0',
+    // A depth setting (scripts/patches/paper-author-depth.md) so a preprint
+    // does not get a venue submission's full checking.
+    rewrite: (text) => [
+      ['argument-hint: "[paper-dir-or-idea]"', 'argument-hint: "[paper-dir-or-idea] [--depth preprint|venue]"'],
+      ['## Stage 1 — Frame the paper', `${readFileSync(join(ROOT, 'scripts/patches/paper-author-depth.md'), 'utf8').trimEnd()}\n\n## Stage 1 — Frame the paper`],
+      ['conference / preprint-only), rough length budget.', 'conference / preprint-only), rough length budget, and the depth.'],
+      ['`references.bib` + paper cards the later `citation-audit` can verify against.', '`references.bib` + paper cards the later `citation-audit` can verify against,\nat the volume the depth sets.'],
+      ['Invoke `paper-review` (panel mode for anything going to a real venue, single\nmode for a fast internal check — ask the user which) alongside', 'Invoke `paper-review` (single mode at `preprint` depth, panel mode at `venue`\ndepth) alongside'],
+      ['check) and `sciwrite` in full-review mode', 'check, scoped by depth) and, at `venue` depth only, `sciwrite` in full-review mode'],
+    ].reduce((current, [from, to]) => replaceOnce(current, from, to), text),
     compatibility: 'Dispatches research and review agents, so it needs a harness with subagents.',
   },
   {
@@ -379,6 +389,12 @@ function knownNames() {
   };
 }
 
+// A patch that no longer matches upstream must stop the import, not vanish.
+function replaceOnce(text, from, to) {
+  if (!text.includes(from)) fail(`patch text not found upstream: ${from.slice(0, 60)}`);
+  return text.replace(from, () => to);
+}
+
 const namedIn = (body, names, self) => [...names].filter((name) => name !== self && body.includes(`\`${name}\``)).sort();
 
 function importWorkflow(spec) {
@@ -411,7 +427,7 @@ function importWorkflow(spec) {
     license: info.license,
     compatibility: spec.compatibility,
     metadata: {
-      version: '0.1.0',
+      version: spec.version ?? '0.1.0',
       author: info.author,
       source: info.repo,
       ...(data['argument-hint'] ? { 'argument-hint': data['argument-hint'] } : {}),

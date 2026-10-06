@@ -4,10 +4,10 @@ description: "Idea to a review-ready single-document academic manuscript (journa
 license: "MIT"
 compatibility: "Dispatches research and review agents, so it needs a harness with subagents."
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "aiudalabs"
   source: "https://github.com/aiudalabs/aimprenta"
-  argument-hint: "[paper-dir-or-idea]"
+  argument-hint: "[paper-dir-or-idea] [--depth preprint|venue]"
   requires: "citation-audit humanizer lit-review manuscript-drafting manuscript-revision paper-review sciwrite"
   agents: "paper-crawler paper-review research-analyst"
 ---
@@ -30,6 +30,30 @@ per-chapter parallelism and `scientific-book-editor`'s seven phases.
 statistics, or numbers anywhere. A claim without a source is flagged
 `[source needed]`, never dressed up.
 
+## Depth: preprint or venue
+
+Every run has a depth, set in Stage 1 and recorded in `BRIEF.md`. Take it
+from `--depth preprint|venue` when given; otherwise use `venue` when the
+brief names a peer-reviewed journal or conference as the target and
+`preprint` for everything else (arXiv, internal report, working paper), and
+confirm it at the first gate. The honesty rules and the gates are the same
+at both depths; depth only sets how much checking each stage does.
+
+| Step | `preprint` | `venue` |
+| --- | --- | --- |
+| Sources (Stage 2) | 25 to 40 references. Full paper cards only for load-bearing sources; background sources get a `references.bib` entry with a one-line `note` | Full `lit-review` |
+| Full-text reading | Only load-bearing sources, about ten at most; abstracts are enough for the rest | Every source cited for a specific finding |
+| Style (Stages 4 and 5) | `humanizer` only | `humanizer`, then `sciwrite` in full-review mode in Stage 5 |
+| Review (Stage 5) | `paper-review` in single mode | `paper-review` in panel mode |
+| Citation audit (Stage 5) | Full audit of load-bearing citations; existence and metadata check for background citations | Full audit of every cited entry |
+
+A **load-bearing** source is one the paper relies on for a specific claim,
+number, finding or method. A **background** source is cited for context or
+attribution, such as the paper that introduced a well-known technique.
+
+Do not add checking steps the depth does not call for. If one seems needed,
+propose it at the next gate with the reason and what it costs.
+
 ## Stage 1 — Frame the paper
 
 Interview the user briefly: research question or thesis, target venue (if
@@ -37,7 +61,7 @@ known — it shapes length and structure conventions), audience, what's novel
 about this over existing work. Spawn `research-analyst` to check the
 positioning claim isn't already staked out. Produce `BRIEF.md` — one
 paragraph: question, thesis, target venue or venue class (journal /
-conference / preprint-only), rough length budget.
+conference / preprint-only), rough length budget, and the depth.
 
 ## Stage 2 — Sources (mandatory, not optional)
 
@@ -45,7 +69,8 @@ Invoke `lit-review` — for a paper, unlike a book, this step is never
 skipped, because the Introduction's gap statement and the Discussion's
 literature placement are load-bearing, not supplementary. Use
 `paper-crawler` for DBLP/OpenAlex sweeps in academic domains. Output:
-`references.bib` + paper cards the later `citation-audit` can verify against.
+`references.bib` + paper cards the later `citation-audit` can verify against,
+at the volume the depth sets.
 
 **Gate: user approves the brief and confirms the venue/scope.**
 
@@ -78,11 +103,11 @@ solely to the reviewer's writing-quality lens.
 
 ## Stage 5 — Independent review
 
-Invoke `paper-review` (panel mode for anything going to a real venue, single
-mode for a fast internal check — ask the user which) alongside
+Invoke `paper-review` (single mode at `preprint` depth, panel mode at `venue`
+depth) alongside
 `citation-audit` (every reference: exists, correctly attributed, and
 actually supports the claim at the citation site — the telephone-game
-check) and `sciwrite` in full-review mode (all five passes: clutter, voice,
+check, scoped by depth) and, at `venue` depth only, `sciwrite` in full-review mode (all five passes: clutter, voice,
 sentence architecture, terminology consistency, numerical/citation
 consistency). All three read the whole manuscript — nothing to shard.
 
