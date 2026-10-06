@@ -27,6 +27,7 @@ npm run catalog    # regenerate catalog/catalog.json and .claude-plugin/marketpl
 npm test           # run the test suite
 node bin/cli.mjs list
 node bin/cli.mjs add <name> --harness <id> --dir <project> --dry-run
+node bin/cli.mjs new <kind> <name>   # skeleton of a skill, agent, workflow, stack or external
 ```
 
 There is nothing to install. The repository has zero dependencies.
@@ -63,6 +64,8 @@ CI runs the last two and fails when generated files are stale.
 | `lib/validate.mjs` | Validation rules |
 | `lib/catalog.mjs` | Builds the generated files |
 | `lib/install.mjs` | Resolves names, expands dependencies, plans and applies installs |
+| `lib/scaffold.mjs` | Plans the skeleton of a new component from `templates/` |
+| `templates/` | One skeleton per kind of component, filled in by `new` |
 | `bin/cli.mjs` | CLI entry point |
 | `test/` | Tests, run with `node --test` |
 | `workflows/` | Workflows: skills that coordinate other skills and agents |
@@ -78,6 +81,8 @@ CI runs the last two and fails when generated files are stale.
 - Add a test in `test/` for every new validation rule or adapter behavior.
 
 ## Common tasks
+
+Start any new component with `node bin/cli.mjs new <kind> <name>` (agents also take `--category`). It writes the skeleton in the right place and marks what to fill in with `TODO`.
 
 **Add a skill**: create `skills/<name>/SKILL.md`, keep the body under 500 lines, move detail to `references/`, then run the three commands above.
 

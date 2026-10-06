@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 // aiudalabs-marketplace CLI: list components and install them into a harness.
 
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { adapters, getAdapter } from '../adapters/index.mjs';
 import { ROOT, loadAll, requiredTools, skillRequires, workflowAgents } from '../lib/components.mjs';
 import { InstallError, applyInstall, expand, missingTools, planInstall, resolveReference } from '../lib/install.mjs';
+import { SCAFFOLD_KINDS, planScaffold } from '../lib/scaffold.mjs';
 import { validateAll } from '../lib/validate.mjs';
 import { banner, colorEnabled, itemLines, makePainter, sectionHeader, table } from './ui.mjs';
 
@@ -18,6 +19,8 @@ Commands:
   harnesses                 Show supported harnesses and where they install
   add <name...>             Install components into a harness
   doctor <name...>          Check that the tools the components need are installed
+  new <kind> <name>         Start a component from its template, in a clone of the marketplace;
+                            kind is skill, agent, workflow, stack or external
 
 Options for add:
   --harness, -a <id>        Target harness (required), see \`harnesses\`
@@ -25,6 +28,10 @@ Options for add:
   --dir <path>              Project directory to install into (default: current directory)
   --dry-run                 Print what would be written, change nothing
   --force                   Overwrite components that are already installed
+
+Options for new:
+  --category <name>         Folder under agents/ for a new agent (required for agents)
+  --dir <path>              Marketplace clone to write into (default: current directory)
 
 Options for list:
   --search, -s <text>       Only show components whose name or description contains the text
@@ -171,6 +178,25 @@ function add(references, options) {
   if (results.some((result) => result.status === 'failed')) process.exitCode = 1;
 }
 
+// Contributors run this in their clone; through npx the current directory is some other project.
+const CHECKOUT_FOLDERS = ['agents', 'skills', 'stacks'];
+
+function create(kind, name, options) {
+  if (!kind) throw new InstallError(`new needs a kind and a name; kinds: ${SCAFFOLD_KINDS.join(', ')}`);
+  const root = resolve(options.dir ?? process.cwd());
+  if (!CHECKOUT_FOLDERS.every((folder) => existsSync(join(root, folder)))) {
+    throw new InstallError(`${root} is not a clone of the marketplace; run \`new\` from the clone you are contributing to, or pass --dir`);
+  }
+  const { path, content } = planScaffold(kind, name, { category: options.category, components: loadAll(root) });
+  const file = join(root, path);
+  if (existsSync(file)) throw new InstallError(`${path} already exists`);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
+  console.log(`created    ${path}`);
+  console.log('\nNext: replace every TODO, then run `npm run catalog`, `npm run validate` and `npm test`.');
+  console.log('What goes in it: CONTRIBUTING.md. Every field and rule: docs/component-formats.md.');
+}
+
 function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
@@ -178,6 +204,7 @@ function main() {
       harness: { type: 'string', short: 'a' },
       global: { type: 'boolean', short: 'g' },
       dir: { type: 'string' },
+      category: { type: 'string' },
       'dry-run': { type: 'boolean' },
       force: { type: 'boolean' },
       json: { type: 'boolean' },
@@ -194,6 +221,7 @@ function main() {
   if (command === 'harnesses') return harnesses();
   if (command === 'add') return add(rest, values);
   if (command === 'doctor') return doctor(rest);
+  if (command === 'new') return create(rest[0], rest[1], values);
   throw new InstallError(`unknown command "${command}"\n\n${HELP}`);
 }
 

@@ -83,6 +83,8 @@ Write it in the third person. State the outcome, then the triggers:
 description: Builds a first visual identity for a startup. Use when the user asks for a brand identity, color palette, font pairing or logo direction.
 ```
 
+A description that still starts with `TODO`, as the skeletons from `new` do, is an error for every kind of component.
+
 ## Agents
 
 An agent is one Markdown file at `agents/<category>/<name>.md`. It describes a persona. It does not contain procedures.
@@ -166,17 +168,19 @@ An external is a skill kept in another repository and cloned when it is installe
 
 ```json
 {
-  "name": "sciwrite",
+  "name": "kindle-cover",
   "description": "What the skill does and when to use it.",
   "version": "0.1.0",
   "kind": "skill",
-  "repo": "https://github.com/owner/repository",
-  "commit": "64b128b88fdaadfd1eb312f42c2ae1475f91b512",
+  "repo": "https://github.com/nikmcfly/kindle-cover-skill",
+  "commit": "954eb8efc270397a635b92088c5a6eea815bf938",
   "path": "",
   "license": "none",
   "notes": "Why it is external, and anything the user should know."
 }
 ```
+
+This is [`kindle-cover`](../externals/kindle-cover/external.json), whose repository has no license file. A skill whose license allows copying is ported instead, with its notices: see "Port from another repository" in [CONTRIBUTING.md](../CONTRIBUTING.md#port-from-another-repository).
 
 | Field | Rule |
 | --- | --- |
@@ -220,5 +224,5 @@ Never edit these by hand. Run `npm run catalog`.
 
 | File | Purpose |
 | --- | --- |
-| `catalog/catalog.json` | Index of every agent, skill and stack, for tools and a future web listing |
+| `catalog/catalog.json` | Index of every agent, skill, workflow, external and stack, for tools and a future web listing |
 | `.claude-plugin/marketplace.json` | Plugin marketplace manifest, one plugin per stack |

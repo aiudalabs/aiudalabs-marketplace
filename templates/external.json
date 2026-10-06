@@ -1,0 +1,11 @@
+{
+  "name": "{{name}}",
+  "description": "TODO: what the skill does, then when to use it.",
+  "version": "0.1.0",
+  "kind": "skill",
+  "repo": "TODO: https URL of the repository",
+  "commit": "TODO: the full 40-character commit hash you reviewed",
+  "path": "",
+  "license": "TODO: SPDX identifier, or none when the repository has no license file",
+  "notes": "TODO: why it is external, and anything the user should know before installing."
+}

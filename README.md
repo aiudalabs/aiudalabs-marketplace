@@ -1,6 +1,6 @@
 # aiudalabs-marketplace
 
-An open-source marketplace of AI agents, skills and stacks that installs into Claude Code, Cursor, OpenAI Codex CLI, Gemini CLI, OpenCode, GitHub Copilot and Osaurus from one canonical source.
+An open-source marketplace of AI agents, skills, workflows and stacks that installs into Claude Code, Cursor, OpenAI Codex CLI, Gemini CLI, OpenCode, GitHub Copilot and Osaurus from one canonical source.
 
 > Status: v0.1.0, not yet released. Eight stacks are available. MCP definitions are a reserved folder with no installer support yet.
 
@@ -16,6 +16,16 @@ Most collections mix personas and procedures in the same file. This repository k
 | Answers | "Who is doing the work, and how do they think?" | "What are the steps, and what files do they need?" |
 
 An agent lists the skills it uses. It does not contain their steps. If an agent file starts to read like a checklist, that checklist belongs in a skill.
+
+Three more kinds build on those two:
+
+| | What it is | Shape |
+| --- | --- | --- |
+| Workflow | A process in phases that coordinates skills and agents, with gates where a person approves | A folder in `workflows/` with the skill format, which also declares the skills it follows and the agents it dispatches |
+| External | A skill kept in another repository, because its license does not allow copying it here | An `external.json` in `externals/` with the repository and a pinned commit |
+| Stack | The pieces for one job, installed together | A `stack.json` in `stacks/` that lists agents, skills and workflows |
+
+Who uses whom: a stack lists entry points; a workflow follows skills and dispatches agents as subagents; an agent loads the skills it names; a skill can require another skill. Installing any piece brings everything it depends on.
 
 Skills follow progressive disclosure: a harness loads only `name` and `description` at discovery time, reads `SKILL.md` when the skill is triggered, and opens files in `references/` only when the instructions point to them.
 
@@ -53,7 +63,7 @@ npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-c
 
 `list` takes a kind (`agents`, `skills`, `workflows`, `externals`, `stacks`), `--search <text>` to filter and `--full` for whole descriptions. Output is colored in a terminal; `--plain` or `NO_COLOR` turns colors off, and `--json` prints it for scripts.
 
-Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, and installing a skill also installs the skills it requires.
+Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, installing a workflow also installs its skills and agents, and installing a skill also installs the skills it requires.
 
 ### Claude Code
 
@@ -117,25 +127,29 @@ node bin/cli.mjs add brand-identity --harness cursor --dir /path/to/your/project
 ```
 agents/            Personas, one Markdown file each, grouped by category
 skills/            Agent Skills folders (SKILL.md + scripts/ references/ assets/)
-stacks/            Curated bundles of agents and skills
 workflows/         Multi-step processes that coordinate skills and agents
 externals/         Skills cloned from other repositories at a pinned commit
+stacks/            Curated bundles of agents, skills and workflows
+templates/         One skeleton per kind of component, filled in by `new`
 mcps/              Reserved: MCP server definitions (format not defined yet)
 adapters/          One module per harness: where files go and how agents are rendered
 catalog/           Generated machine-readable index
 .claude-plugin/    Generated plugin marketplace manifest
 bin/               The CLI
 lib/               Loaders, validator, catalog builder, installer
-scripts/           validate and build-catalog entry points
+scripts/           validate, build-catalog and the aimprenta importer
 test/              Tests (node --test)
 docs/              Component format reference
+CONTRIBUTING.md    How to add each kind of component
 ```
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/component-formats.md](docs/component-formats.md). The short version:
+[CONTRIBUTING.md](CONTRIBUTING.md) explains how to add a skill, an agent, a workflow, a stack or an external, step by step, and how to port one from another repository. Every field and rule is in [docs/component-formats.md](docs/component-formats.md). The short version, from a clone:
 
 ```bash
+node bin/cli.mjs new skill <name>   # or agent, workflow, stack, external
+# replace every TODO in the new file, then:
 npm run catalog    # regenerate catalog/catalog.json and the plugin manifest
 npm run validate   # check every component against the rules
 npm test           # run the test suite

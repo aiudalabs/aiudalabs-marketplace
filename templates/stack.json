@@ -1,0 +1,8 @@
+{
+  "name": "{{name}}",
+  "description": "TODO: the job this stack does, start to finish.",
+  "version": "0.1.0",
+  "agents": [],
+  "skills": [],
+  "workflows": []
+}
