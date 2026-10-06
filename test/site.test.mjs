@@ -73,6 +73,8 @@ test('the build writes a folder GitHub Pages can serve', (t) => {
   assert.equal(window.MARKETPLACE.logo.length, 'aiudalabs'.length);
   // The page is served from a subfolder, so every local reference is relative.
   const html = readFileSync(join(out, 'index.html'), 'utf8');
+  // Each asset URL carries a version, so a deploy is not hidden by the browser's cache.
+  for (const file of ['styles.css', 'app.js', 'data.js']) assert.match(html, new RegExp(`"${file.replace('.', '\\.')}\\?v=[0-9a-f]{10}"`), file);
   assert.ok(!/(?:href|src)="\/(?!\/)/.test(html), 'no root-relative URLs');
 });
 
