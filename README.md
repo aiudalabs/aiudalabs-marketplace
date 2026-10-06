@@ -2,6 +2,8 @@
 
 An open-source marketplace of AI agents, skills, workflows and stacks that installs into Claude Code, Cursor, OpenAI Codex CLI, Gemini CLI, OpenCode, GitHub Copilot and Osaurus from one canonical source.
 
+**Browse the catalog: [aiudalabs.github.io/aiudalabs-marketplace](https://aiudalabs.github.io/aiudalabs-marketplace/)**
+
 > Status: v0.1.0, not yet released. Eight stacks are available. MCP definitions are a reserved folder with no installer support yet.
 
 ## The idea: agents are the "who", skills are the "how"

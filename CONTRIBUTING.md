@@ -232,6 +232,8 @@ Commit the regenerated files along with your change. Never edit `catalog/catalog
 
 Install the component in at least one harness and use it once. Say which harness in the pull request.
 
+Every change reaches `main` through a pull request. Nobody pushes to `main` directly, the `validate` check has to pass, and a maintainer approves before it merges.
+
 ## Versioning
 
 Components use semver.
