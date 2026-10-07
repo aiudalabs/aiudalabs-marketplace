@@ -3,7 +3,7 @@ name: execution-router
 description: "Prepares the next sprint just in time, from the repository's real state: reads spec-guard status, the previous sprint's retro and the code that actually got merged, corrects the sprint's issues when reality moved, classifies each issue by size, scope and risk to choose its execution mode (parallel worktree or sequential, autonomous or with a human checkpoint) and its validation rigor, and rewrites that sprint's orchestrator and executor prompts in docs/SPRINT_PROMPTS.md. Use between sprints: \"prepara el sprint 3\", \"cerramos el sprint, ¿qué sigue?\", \"regenera los prompts del próximo sprint\", \"route the next sprint\". It does not plan the whole backlog (multi-agent-governance) and does not run the sprint (sprint-runner)."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: aiudalabs
   requires: spec-guard issue-delivery
 ---
@@ -20,6 +20,7 @@ This skill prepares. It does not write application code and does not run the spr
 - "regenera los prompts del próximo sprint" / "route the next sprint"
 - After `sprint-runner` ends a sprint and points here
 - Before Sprint 0 or 1 when their prompts are stale (the kickstart or the spec changed after governance)
+- Mid-sprint, after an approved amendment to one issue, when `spec.mjs amend` has not regenerated its prompt: rewrite that issue's executor prompt only (Step 4, part 3), from the amended issue
 
 Do not use it when:
 
@@ -51,7 +52,10 @@ Reality moves; the backlog follows. Typical corrections:
 - A path changed: update `files_touched` (still inside the owner's lane).
 - A hidden dependency surfaced in the retro: add it to `depends_on`.
 - An issue is too big for one agent session (Step 3 says "large + cross-package"): split it into two issues with new ids at the end of the sprint.
-- A risky issue was marked autonomous: set `autonomous: false`.
+- A risky issue was marked autonomous: set `autonomous: false`. That includes issues that create or deploy cloud resources or need a device, a native SDK build, credentials or a vendor account; or split those checks into an issue for a person. A criterion with the `human:` prefix always makes its issue `autonomous: false`.
+- A criterion names or needs a path missing from `files_touched` (the setting's file, the test file, a deleted file, the workspace manifest), or cites a section missing from `reads` (the permissions section for auth code): add it. Every criterion is checked this way, against the rules in `multi-agent-governance` Step 5.
+- A manifest change and its lockfile refresh would merge at different barriers: pair them with `merge_with` and put the refresh in the wave right after the manifest issue, before every issue that installs from it.
+- A deliverable the lane gate never runs (a shell script, a workflow, docs only): add a `gate:` list.
 - Something an earlier sprint should have built is missing: add an issue for it here and say so; do not hide it inside another issue.
 - A lane needs a change in a file it does not own (the retro, or a blocked issue, says so): add an issue for the owning lane and make the waiting issue depend on it. Lockfiles, CI workflows and generated barrels have one owner each, as in `docs/AGENT_ROSTER.md`.
 - A UI issue's `reads` lists `docs/UI_SCREENS.md#s-<screen-id>` for every screen it builds, and `mockups/<app-id>.html#s-<screen-id>` only for a key screen that has a mockup. Remove a mockup anchor that does not resolve.
@@ -73,7 +77,7 @@ Fix every error before writing prompts.
 |---|---|---|
 | **Size** | small (< 200 lines changed), medium (200-1000), large (> 1000) | acceptance criteria, number of `files_touched` |
 | **Scope** | single file, single package, cross-package, repo-wide | `files_touched` against the folder layout |
-| **Risk** | low (UI, docs), medium (server units, schema), high (authorization, money, migrations, deletes) | `decision_refs`, the criteria, the retro |
+| **Risk** | low (UI, docs), medium (server units, schema), high (authorization, money, migrations, deletes, cloud resources and deploys, device or native builds) | `decision_refs`, the criteria, the retro |
 
 When an issue is ambiguous, call it medium on all three.
 
@@ -85,7 +89,7 @@ The classification decides three things:
 
 **Autonomy.**
 - **Autonomous**: the executor plans, implements and hands to `qa-tester` without stopping.
-- **Human checkpoint**: the executor posts its plan and stops for approval before writing code, and again before the final commit. Required for high risk, and for anything the retro flagged. Mirror it in the issue as `autonomous: false`.
+- **Human checkpoint**: the executor posts its plan and stops for approval before writing code, and again before the final commit. Required for high risk (creating or deploying cloud resources, and anything that needs a device, a native SDK, credentials or a vendor account, included), and for anything the retro flagged. Mirror it in the issue as `autonomous: false`.
 
 **Validation rigor.**
 - **Low risk**: the lane's test command and `spec.mjs verify <id>`.
@@ -109,16 +113,16 @@ The section has three parts.
 
 1. *Anchor*: "You are playing the orchestrator role for Sprint {N}: {theme}. Read AGENTS.md, docs/AGENT_ROSTER.md, docs/ORCHESTRATOR.md, docs/ISSUES.md (Sprint {N}), docs/WAVE_DAG.md (Sprint {N}). Run `spec.mjs status` and confirm scope."
 2. *Current state*: facts from Step 1, written today: what is merged, what exists, what the retro changed. Never copied from an earlier sprint.
-3. *Wave plan*: per wave, the issues, owners, worktrees and modes; sequential issues after the barrier; checkpoints named.
+3. *Wave plan*: per wave, the issues, owners, worktrees, emulator port offsets (k×100 for the k-th worktree) and modes; sequential issues after the barrier; `merge_with` pairs merged together; checkpoints named. How an approved amendment reaches a worktree: commit it on the base with `spec.mjs amend`, regenerate the executor prompt, the owner merges the base into `wt/<id>`.
 4. *Approval gate*: "Output the wave plan FIRST. Spawn nothing until I approve."
 
 **3. Executor prompt per issue** (typically 25-40 lines around the inlined issue), paste-ready:
 
 1. *Identity*: "You are {owner}, delivering {id} in worktree `wt/{id}`. Your lane is docs/AGENT_ROSTER.md § {owner}. Follow the `issue-delivery` skill."
-2. *Context*: the `reads` list in order, and nothing else.
+2. *Context*: "Read these first, in order, then the decisions and requirements your issue cites, and nothing else", followed by the `reads` list.
 3. *Current state*: the two or three repo facts this issue depends on.
-4. *Task*: the issue inlined verbatim, with `files_touched` and the lanes not to touch.
-5. *Validation*: the exact commands for its rigor level, and `spec.mjs verify {id}`.
+4. *Task*: the issue inlined verbatim, with `files_touched` and the lanes not to touch, and the commit subject `{id} task-{k}: {summary} [refs: {decision_refs}, {requirement_refs}]`. Omit ` [refs: ...]` when both lists are empty; never `[refs: setup]`.
+5. *Validation*: the issue's `gate:` commands first, then the exact lane commands for its rigor level, and `spec.mjs verify {id}`. Emulator gates use the worktree's port offset, and the executor stops everything it starts before it reports.
 6. *Autonomy*: autonomous, "post your plan, then proceed"; human checkpoint, "post your plan and wait for approval before writing code".
 7. *Done signal*: summary, commits, deviations, the human checks, handoff to `qa-tester`. No self-merge.
 
@@ -126,7 +130,7 @@ The section has three parts.
 
 1. Every unmerged issue of the target sprint has a row in the plan and an executor prompt; no merged issue has one.
 2. Every prompt cites documents and sections that exist, and commands that exist in `AGENTS.md` and actually run (Step 1.5).
-3. Every executor prompt matches its issue's frontmatter after the corrections.
+3. Every executor prompt matches its issue's frontmatter after the corrections. Regenerate a prompt from its issue; never patch both by hand.
 4. `spec.mjs check --strict` exits 0.
 
 Close in Spanish:
