@@ -34,11 +34,52 @@ This is deliberate for Claude Code, whose subagent `skills` field injects the fu
 
 Codex (`skills.config`) and OpenCode (`permission.skill`) can enable, disable or restrict skills per agent. The adapters do not use those settings.
 
+## Can an agent load its skills?
+
+This is the assumption the design rests on. An installed agent names its skills in its body and carries no skills field, so it reaches them only if the harness lets a subagent load skills on demand. What each vendor documents, checked on 2026-10-07:
+
+| Harness | Subagent loads skills on demand | Evidence |
+| --- | --- | --- |
+| Claude Code | Documented yes | The sub-agents page: without `skills`, "the subagent can still discover and invoke project, user, and plugin skills through the Skill tool during execution". Omitting `tools` inherits every tool, the Skill tool included. |
+| OpenCode | Documented yes | Skills load "on-demand via the native `skill` tool"; per-agent `permission.skill` defaults to allow. |
+| Gemini CLI | Likely, not documented | Subagents that omit `tools` inherit all of them, which would include `activate_skill`; the subagents page never mentions skills. |
+| GitHub Copilot | Unclear | The `.agent.md` reference has no skills property and `tools` defaults to all. The Copilot SDK page says sub-agents "do not inherit skills", but it covers programmatic agents, not `.agent.md` files. |
+| Cursor | Not verified | The documentation could not be read from where this was checked. |
+| OpenAI Codex CLI | Not verified | Same. Codex has a per-agent `skills.config`, which the adapter does not set. |
+
+Every path in the table at the top of this page matched the documentation that could be read. Gemini CLI, OpenCode and Copilot also read `.agents/skills/`.
+
+### Check it in your harness
+
+Documentation is not behavior. To check a harness, install this canary in an empty project, using that harness's folders from the table above, then ask the main session to have `canary-agent` fetch the codeword:
+
+```markdown
+<!-- <skills folder>/canary-skill/SKILL.md -->
+---
+name: canary-skill
+description: Gives the project codeword. Use when anyone asks for the project codeword.
+---
+
+The project codeword is PERIWINKLE-4417. Reply with it exactly.
+```
+
+```markdown
+<!-- <agents folder>/canary-agent.md -->
+---
+name: canary-agent
+description: Answers questions about the project codeword. Delegate to it when the user asks for the codeword.
+---
+
+You do not know the codeword. Load the `canary-skill` skill and follow it. If you cannot load skills, say "NO SKILL ACCESS" and list your tools.
+```
+
+Ask: "Use the canary-agent subagent to get the project codeword. Do not read any files or load skills yourself." `PERIWINKLE-4417` means the subagent loaded the skill; "NO SKILL ACCESS" means agents installed here cannot reach their skills. Please open an issue with the result and the harness version, so the table above can say "tested".
+
 ## What has been tested
 
 The test suite installs the example stack through every adapter into a temporary project and checks the files land in the paths above. The generated plugin manifest passes `claude plugin validate`.
 
-Loading the installed files inside each harness has not been verified yet. If a harness does not pick up a component, please open an issue with the harness version.
+Loading the installed files inside each harness has not been verified yet; the canary above is how to verify it. If a harness does not pick up a component, please open an issue with the harness version.
 
 ## Plugin marketplace
 

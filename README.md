@@ -65,7 +65,31 @@ npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-c
 
 `list` takes a kind (`agents`, `skills`, `workflows`, `externals`, `stacks`), `--search <text>` to filter and `--full` for whole descriptions. Output is colored in a terminal; `--plain` or `NO_COLOR` turns colors off, and `--json` prints it for scripts.
 
-Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, installing a workflow also installs its skills and agents, and installing a skill also installs the skills it requires.
+Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` replaces components that are already installed. Installing an agent also installs the skills it uses, installing a workflow also installs its skills and agents, and installing a skill also installs the skills it requires.
+
+### Pin the version you run
+
+`npx github:aiudalabs/aiudalabs-marketplace` runs whatever is on the default branch at that moment, including the installer itself. When you depend on the result, or run it in CI, pin a commit (or a release tag, once there are tags):
+
+```bash
+npx github:aiudalabs/aiudalabs-marketplace#<commit-or-tag> add brand-identity --harness claude-code
+```
+
+### Update and remove
+
+`add` records what it installed, with versions and a fingerprint of each file, in `.aiudalabs-marketplace.json` at the root of the project (in your home directory with `--global`). Commit it if your team shares the installed components. The other commands read it and only touch what it lists:
+
+```bash
+npx github:aiudalabs/aiudalabs-marketplace outdated                                   # what has a newer version
+npx github:aiudalabs/aiudalabs-marketplace update --harness claude-code               # upgrade everything you added
+npx github:aiudalabs/aiudalabs-marketplace remove brand-identity --harness claude-code
+```
+
+`update` leaves a component you edited after installing it alone, and says so; `--force` replaces your edits. `remove` deletes what you added and the dependencies nothing else you added still needs; it keeps files you edited, and never deletes files it did not install.
+
+### Externals without a license
+
+An external is cloned from its own repository at a pinned commit. When that repository has no license, nothing grants you the right to copy or use the code, so `add` asks before installing it. Outside a terminal it skips it, unless you pass `--allow-unlicensed`.
 
 ### Claude Code
 
