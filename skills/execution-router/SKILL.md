@@ -3,7 +3,7 @@ name: execution-router
 description: "Prepares the next sprint just in time, from the repository's real state: reads spec-guard status, the previous sprint's retro and the code that actually got merged, corrects the sprint's issues when reality moved, classifies each issue by size, scope and risk to choose its execution mode (parallel worktree or sequential, autonomous or with a human checkpoint) and its validation rigor, and rewrites that sprint's orchestrator and executor prompts in docs/SPRINT_PROMPTS.md. Use between sprints: \"prepara el sprint 3\", \"cerramos el sprint, ¿qué sigue?\", \"regenera los prompts del próximo sprint\", \"route the next sprint\". It does not plan the whole backlog (multi-agent-governance) and does not run the sprint (sprint-runner)."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires: spec-guard issue-delivery
 ---
@@ -34,7 +34,7 @@ Do not use it when:
 - The real repository: `git log` on the base branch, the files that exist, the commands that work
 - `AGENTS.md`, `docs/AGENT_ROSTER.md`, `docs/ISSUES.md`, `docs/WAVE_DAG.md`, `docs/ARCHITECTURE.md`, the schema document
 
-If `spec-guard` is not installed in the project, ask the user to install it (see the `spec-guard` skill) before going on: the status and the checks are the inputs this skill trusts. If the retro is missing, say so and ask for the three facts it would have given: what was not finished, what broke, what to change.
+If `spec-guard` is not installed in the project, ask the user to install it (see the `spec-guard` skill) before going on: the status and the checks are the inputs this skill trusts. If the `spec-guard` skill was updated since the project's copy was installed, ask the user to run its installer again (`node <spec-guard skill folder>/scripts/install.mjs`; safe to repeat, it replaces `tools/spec-guard/` and keeps hooks and settings). If the retro is missing, say so and ask for the three facts it would have given: what was not finished, what broke, what to change.
 
 ## Step 1: Establish where the project really is
 
@@ -42,6 +42,7 @@ If `spec-guard` is not installed in the project, ask the user to install it (see
 2. Unmerged issues from earlier sprints are carried over, not forgotten: list them and ask whether they move into the target sprint or stay where they are.
 3. Read the retro. Extract every point that changes the plan: an underestimated area, a flaky command, a lane that was too wide, a dependency nobody declared.
 4. Look at the code the target sprint builds on. For each issue, check that what its `reads` and acceptance criteria assume exists (the collection, the endpoint, the shared type, the package) and that its `files_touched` still match the real layout.
+5. Check that each validation command in `AGENTS.md` really runs: the script exists in the package's `package.json` (or `melos.yaml`, `pyproject.toml`) and its output shows it ran. pnpm exits 0 when `--filter` matches no package or the package lacks the script; those messages ("No projects matched the filters", "None of the selected packages has a ... script") are failures, not passes. Prefer `pnpm --dir <package folder> run <script>`, which fails on a missing script.
 
 ## Step 2: Correct the sprint's issues
 
@@ -52,6 +53,8 @@ Reality moves; the backlog follows. Typical corrections:
 - An issue is too big for one agent session (Step 3 says "large + cross-package"): split it into two issues with new ids at the end of the sprint.
 - A risky issue was marked autonomous: set `autonomous: false`.
 - Something an earlier sprint should have built is missing: add an issue for it here and say so; do not hide it inside another issue.
+- A lane needs a change in a file it does not own (the retro, or a blocked issue, says so): add an issue for the owning lane and make the waiting issue depend on it. Lockfiles, CI workflows and generated barrels have one owner each, as in `docs/AGENT_ROSTER.md`.
+- A UI issue's `reads` lists `docs/UI_SCREENS.md#s-<screen-id>` for every screen it builds, and `mockups/<app-id>.html#s-<screen-id>` only for a key screen that has a mockup. Remove a mockup anchor that does not resolve.
 
 Never change `decision_refs` or `requirement_refs` to make an issue fit, and never drop an issue silently: dropping scope is the user's decision.
 
@@ -102,14 +105,14 @@ The section has three parts.
 | Issue | Owner | Wave | Size | Scope | Risk | Mode | Autonomy | Validation |
 |---|---|---|---|---|---|---|---|---|
 
-**2. Orchestrator prompt** (60-90 lines), paste-ready:
+**2. Orchestrator prompt** (typically 60-90 lines; completeness wins), paste-ready:
 
 1. *Anchor*: "You are playing the orchestrator role for Sprint {N}: {theme}. Read AGENTS.md, docs/AGENT_ROSTER.md, docs/ORCHESTRATOR.md, docs/ISSUES.md (Sprint {N}), docs/WAVE_DAG.md (Sprint {N}). Run `spec.mjs status` and confirm scope."
 2. *Current state*: facts from Step 1, written today: what is merged, what exists, what the retro changed. Never copied from an earlier sprint.
 3. *Wave plan*: per wave, the issues, owners, worktrees and modes; sequential issues after the barrier; checkpoints named.
 4. *Approval gate*: "Output the wave plan FIRST. Spawn nothing until I approve."
 
-**3. Executor prompt per issue** (25-40 lines), paste-ready:
+**3. Executor prompt per issue** (typically 25-40 lines around the inlined issue), paste-ready:
 
 1. *Identity*: "You are {owner}, delivering {id} in worktree `wt/{id}`. Your lane is docs/AGENT_ROSTER.md § {owner}. Follow the `issue-delivery` skill."
 2. *Context*: the `reads` list in order, and nothing else.
@@ -122,7 +125,7 @@ The section has three parts.
 ## Step 5: Check and hand off
 
 1. Every unmerged issue of the target sprint has a row in the plan and an executor prompt; no merged issue has one.
-2. Every prompt cites documents and sections that exist, and commands that exist in `AGENTS.md`.
+2. Every prompt cites documents and sections that exist, and commands that exist in `AGENTS.md` and actually run (Step 1.5).
 3. Every executor prompt matches its issue's frontmatter after the corrections.
 4. `spec.mjs check --strict` exits 0.
 
@@ -138,7 +141,8 @@ Close in Spanish:
 - **Ignoring the retro.** It is the best input the next sprint has.
 - **Rewriting scope.** Corrections fix paths, dependencies and size; dropping or changing requirements is the user's call.
 - **Waves by hand.** Re-run `waves --write` after any backlog change.
-- **Validation without commands.** "Run the tests" is not a gate; `pnpm --filter functions test` is.
+- **Validation without commands.** "Run the tests" is not a gate; `pnpm --dir functions run test` is.
+- **Vacuous green.** A command that matched no package or found no script ran nothing; it is not a passing gate.
 - **Meta-narrative inside the prompt block.** Explanations go around the fenced prompt, not in it.
 
 ## Communication style

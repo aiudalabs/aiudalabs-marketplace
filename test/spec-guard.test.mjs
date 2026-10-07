@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { ROOT } from '../lib/components.mjs';
 import {
-  assignWaves, checkProject, globCovers, globsOverlap, matches, mergedIds, nextWave, parseDecisions, parseIssues,
-  parseRequirements, parseRoster, readProject, toCsv, toGithubScript, writeWavesInto,
+  assignWaves, checkProject, globCovers, globsOverlap, markdownAnchors, matches, mergedIds, nextWave, parseDecisions, parseIssues,
+  parseRequirements, parseRoster, parseScreens, readProject, slugify, toCsv, toGithubScript, writeWavesInto,
 } from '../skills/spec-guard/scripts/lib.mjs';
 
 const SKILL = join(ROOT, 'skills/spec-guard');
@@ -56,12 +56,15 @@ test('decisions: D-xx headings, the older "Decision N:" form, deferred and the p
   assert.equal(decisions.get('D-02').title, 'Free cancellation');
   assert.ok(decisions.get('D-11').deferred);
   assert.equal(profile, 'flutter-firebase');
+  const withProfile = parseDecisions('## D-01 — Stack\n\n**Stack profile:** fastapi-react\n\n## D-02 — Other\n');
+  assert.ok(withProfile.decisions.get('D-01').locksProfile, 'the profile decision is implemented by the scaffold');
+  assert.ok(!withProfile.decisions.get('D-02').locksProfile);
   assert.deepEqual(parseDecisions('## D-01 — a\n## D-01 — b\n').problems.map((p) => p.code), ['duplicate-decision']);
 });
 
 test('requirements and roster', () => {
-  const { requirements } = parseRequirements('### FR-ORDER-1 — Place an order\n### FR-12 — Legacy id\n#### FR-PAY-2 — Refunds (deferred)\n');
-  assert.deepEqual([...requirements.keys()], ['FR-ORDER-1', 'FR-12', 'FR-PAY-2']);
+  const { requirements } = parseRequirements('### FR-ORDER-1 — Place an order\n### FR-12 — Legacy id\n#### FR-PAY-2 — Refunds (deferred)\n### FR-CHECK-IN-3 — Check in\n');
+  assert.deepEqual([...requirements.keys()], ['FR-ORDER-1', 'FR-12', 'FR-PAY-2', 'FR-CHECK-IN-3']);
   assert.ok(requirements.get('FR-PAY-2').deferred);
 
   const { agents, problems } = parseRoster('## flutter-dev\n\n**Owns:** `apps/**`, `packages/ui/**`\n\n## qa-tester\n\n**Owns:** none\n\n## react-dev — admin\n\nNo lane line.\n');
@@ -179,6 +182,135 @@ test('spec.mjs: check exit codes, and export refuses a backlog with errors', (t)
   assert.match(exported.stderr, /error/);
 });
 
+test('check runs before there is a backlog, on the documents that exist', (t) => {
+  const dir = copyExample(t);
+  rmSync(join(dir, 'docs/ISSUES.md'));
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'decisions, PRD and roster alone are fine');
+  const ok = run([join(SCRIPTS, 'spec.mjs'), 'check', '--strict', '--root', dir]);
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.match(ok.stdout, /No backlog yet/);
+  edit(dir, 'PRD.md', '- Given a free slot', '- Serves D-09. Given a free slot');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-decision'], 'a PRD citing a decision that does not exist');
+  assert.equal(run([join(SCRIPTS, 'spec.mjs'), 'impact', 'D-01', '--root', dir]).status, 2, 'impact still needs a backlog');
+});
+
+test('check: the brief headings and the jobs the PRD traces', (t) => {
+  const dir = copyExample(t);
+  const headings = ['Tagline', 'Apps', 'Market', 'User groups', 'Core value loop', 'Personas and jobs', 'Adversarial analysis', 'Do-not-build list'];
+  const brief = headings.map((name, i) => `## ${i + 1}. ${name}\n\n${name === 'Personas and jobs' ? '| J-ANA-1 | Book a court |\n| J-ANA-2 | Cancel |\n' : 'Text.\n'}`).join('\n');
+  writeFileSync(join(dir, 'docs/PRODUCT_BRIEF.md'), `# Product Brief — Courts\n\n${brief}`);
+  edit(dir, 'PRD.md', '- Given a free slot', '- Traces J-ANA-1. Given a free slot');
+  edit(dir, 'PRD.md', '- Given a `requested` booking', '- Traces J-ANA-2 and J-BOB-1. Given a `requested` booking');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-job'], 'J-BOB-1 is not in the brief');
+  edit(dir, 'PRD.md', ' and J-BOB-1', '');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
+  edit(dir, 'PRD.md', 'Traces J-ANA-2. ', '');
+  assert.deepEqual(codes(checkProject(readProject(dir), { strict: true })), ['uncovered-job']);
+  writeFileSync(join(dir, 'docs/PRODUCT_BRIEF.md'), '# Brief\n\n## Tagline\n\nOld format.\n');
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['brief-format'], 'an old brief only warns');
+});
+
+test('check: other documents may only cite decisions and requirements that exist', (t) => {
+  const dir = copyExample(t);
+  writeFileSync(join(dir, 'docs/FIREBASE_SCHEMA.md'), '# Schema\n\nBookings serve FR-BOOKING-1 and D-03.\n\n```\nexample D-99\n```\n');
+  assert.deepEqual(checkProject(readProject(dir)), []);
+  writeFileSync(join(dir, 'docs/UI_SCREENS.md'), '# Screens\n\nServes FR-BOOKING-7 under D-42.\n');
+  const found = checkProject(readProject(dir));
+  assert.deepEqual(found.map((p) => [p.code, p.where]), [['dangling-ref', 'docs/UI_SCREENS.md:3'], ['dangling-ref', 'docs/UI_SCREENS.md:3']]);
+});
+
+test('check: an id a document proposes with (proposed) warns instead of dangling', (t) => {
+  const dir = copyExample(t);
+  const write = (text) => writeFileSync(join(dir, 'docs/ARCHITECTURE.md'), text);
+  write('# Architecture\n\n## 15. Changes to earlier documents\n\n1. PRD: add `FR-AUTH-3` (proposed) for account deletion.\n2. Decisions: a new D-13 (proposed), recorded by the vendor spike.\n');
+  const found = checkProject(readProject(dir), { strict: true });
+  assert.deepEqual(found.map((p) => [p.level, p.code, p.where]), [
+    ['warning', 'proposed-id', 'docs/ARCHITECTURE.md:5'],
+    ['warning', 'proposed-id', 'docs/ARCHITECTURE.md:6'],
+  ], 'open proposals pass even under --strict');
+  assert.match(found[0].message, /FR-AUTH-3 is proposed \(docs\/ARCHITECTURE\.md:5\) and not yet in docs\/PRD\.md/);
+
+  writeFileSync(join(dir, 'docs/FIREBASE_SCHEMA.md'), '# Schema\n\n`deleteAccount` serves FR-AUTH-3.\n');
+  const relied = checkProject(readProject(dir));
+  assert.deepEqual(codes(relied, 'warning'), ['proposed-id', 'proposed-id'], 'an unmarked citation of a proposed id only warns');
+  assert.match(relied[0].message, /cited without \(proposed\) at docs\/FIREBASE_SCHEMA\.md:3/);
+  assert.deepEqual(codes(checkProject(readProject(dir), { strict: true })), ['proposed-id'], '--strict fails when another line relies on it');
+
+  write('# Architecture\n\nServes FR-AUTH-4 and D-14 (proposed).\n');
+  writeFileSync(join(dir, 'docs/FIREBASE_SCHEMA.md'), '# Schema\n');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['dangling-ref'], 'the marker covers only the id it follows');
+
+  write('# Architecture\n\nAdds FR-BOOKING-1 (proposed).\n');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'once defined, a proposal is silent');
+});
+
+const SCREEN = (id, title, { anchor = id, blocks = ['Header', 'Body', 'Primary CTA', 'Navigation', 'Data', 'Permissions'], nav = 'Back: 1.1' } = {}) => [
+  anchor && `<a id="s-${anchor}"></a>`, `### ${id} — ${title}`, '',
+  ...blocks.map((block) => (block === 'Navigation' ? `**Navigation**\n- ${nav}\n` : block === 'Data' ? '- **Data:** reads courts. Serves: FR-BOOKING-1.\n' : `**${block}**\n- None. Price [COPY: "$12.50 por 1.5 h"], cold start < 2.5 s.\n`)),
+].filter(Boolean).join('\n');
+
+const UI_SCREENS = [
+  '# UI Screens — Courts', '', '## 1. Apps inventory', '', 'Version 3.22.0 of Flutter.', '',
+  '## App 1 — player-app', '', '### Navigation graph — player-app', '', 'Entry points: Home (1.1).', '', '```',
+  'Home (1.1)', '  → Court (1.2.1)          tap', '  → Auth (1.3.x)           signed out', '```', '',
+  SCREEN('1.1', 'Home', { nav: 'Tab bar. Card tap → 1.2.1' }),
+  SCREEN('1.2.1', 'Court'),
+  SCREEN('1.3.1', 'Sign-in'),
+  '## Key screens', '', '| 1.2.1 Court | The detail view | mockup: mockups/player-app.html#s-1.2.1 |', '',
+].join('\n');
+
+test('screens: anchors, the six blocks and navigation targets', () => {
+  const { screens, refs, apps, problems } = parseScreens(UI_SCREENS);
+  assert.deepEqual(problems, []);
+  assert.deepEqual([...screens.keys()], ['1.1', '1.2.1', '1.3.1']);
+  assert.equal(screens.get('1.2.1').app, 'player-app');
+  assert.equal(screens.get('1.2.1').blocks.size, 6);
+  assert.deepEqual(Object.fromEntries(apps), { 1: 'player-app' });
+  assert.deepEqual([...new Set(refs.map((ref) => ref.id))].sort(), ['1.1', '1.2.1', '1.3.x'], 'prices, sizes and versions are not screen ids');
+});
+
+test('check: docs/UI_SCREENS.md, the links into it and the mockups', (t) => {
+  const dir = copyExample(t);
+  const write = (text) => writeFileSync(join(dir, 'docs/UI_SCREENS.md'), text);
+  write(UI_SCREENS);
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'no mockups yet is fine');
+
+  write(UI_SCREENS + SCREEN('1.2.1', 'Court again'));
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['duplicate-screen']);
+  write(UI_SCREENS.replace('<a id="s-1.3.1"></a>', '<a id="s-1.3.2"></a>'));
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['screen-anchor-mismatch']);
+  write(UI_SCREENS.replace('<a id="s-1.3.1"></a>\n', ''));
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['screen-no-anchor']);
+  write(UI_SCREENS.replace('**Permissions**\n- None. Price [COPY: "$12.50 por 1.5 h"], cold start < 2.5 s.\n\n<a id="s-1.2.1">', '<a id="s-1.2.1">'));
+  const blocks = checkProject(readProject(dir));
+  assert.deepEqual(blocks.map((p) => [p.level, p.code, p.where]), [['warning', 'screen-blocks', 'docs/UI_SCREENS.md:20']]);
+  assert.match(blocks[0].message, /screen 1\.1 has no Permissions block/);
+
+  for (const [from, to] of [['  → Court (1.2.1)', '  → Court (1.2.9)'], ['Card tap → 1.2.1', 'Card tap → 1.4.1'], ['Back: 1.1\n', 'Back: 7.1\n'], ['(1.3.x)', '(1.4.x)']]) {
+    write(UI_SCREENS.replace(from, to));
+    assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-screen'], to);
+  }
+  write(UI_SCREENS.replaceAll('Serves: FR-BOOKING-1.', 'Serves: FR-BOOKING-8.'));
+  assert.deepEqual(codes(checkProject(readProject(dir))).filter((code) => code === 'dangling-ref').length, 3, 'FR ids are checked as citations, once per line');
+
+  write(UI_SCREENS.replace('mockups/player-app.html#s-1.2.1', 'mockups/player-app.html#s-1.2.2'));
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-screen']);
+  write(UI_SCREENS.replace('mockups/player-app.html#s-1.2.1', 'mockups/owner-app.html#s-1.2.1'));
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['mockup-app']);
+  write(UI_SCREENS);
+  edit(dir, 'ISSUES.md', '---\n**Objetivo:**', 'reads:\n  - docs/UI_SCREENS.md#s-1.9.9\n---\n**Objetivo:**');
+  const issueLink = checkProject(readProject(dir));
+  assert.deepEqual(issueLink.map((p) => p.code), ['unknown-screen']);
+  assert.match(issueLink[0].where, /^docs\/ISSUES\.md:\d+$/);
+  edit(dir, 'ISSUES.md', '#s-1.9.9', '#s-1.2.1');
+
+  mkdirSync(join(dir, 'mockups'));
+  writeFileSync(join(dir, 'mockups/player-app.html'), '<section id="s-1.1"></section>');
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['mockup-missing-screen']);
+  writeFileSync(join(dir, 'mockups/player-app.html'), '<section id="s-1.2.1"></section>');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
+});
+
 test('install and hooks: commits and agent edits stay inside the active issue', { skip: !hasGit && 'git is not installed' }, (t) => {
   const dir = copyExample(t);
   const git = (...args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8' });
@@ -221,4 +353,33 @@ test('install and hooks: commits and agent edits stay inside the active issue', 
   assert.equal(settings.hooks.PreToolUse.length, 1);
   run([join(SCRIPTS, 'install.mjs'), '--claude'], dir);
   assert.equal(JSON.parse(readFileSync(join(dir, '.claude/settings.json'), 'utf8')).hooks.PreToolUse.length, 1, 'installing twice adds the hook once');
+});
+
+test('anchors: GitHub heading slugs and explicit <a id>', () => {
+  assert.equal(slugify('5.3 Checkout and payment'), '53-checkout-and-payment');
+  assert.equal(slugify('Architecture — Canchas Pa'), 'architecture--canchas-pa');
+  assert.equal(slugify('The `bookings_count` field and _emphasis_ **here**'), 'the-bookings_count-field-and-emphasis-here');
+  assert.equal(slugify('[Cloud Functions](x.md) inventory (CF-*)'), 'cloud-functions-inventory-cf-');
+  assert.equal(slugify('Reservas: año'), 'reservas-año');
+  const anchors = markdownAnchors('# Notes\n## Notes\n```\n# fenced\n```\n<a id="cf-inventory"></a>\n### Inventory ###\n');
+  assert.deepEqual([...anchors], ['notes', 'notes-1', 'cf-inventory', 'inventory']);
+});
+
+test('check: issue reads resolve to a document and one of its anchors', (t) => {
+  const dir = copyExample(t);
+  const reads = (...entries) => edit(dir, 'ISSUES.md', '---\n**Objetivo:** Las reservas', `reads:\n${entries.map((entry) => `  - ${entry}`).join('\n')}\n---\n**Objetivo:** Las reservas`);
+  reads('docs/PRD.md#fr-booking-2--the-owner-confirms-and-the-player-is-charged', 'docs/PRD.md', 'mockups/player-app.html#s-1.2.1', 'functions/README.md#later', 'AGENTS.md#anything');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'slugs, whole files, mockups and files outside docs/ that do not exist yet');
+
+  edit(dir, 'ISSUES.md', 'docs/PRD.md#fr-booking-2--', 'docs/PRD.md#fr-booking-2-');
+  const found = checkProject(readProject(dir));
+  assert.deepEqual(codes(found), ['unresolved-read']);
+  assert.match(found[0].message, /anchor #fr-booking-2-the-owner/);
+  assert.match(found[0].where, /^docs\/ISSUES\.md:\d+$/);
+
+  edit(dir, 'PRD.md', '### FR-BOOKING-2', '<a id="fr-booking-2-the-owner-confirms-and-the-player-is-charged"></a>\n### FR-BOOKING-2');
+  assert.deepEqual(codes(checkProject(readProject(dir))), [], 'an explicit anchor resolves it');
+
+  edit(dir, 'ISSUES.md', '  - docs/PRD.md\n', '  - docs/SCHEMA.md\n');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unresolved-read'], 'a document under docs/ must exist');
 });

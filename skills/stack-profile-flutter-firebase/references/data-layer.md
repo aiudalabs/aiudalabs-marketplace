@@ -4,18 +4,20 @@ Read by the `schema-design` skill (Phase 3). This file carries the Firebase know
 
 ## Output document
 
-Phase 3 writes `docs/FIREBASE_SCHEMA.md` (400-700 lines). Profile-specific section names:
+Phase 3 writes `docs/FIREBASE_SCHEMA.md` (typically 400-700 lines; completeness wins over the budget). Profile-specific section names:
 
 1. **Stack confirmation**: Firebase services in use (Firestore, RTDB, Auth, Storage, Functions, Cloud Messaging) and versions.
-2. **Top-level collections**: one-line purpose each, one heading per collection so issues can link to `docs/FIREBASE_SCHEMA.md#bookings`.
+2. **Collections and subcollections**: one-line purpose each, one heading per collection and per subcollection so issues can link to `docs/FIREBASE_SCHEMA.md#bookings`. Include the `idempotencyKeys` container (see below).
 3. **Document shapes**: TypeScript types for every collection and subcollection.
-4. **State machines**: states, transitions and the Cloud Function that owns each.
+4. **State machines and server writes**: states, transitions and the one Cloud Function that owns each, one owner per cause (see below); then the table of every function that writes, and the `### Direct client writes` table (device tokens, `readAt`, a user's own listing fields) with the security rule that bounds each.
 5. **RTDB usage**: what lives in RTDB and why it is not in Firestore.
 6. **Security rules philosophy**: tenancy, owner model, role model, custom claims approach. Not literal rules.
 7. **Composite indexes**: every where-plus-orderBy-on-different-fields combination, with the query that needs it.
 8. **Scaling concerns**: hot documents, unbounded subcollections, document size risks, write fan-out.
 9. **Denormalization decisions**: every duplicated field with rationale.
 10. **Migration story**: versioning, backfills, breaking changes.
+
+**Container headings appear once.** The heading named after a container (`### bookings`) exists only in section 2; that is the anchor issues link to. Every collection and subcollection gets that heading in section 2. Sections 3 and 4 use different heading text for the same container (`### Booking shape`, `### Booking states`) or link back to it (`[bookings](#bookings)`). Two headings with the same text give the second the anchor `#bookings-1`, and links go to the wrong one.
 
 ## Placement heuristic
 
@@ -57,19 +59,56 @@ type User = {
 - Optional fields use `?:`, not `| undefined`.
 - Enum-like fields are literal unions, not `string`.
 - No `any`, no `unknown`.
-- Server-only fields (private data, internal flags) go in a `private` subcollection, not the public document.
+- Two kinds of restricted field, kept apart:
+  - **Read-restricted** data (PII such as a national id or tax id, internal notes) goes in a `private` subcollection whose rules allow reads only to the owner, the functions and admins.
+  - **Write-restricted** fields (`status`, totals, commission, ratings, denormalized copies) stay on the main document, where clients read them; rules deny client writes to them and only functions write them.
 - Subcollections only for data accessed exclusively through the parent. Anything queried across parents ("all bookings of provider X") is a top-level collection with a reference field.
 
 ## State-machine enforcement
 
-Clients never write `status`; security rules deny it regardless of role. Every transition goes through a Cloud Function, and the schema names it:
+Clients never write `status`; security rules deny it regardless of role. Every transition goes through a Cloud Function of any pattern: a **callable** for a user action, a **scheduled** function for expiry and no-show, an **https** webhook for a payment confirmation, a **trigger** for a reaction to another write. The schema names the owner of each:
 
 ```
-- draft → submitted: customer (createBooking)
-- submitted → accepted: provider (acceptBooking)
-- disputed → resolved: admin only (resolveDispute)
+- draft → submitted: customer (createBooking, callable)
+- submitted → accepted: provider (acceptBooking, callable)
+- held → free, cause checkout cancelled: customer (cancelCheckout, callable)
+- held → free, cause hold expired: system (expireHolds, scheduled)
+- pending_payment → confirmed: payment provider (paymentWebhook, https)
+- disputed → resolved: admin only (resolveDispute, callable)
 Forbidden: completed → anything (terminal); any client write to status
 ```
+
+**One owner per cause.** A transition is identified by from-state, to-state and cause. Each has exactly one owning function; every other function only reads `status`. When two causes lead to the same states (the customer cancels a hold, a job expires it), list them as separate transitions, each with its owner, as above. Each owner applies its transition in a transaction that re-reads the document and aborts when the status is no longer the from-state, so two owners can never both apply a change to the same document; the schema says this once for all of them. One cause that reaches the server by two routes (the payment provider's webhook and a status poll) stays one transition with one owner: the other route calls the owner's shared handler, never a second implementation.
+
+### Offline state changes
+
+Firestore's offline write queue cannot carry a transition, because clients never write `status`. An app that must change state offline (check-in at a venue with poor signal, blocking a slot) keeps an **app-local ordered queue of callable calls**, persisted on the device:
+
+- The app generates each call's `clientRequestId` when the user acts, and records the time of the action as a claimed field (`actedAt`) alongside the server time the function uses.
+- On reconnect it replays the queue in order; a retried call is deduplicated through `idempotencyKeys`.
+- The UI shows queued actions as pending, not as done.
+- The schema says, per transition, whether it may be queued offline and what the function does when the call arrives after the state has moved on (accept with `actedAt` within a stated window, or reject with a reason the app shows).
+
+### Idempotency container
+
+Callable and https functions with side effects require a `clientRequestId` (or the provider's event id for a webhook). Triggers are delivered at least once, so a trigger whose effect is not deterministic (an increment, a push, a call out) records its event id here too; a trigger that only sets values derived from the event needs no record. The schema includes the container where the dedup record lives, so Phase 5 does not have to invent one:
+
+```typescript
+// Collection: idempotencyKeys, doc id `${callerUid}_${clientRequestId}` (or `${provider}_${eventId}`, or `trigger_${eventId}`)
+type IdempotencyKey = {
+  functionName: string
+  callerUid: string | null      // null for webhooks and triggers
+  outcome: 'applied' | 'rejected'
+  resultPath: string | null    // the document the call created or changed; a retry returns it
+  errorCode?: string           // the error a rejected call returned, replayed on retry
+  createdAt: Timestamp
+  expiresAt: Timestamp          // createdAt + the dedup window (at least 1 h, typically 24 h)
+}
+```
+
+- The owning function writes it in the **same transaction** as the transition; a retry finds it and returns the same outcome without applying anything again.
+- Rules deny all client reads and writes.
+- A Firestore TTL policy on `expiresAt` deletes expired records. TTL deletion is not immediate, so the function also treats an expired record as absent (check the current Firebase docs for TTL behavior).
 
 ## Permissions philosophy checklist
 
@@ -77,7 +116,7 @@ Phase 3 documents the philosophy; `firebase-dev` writes the literal `firestore.r
 
 - **Tenancy:** single-tenant, multi-tenant (organizations with members) or hybrid.
 - **Ownership:** which collections are owned by `request.auth.uid`.
-- **Roles:** how custom claims are populated, who reads admin-only data.
+- **Roles:** which roles are custom claims (global, rarely changing: `admin`) and which are membership documents (per tenant or venue, changes apply at once); who writes each (a function or an admin script, never the client); who reads admin-only data. The two models are compared in `architecture.md` in this folder.
 - **Public data:** what is readable without auth (usually nothing in the MVP).
 - **Field-level security:** write-restricted fields (status, computed totals, ratings).
 - **Cross-document constraints:** what rules cannot enforce ("max 5 active bookings") goes to Cloud Functions.
@@ -85,12 +124,22 @@ Phase 3 documents the philosophy; `firebase-dev` writes the literal `firestore.r
 
 ## Query costs: composite indexes
 
-Firestore needs a composite index for every query with `where` on one field and `orderBy` on another. Anticipate all of them in Phase 3; a missing index in production makes functions throw `failed-precondition`.
+Firestore builds single-field indexes automatically. A query needs a **composite index** when it constrains or orders more than one field, except a query with only equality filters, which Firestore serves by merging single-field indexes. In practice:
+
+- equality on one field plus a range or inequality (`<`, `<=`, `>`, `>=`, `!=`, `not-in`) on another, even with no `orderBy`;
+- a filter on one field plus `orderBy` on another;
+- `orderBy` on several fields;
+- `array-contains` or `array-contains-any` combined with another filter or ordering;
+- collection-group queries need their own index with collection-group scope.
+
+Anticipate all of them in Phase 3; a missing index in production makes the query fail with `failed-precondition`. The emulator does not enforce indexes, so list them from this rule (check the current Firestore docs when a query is unusual).
 
 | Query | Where | OrderBy | Index |
 |---|---|---|---|
 | Customer's recent bookings | `customerId == uid` | `createdAt desc` | `customerId asc, createdAt desc` |
 | Provider's pending bookings | `providerId == uid AND status == 'submitted'` | `createdAt asc` | `providerId asc, status asc, createdAt asc` |
+| Venue's slots from now on | `venueId == id AND startAt >= now` | none | `venueId asc, startAt asc` |
+| Bookings of one court and day | `courtId == id AND date == d` | none | none (equality only) |
 
 They land in `firestore.indexes.json` in Sprint 0.
 
@@ -120,6 +169,9 @@ Every denormalized field records what is duplicated, why (the query it speeds up
 - `Date` instead of `Timestamp`.
 - Doc ids containing PII.
 - Firestore and RTDB used for the same purpose.
+- A transition with two owners, or with none.
+- Required idempotency with no container to store it.
+- A per-container heading repeated in several sections.
 
 ## What Phase 3 does not do here
 

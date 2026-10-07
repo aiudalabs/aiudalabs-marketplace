@@ -4,7 +4,7 @@ description: "Checks a product spec and its sprint backlog with code instead of 
 license: MIT
 compatibility: Node.js 18 or later and git. No dependencies and no network access; the GitHub export writes a script for the gh CLI that a person runs.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires-tools: "node git"
 ---
@@ -49,6 +49,8 @@ On a branch whose name carries an issue id (`wt/S3-07`, `S3-07-create-booking`):
 
 On any branch, a commit that changes `docs/ISSUES.md` must pass `check`. Existing hook or workflow files that spec-guard did not write are left alone; the installer says so.
 
+After the `spec-guard` skill is updated (`npx github:aiudalabs/aiudalabs-marketplace update`), run the installer again: it replaces `tools/spec-guard/` with the new scripts and keeps the hooks, the CI workflow and `.claude/settings.json` as they are. Until then the project keeps checking with the old copy.
+
 `git commit --no-verify` skips the local hooks. That is deliberate, for emergencies; CI runs the same checks, so nothing skipped locally reaches the base branch unseen.
 
 ## How the other skills use it
@@ -65,8 +67,11 @@ Every message names the file, the line and the issue. The ones that need a decis
 - **outside-lane**: an issue writes a file its owner does not own. Move the file to the right agent's issue, or split the issue. Do not widen the lane to make the error go away; lanes exist so two agents never edit the same file.
 - **lanes-overlap**: two agents own the same path in the roster. Give it to one of them.
 - **uncovered-decision** or **uncovered-requirement**: a locked decision or requirement has no issue. Either the backlog dropped scope silently, or it was deferred and the document should say `(deferred)`, or the code already implements it (an adopted repository) and it should say `(existing)`. Ask the user which.
+- **dangling-ref** or **proposed-id**: a document cites a `D-xx` or `FR-...` id the decisions or PRD do not define. If the document proposes that id for an earlier document, it writes `(proposed)` after it and the error becomes a warning until the owning phase defines it; otherwise fix the id.
+- **unresolved-read**: an issue's `reads:` names a document under `docs/` that does not exist, or an anchor its file lacks. Copy the anchor from the heading's GitHub slug or add an `<a id>` before the heading; the slug rule is in [references/formats.md](references/formats.md#reads-anchors).
 - **wave-mismatch** or **no-wave**: never fix by hand; run `waves --write`.
 - **dependency-cycle**: two issues wait for each other. One of them is really two issues.
+- **unknown-screen** or **mockup-missing-screen**: `docs/UI_SCREENS.md` (or a link into it or into a mockup) names a screen id that does not exist, or a mockup lacks a key screen. Renumbering a screen means updating every link to it; a stale mockup is refreshed with `navegable-mockups`. The screen checks are in [references/formats.md](references/formats.md).
 
 The overlap test between globs errs toward "overlap" and the lane test errs toward "outside". A false alarm costs a minute to look at; a missed overlap costs a merge conflict at the wave barrier.
 

@@ -455,7 +455,7 @@
     {
       "name": "aiuda-brand",
       "description": "Produces Aiuda Labs branded business documents (proposals, training proposals, quotes, SOWs, one-pagers, reports, case studies) as print-ready PDF from branded HTML, or HTML or Word on request, in the exact visual identity of aiudalabs.com: Satoshi, Instrument Serif and JetBrains Mono, warm cream background, orange accent, eyebrow labels, dark footer and the <ai/>labs logo. Use for 'propuesta comercial', 'propuesta de capacitación', 'cotización', 'one-pager con la marca de Aiuda Labs', 'dame esto branded'. Applies only the Aiuda Labs brand. Not for writing a brand's guidelines (use `brand-guidelines`), checking a piece against a brand (use `brand-review`), or technical architecture pages (use `html-spec-generator`).",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -718,7 +718,7 @@
     {
       "name": "execution-router",
       "description": "Prepares the next sprint just in time, from the repository's real state: reads spec-guard status, the previous sprint's retro and the code that actually got merged, corrects the sprint's issues when reality moved, classifies each issue by size, scope and risk to choose its execution mode (parallel worktree or sequential, autonomous or with a human checkpoint) and its validation rigor, and rewrites that sprint's orchestrator and executor prompts in docs/SPRINT_PROMPTS.md. Use between sprints: \"prepara el sprint 3\", \"cerramos el sprint, ¿qué sigue?\", \"regenera los prompts del próximo sprint\", \"route the next sprint\". It does not plan the whole backlog (multi-agent-governance) and does not run the sprint (sprint-runner).",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "spec-guard",
@@ -749,8 +749,8 @@
     },
     {
       "name": "html-spec-generator",
-      "description": "Turns a project's architecture and data schema documents into one self-contained, navigable HTML technical reference (docs/architecture.html) with a sticky section nav, Mermaid diagrams of the system, core flows, data model, auth and deployment, tables and callouts, in the Aiuda Labs house style. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero el documento de arquitectura para compartir con el equipo'. Needs docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`).",
-      "version": "1.0.0",
+      "description": "Turns a project's spec documents into one navigable HTML reference (docs/architecture.html) with a sticky section nav, in the Aiuda Labs house style or a neutral one: the product layer when present (brief summary, D-xx decisions table, PRD requirements index with ids, screens index linked to the mockups) and the architecture (Mermaid diagrams of the system, core flows, data model, auth and deployment, tables, open questions), stamped with each source version. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero ver las especificaciones en una página', 'quiero el documento de arquitectura para compartir con el equipo', or to regenerate the page after a phase changed the docs. Architecture sections need docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`).",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "system-architecture"
@@ -760,7 +760,9 @@
       "files": [
         "SKILL.md",
         "evals/triggers.json",
-        "references/DESIGN_SYSTEM.md"
+        "references/DESIGN_SYSTEM.md",
+        "references/NEUTRAL_STYLE.md",
+        "references/checks.md"
       ]
     },
     {
@@ -781,7 +783,7 @@
     {
       "name": "issue-delivery",
       "description": "Implements one backlog issue from docs/ISSUES.md end to end as its owning developer agent: reads the issue and its reads, works in the issue's branch or worktree, writes only inside files_touched, commits one task at a time with the issue id and the decisions it serves, keeps the test gate green, runs spec.mjs verify, and posts the SUMMARY handoff for qa-tester. Use when a developer agent (flutter-dev, firebase-dev, react-dev, python-dev or a custom one) is told to implement, build or execute an issue such as S3-07, or when a user says 'implementa S3-07', 'ejecuta el issue S2-04', 'arranca con S4-01 en su worktree'. It covers a single issue. Reviewing the result belongs to issue-review, running a whole sprint or wave belongs to the sprint-runner workflow, and checking the backlog structure belongs to spec-guard.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "spec-guard"
@@ -797,7 +799,7 @@
     {
       "name": "issue-review",
       "description": "Reviews one implemented backlog issue as the gate before merge: checks the diff against every acceptance criterion in docs/ISSUES.md with file:line evidence and a test that actually ran, reruns the project's test gate, runs spec.mjs verify for lane discipline, checks the hard rules of the root AGENTS.md, and writes an approved or changes-requested verdict without editing code. Also closes a sprint with goal-backward verification and a retro in docs/execution/. Use when qa-tester is asked to review or approve an issue, after a developer posts its SUMMARY, or when a user says 'revisa S3-07', 'qa de este PR', 'valida contra los criterios de aceptación', 'cerrar sprint 3'. It never implements fixes: issue-delivery does that. It does not review academic papers (paper-review) or brand work (brand-review), and running a whole sprint is the sprint-runner workflow.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "spec-guard"
@@ -978,7 +980,7 @@
     {
       "name": "multi-agent-governance",
       "description": "Turns a finished product spec into the governance of a multi-agent repository: the root AGENTS.md constitution (plus a CLAUDE.md that imports it), docs/AGENT_ROSTER.md with exclusive lanes, docs/ORCHESTRATOR.md, a sprint backlog in docs/ISSUES.md whose waves are computed by spec-guard, and paste-ready prompts for Sprint 0 and Sprint 1. Use when the spec documents (brief, defaults, PRD, schema, UI screens, architecture) exist and the user wants the repo ready for coding agents: \"preparemos esto para los agentes\", \"vamos al build\", \"backlog de issues\", \"sprint planning\", \"AGENTS.md\". Phase 6 of product-spec-orchestrator. Stops when inputs are missing. It plans the whole backlog once; preparing a later sprint from the repo's real state is execution-router, running a sprint with agents is sprint-runner, and bringing an existing codebase into the method is project-adopt.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "spec-guard",
@@ -995,8 +997,8 @@
     },
     {
       "name": "navegable-mockups",
-      "description": "Builds clickable HTML mockups of a product's key app screens: one standalone file per app, with a phone frame (or desktop layout for admin web apps), a neutral review toolbar with a screen selector, working navigation between screens, the product's own locked design tokens and realistic market data, openable by double-click with no server or dependencies. Use for 'mockups navegables', 'prototipo HTML', 'hagamos los mockups', 'quiero enseñar las pantallas al equipo o a inversores', or as Phase 7 of the product-spec workflow once the key screens are picked in docs/UI_SCREENS.md. Not for specifying screens (use `ui-screens-spec`), exploring brand looks or style options (use `visual-directions`), or app code.",
-      "version": "1.0.0",
+      "description": "Builds clickable HTML mockups of a product's key app screens: one standalone file per app, with a phone frame (or a desktop web frame with sidebar for web apps such as an admin dashboard), a neutral review toolbar with a screen selector, deep links to each screen, working navigation between screens, the product's own locked design tokens and realistic market data, openable by double-click with no server or dependencies. Use for 'mockups navegables', 'prototipo HTML', 'hagamos los mockups', 'quiero enseñar las pantallas al equipo o a inversores', or as Phase 7 of the product-spec workflow, which can run as soon as the key screens are picked in docs/UI_SCREENS.md. Not for specifying screens (use `ui-screens-spec`), exploring brand looks or style options (use `visual-directions`), or app code.",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "ui-screens-spec"
@@ -1005,7 +1007,8 @@
       "path": "skills/navegable-mockups",
       "files": [
         "SKILL.md",
-        "evals/triggers.json"
+        "evals/triggers.json",
+        "references/skeleton.md"
       ]
     },
     {
@@ -1041,7 +1044,7 @@
     {
       "name": "product-discovery",
       "description": "Takes a product idea that is about to be built from vague to locked: a one-page PRODUCT_BRIEF.md and an OPINIONATED_DEFAULTS.md with 10-12 numbered decisions (D-01, D-02...), each with rationale, rejected alternatives and a re-decide trigger, including the business model and the locked stack profile. Forces commitments, rejects 'it depends', and runs a pre-mortem before locking anything. Use when the user says 'tengo una idea para una app', 'nuevo proyecto', 'qué incluyo en el MVP', 'help me scope the MVP' or describes a marketplace, SaaS or app concept with no written brief. Phase 1 of the product-spec workflow. It does not decide whether the idea is worth building or how to position it: for brand attributes and visual direction use brand-strategy-brief, for an adversarial audit of positioning, ICP and launch readiness use startup-positioning-audit. Once a brief exists, use product-requirements for the PRD.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "stack-profile-flutter-firebase",
@@ -1059,7 +1062,7 @@
     {
       "name": "product-requirements",
       "description": "Turns an approved PRODUCT_BRIEF.md and OPINIONATED_DEFAULTS.md into PRD.md: functional requirements with stable ids (### FR-ORDER-1 — Title) and Given/When/Then acceptance criteria, traceability to persona jobs and D-xx decisions, explicit out of scope, numeric non-functional requirements, user stories and success metrics. Use when the user asks for a PRD, requisitos, criterios de aceptación, user stories or 'qué entra y qué no en el MVP', or for Phase 2 of the product-spec workflow once the brief is approved. It needs the brief: with only an idea and no locked decisions, use product-discovery first. It specifies what the product must do, not the data model (schema-design) or the screens (ui-screens-spec).",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -1088,8 +1091,8 @@
     },
     {
       "name": "project-kickstart",
-      "description": "Scaffolds a NEW, empty repository for the product-spec method, from the stack profile: for flutter-firebase a Melos + pnpm monorepo with Firebase config, Cloud Functions, CI and env files from bundled templates; for fastapi-react the src-layout Python API, worker, React frontend and Docker Compose deploy of that profile. Writes the AGENTS.md constitution and a CLAUDE.md that imports it, starts git on develop, and installs the spec-guard guardrails. Use at the very start of a project: \"arranca el repo\", \"kickstart\", \"crea la estructura del proyecto\", \"scaffold a new Flutter Firebase monorepo\". For a repository that already has code, use project-adopt; to design the product itself, use product-spec-orchestrator.",
-      "version": "1.0.0",
+      "description": "Scaffolds a NEW, empty repository for the product-spec method, from the stack profile: for flutter-firebase a Melos + pnpm monorepo with Firebase config, Cloud Functions, CI and env files from bundled templates; for fastapi-react the src-layout Python API, worker, React frontend and Docker Compose deploy of that profile. Writes the AGENTS.md constitution and a CLAUDE.md that imports it, installs the matching aiuda stack into the chosen harness and the spec-guard guardrails, and commits it all once on main with develop as the working branch. Use at the very start of a project: \"arranca el repo\", \"kickstart\", \"crea la estructura del proyecto\", \"scaffold a new Flutter Firebase monorepo\". For a repository that already has code, use project-adopt; to design the product itself, use product-spec-orchestrator.",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "stack-profile-flutter-firebase",
@@ -1102,12 +1105,14 @@
         "SKILL.md",
         "assets/flutter-firebase/.env.example",
         "assets/flutter-firebase/.firebaserc",
-        "assets/flutter-firebase/.github/workflows/ci.yml",
+        "assets/flutter-firebase/.github/workflows/admin.yml",
+        "assets/flutter-firebase/.github/workflows/firebase.yml",
+        "assets/flutter-firebase/.github/workflows/flutter.yml",
         "assets/flutter-firebase/.gitignore",
         "assets/flutter-firebase/.tool-versions",
         "assets/flutter-firebase/AGENTS.md",
+        "assets/flutter-firebase/AIUDA_HOUSE_STYLE.md",
         "assets/flutter-firebase/CLAUDE.md",
-        "assets/flutter-firebase/DESIGN_SYSTEM.md",
         "assets/flutter-firebase/README.md",
         "assets/flutter-firebase/SESSION.md",
         "assets/flutter-firebase/STATUS.md",
@@ -1115,9 +1120,15 @@
         "assets/flutter-firebase/firebase.json",
         "assets/flutter-firebase/firestore.indexes.json",
         "assets/flutter-firebase/firestore.rules",
+        "assets/flutter-firebase/functions/.gitignore",
+        "assets/flutter-firebase/functions/eslint.config.mjs",
         "assets/flutter-firebase/functions/package.json",
-        "assets/flutter-firebase/functions/src/index.ts",
+        "assets/flutter-firebase/functions/scripts/gen-index.mjs",
+        "assets/flutter-firebase/functions/src/init.ts",
         "assets/flutter-firebase/functions/tsconfig.json",
+        "assets/flutter-firebase/functions/vitest.config.ts",
+        "assets/flutter-firebase/functions/vitest.integration.config.ts",
+        "assets/flutter-firebase/functions/vitest.rules.config.ts",
         "assets/flutter-firebase/melos.yaml",
         "assets/flutter-firebase/package.json",
         "assets/flutter-firebase/pnpm-workspace.yaml",
@@ -1129,7 +1140,7 @@
     {
       "name": "schema-design",
       "description": "Designs a product's data model as Phase 3 of the product-spec workflow: stores and collections or tables, typed shapes, state machines with the server-side unit that owns each transition, placement per store, permissions philosophy, anticipated indexes and query costs, scaling risks, denormalization and the migration story. Writes FIREBASE_SCHEMA.md or DATA_SCHEMA.md according to the locked stack profile. Use when the user says 'diseñemos el schema', 'modelo de datos', 'qué colecciones necesito en Firestore', 'diseño de tablas' or 'Firestore vs RTDB', or after the PRD is approved. It needs PRODUCT_BRIEF.md and OPINIONATED_DEFAULTS.md with the stack profile locked. It stops at data: repo layout, Cloud Functions or endpoints inventory, CI/CD, IAM and observability belong to system-architecture.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "stack-profile-flutter-firebase",
@@ -1162,7 +1173,7 @@
     {
       "name": "spec-guard",
       "description": "Checks a product spec and its sprint backlog with code instead of trusting the model to check them, and guards the build: verifies docs/ISSUES.md (dependency cycles, waves, files_touched inside each agent's lane, every locked decision and requirement implemented by an issue), assigns waves deterministically, reports sprint progress, traces a decision or requirement to the issues, files and commits it reaches (impact) and a file back to the decisions behind it (why), and installs git hooks, a CI check and an optional Claude Code hook that refuse changes outside the active issue. Use for \"revisa el backlog\", \"check ISSUES.md\", \"asigna las waves\", \"¿en qué sprint vamos?\", \"qué toca si cambio la decisión D-03\", \"por qué existe este archivo\", \"instala los guardrails\" or exporting the backlog to GitHub, Jira or Linear. It checks structure, not judgment: writing the backlog is multi-agent-governance, reviewing an issue's code is issue-review.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -1188,7 +1199,7 @@
     {
       "name": "stack-profile-fastapi-react",
       "description": "Stack profile for a self-hosted Python backend (FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, Postgres, SQLite in dev) with React frontends and worker processes, deployed with Docker Compose: Postgres-first placement, separate Create/Update/Read schemas, LEGAL_TRANSITIONS and DB constraints for state machines, Postgres queues with FOR UPDATE SKIP LOCKED, default-deny auth dependencies, and the agent roster with its lanes (python-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is fastapi-react. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Postgres en este stack?', 'necesitamos Celery o basta la cola en Postgres', 'cómo evito que el cliente mande status' or 'qué carpetas son de python-dev'. For Flutter and Firebase, use stack-profile-flutter-firebase.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -1204,8 +1215,8 @@
     },
     {
       "name": "stack-profile-flutter-firebase",
-      "description": "Stack profile for Flutter apps on Firebase with a React admin, the default profile of the product-spec workflow: Firestore and RTDB placement, TypeScript types as the contract mirrored to Dart, status transitions only through callable Cloud Functions, custom claims and security rules, per-function IAM and Secret Manager, Melos plus pnpm monorepo, emulator-first dev, and the agent roster with its lanes (flutter-dev, firebase-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is flutter-firebase. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Firestore en este stack?', 'qué va en RTDB y qué en Firestore', 'qué campos lleva el bloque de una Cloud Function' or 'quién es dueño de firestore.rules'. For a Python FastAPI and Postgres stack, use stack-profile-fastapi-react.",
-      "version": "1.0.0",
+      "description": "Stack profile for Flutter apps on Firebase with a React admin, the default profile of the product-spec workflow: Firestore and RTDB placement, TypeScript types as the contract mirrored to Dart, status transitions only through Cloud Functions with one owner per cause, custom claims or membership documents with security rules, least-privilege IAM and Secret Manager, Melos plus pnpm monorepo, emulator-first dev, and the agent roster with its lanes (flutter-dev, firebase-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is flutter-firebase. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Firestore en este stack?', 'qué va en RTDB y qué en Firestore', 'qué campos lleva el bloque de una Cloud Function' or 'quién es dueño de firestore.rules'. For a Python FastAPI and Postgres stack, use stack-profile-fastapi-react.",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -1251,7 +1262,7 @@
     {
       "name": "system-architecture",
       "description": "Designs the technical architecture of a product as Phase 5 of the product-spec workflow: repo layout and package boundaries with one-way dependency rules, an inventory of every server-side unit (Cloud Functions, endpoints, workers, scheduled jobs), state-machine enforcement, transactional consistency, permissions and service identity, performance budgets per layer, local-first dev workflow, CI/CD, observability with alert thresholds, and the deferred-complexity list. Writes ARCHITECTURE.md, plus IAM_REQUIREMENTS.md when the stack profile is managed cloud. Use when the user says 'diseñemos la arquitectura', 'cómo estructuro el monorepo', 'qué Cloud Functions necesito', 'CI/CD', 'qué defiero para v1.1', or after the UI screens are approved. It needs the brief, the locked stack profile, the schema and UI_SCREENS.md. Entities, fields, state machines and indexes are schema-design; this skill takes them as given.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "stack-profile-flutter-firebase",
@@ -1300,7 +1311,7 @@
     {
       "name": "ui-screens-spec",
       "description": "Specifies every screen of every app in text before anything is built, writing UI_SCREENS.md: numbered screen ids (X.Y.Z), six fixed blocks per screen (header, body, primary CTA, navigation, data, permissions) with empty, loading and error states, a navigation graph per app, locked design tokens and tap targets per app context, a reusable component inventory, [COPY] placeholders, and the five key screens per app chosen for mockups. Use when the user says 'diseñemos las pantallas', 'qué pantallas necesito', 'wireframes en texto', 'screen spec' or 'componentes reutilizables', or as Phase 4 after the schema is approved. It needs the brief, the decisions and the schema document. It writes specs, not visuals: clickable HTML mockups of the key screens are navegable-mockups, which reads this document.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -1554,7 +1565,7 @@
     {
       "name": "product-spec-orchestrator",
       "description": "Takes a product idea to a buildable spec through seven gated phases: discovery, requirements (PRD), data schema, UI screens, architecture, multi-agent governance and optional navigable mockups, for the flutter-firebase or fastapi-react stack profile. It sequences the phase skills, stops for explicit approval after each one, surfaces the decisions worth checking, checks cross-phase coherence and resumes a half-finished spec from the files on disk. Use when the user wants the full treatment for a new product: \"quiero diseñar un producto de cero\", \"tengo una idea de app\", \"espec completa\", \"lleva esto hasta que sea buildable\". For one phase only, use that phase's skill (product-discovery for just the idea and the decisions); for an existing codebase, use project-adopt; to build, use sprint-runner.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "product-discovery",
@@ -1565,7 +1576,8 @@
         "multi-agent-governance",
         "navegable-mockups",
         "spec-guard",
-        "operational-readiness"
+        "operational-readiness",
+        "html-spec-generator"
       ],
       "tools": [],
       "path": "workflows/product-spec-orchestrator",
@@ -1631,7 +1643,7 @@
     {
       "name": "sprint-runner",
       "description": "Runs one sprint of docs/ISSUES.md with coding agents, wave by wave: one git worktree per issue, the issue's owner agent dispatched with its executor prompt, qa-tester reviewing each result with spec.mjs verify, approved issues merged at the wave barrier in id order, and a sprint retro at the end. Stops for human approval before every wave and on issues marked autonomous: false. Use when the backlog exists and the user wants it built: \"corre el sprint 2\", \"ejecuta la ola 1 con los agentes\", \"arranca el build\", \"run sprint 0\". Preparing the next sprint's prompts from the repo's state is execution-router; writing the backlog is multi-agent-governance; implementing one single issue is issue-delivery.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "license": "MIT",
       "requires": [
         "spec-guard",

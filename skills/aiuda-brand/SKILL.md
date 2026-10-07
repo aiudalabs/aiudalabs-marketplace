@@ -4,7 +4,7 @@ description: "Produces Aiuda Labs branded business documents (proposals, trainin
 license: MIT
 compatibility: PDF output needs a headless browser (Playwright with Chromium) or WeasyPrint on the machine. Without one, the skill delivers the HTML and the user prints it to PDF from a browser.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   author: aiudalabs
 ---
 

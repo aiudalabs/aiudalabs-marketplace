@@ -251,7 +251,7 @@ Components use semver.
 - Minor: new capability, backward compatible
 - Major: a change that alters what the component does or requires
 
-Bump the version of every component you change, including a stack whose list changed. `update` compares installed versions with the catalog, so a change without a bump never reaches people who already installed the component. The repository version in `package.json` is bumped by maintainers at release time.
+Bump the version of every component you change, including a stack whose list changed. `update` notices changed content even without a bump, but `outdated` and the catalog show versions, so CI runs `npm run check-versions` on every pull request and fails when a changed component kept its version. Changes to `evals/` alone need no bump. The repository version in `package.json` is bumped by maintainers at release time.
 
 ## Quality bar
 

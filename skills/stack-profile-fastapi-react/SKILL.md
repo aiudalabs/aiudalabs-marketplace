@@ -3,7 +3,7 @@ name: stack-profile-fastapi-react
 description: "Stack profile for a self-hosted Python backend (FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, Postgres, SQLite in dev) with React frontends and worker processes, deployed with Docker Compose: Postgres-first placement, separate Create/Update/Read schemas, LEGAL_TRANSITIONS and DB constraints for state machines, Postgres queues with FOR UPDATE SKIP LOCKED, default-deny auth dependencies, and the agent roster with its lanes (python-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is fastapi-react. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Postgres en este stack?', 'necesitamos Celery o basta la cola en Postgres', 'cómo evito que el cliente mande status' or 'qué carpetas son de python-dev'. For Flutter and Firebase, use stack-profile-flutter-firebase."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
 ---
 
@@ -37,11 +37,11 @@ The nine sections below are the profile contract. Every profile answers all nine
 
 ## 3. Contracts
 
-Pydantic v2 models are the API contract, SQLAlchemy 2 declarative models are the persistence shape, Alembic migrations are the schema history (every schema change ships its migration). Enums are `StrEnum` or `Literal`, mirrored in TypeScript for the React side, with parity checked in CI.
+Pydantic v2 models are the API contract, SQLAlchemy 2 declarative models are the persistence shape, Alembic migrations are the schema history (every schema change ships its migration). Enums are `StrEnum` or `Literal`, mirrored in TypeScript for the React side. No parity tool ships with this profile: `qa-tester` checks both sides on every change that touches either, and a project that wants it automated adds a parity check as its own Sprint 0 issue.
 
 ## 4. State-machine enforcement
 
-Legal transitions live in one shared module (`shared/contracts.py: LEGAL_TRANSITIONS`) and are validated in the store layer on every status write. Clients never PATCH `status`: every transition is a dedicated endpoint or worker action that validates before writing. Database constraints back the invariants (CHECK on valid statuses, partial UNIQUE indexes for "only one active X").
+Legal transitions live in one shared module (`shared/contracts.py: LEGAL_TRANSITIONS`) and are validated in the store layer on every status write. Clients never PATCH `status`: every transition is a dedicated endpoint or worker action that validates before writing, and each cause of a transition has exactly one owning unit (one owner per cause); one cause that arrives by two routes (a payment webhook and a status poll) goes through one shared handler; other units only read the status. Database constraints back the invariants (CHECK on valid statuses, partial UNIQUE indexes for "only one active X").
 
 ## 5. Execution units
 
@@ -50,7 +50,7 @@ Four patterns: **endpoint** (FastAPI route, client to server), **webhook** (HMAC
 ## 6. Tooling and gates
 
 - **Package:** src-layout, `pyproject.toml`, pinned dependencies, console-script entry points; pnpm for the React apps. No `PYTHONPATH` or `sys.path` hacks, ever.
-- **Test gate:** `python -m pytest -q`, plus `pnpm --filter <app> lint` and `pnpm --filter <app> typecheck` for each frontend.
+- **Test gate:** `python -m pytest -q`, plus `pnpm --dir frontend/<app> run lint` and `pnpm --dir frontend/<app> run build` for each frontend (`--dir … run` fails when a script is missing).
 - **Dev loop:** editable install, SQLite by default (zero infrastructure), Compose for the full stack; end-to-end Compose tests opt-in through an environment variable.
 - **CI:** pull request runs lint, typecheck, pytest on SQLite and a pytest job against a Postgres service; a tag on main builds the image and deploys.
 - **No `IAM_REQUIREMENTS.md`:** deploy identity, secrets and ingress are a section of `ARCHITECTURE.md` for this self-hosted profile.
@@ -61,7 +61,9 @@ Auth dependencies in FastAPI: tokens compared in constant time for services, ses
 
 ## 8. Agent roster
 
-`python-dev` (backend, migrations, tests, deploy), `react-dev` (frontends), `qa-tester` (review only) and the stack-agnostic `product-advisor` (review only). Exact lanes, in the `docs/AGENT_ROSTER.md` format, in [references/agents.md](references/agents.md).
+`python-dev` (backend, migrations, tests, Python lockfile, deploy), `react-dev` (frontends, the pnpm workspace and its lockfile) and `qa-tester` (review only). Each CI workflow belongs to the lane it validates. Every root and generated file has one owner; a lane asks the owner for changes to files outside it. Exact lanes, in the `docs/AGENT_ROSTER.md` format, in [references/agents.md](references/agents.md).
+
+`product-advisor` is not in the roster: it owns no issue, so it is consulted outside the roster (spec reviews between phases, scope questions), never dispatched as a build agent.
 
 ## 9. Kickstart
 

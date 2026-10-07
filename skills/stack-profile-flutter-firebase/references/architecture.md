@@ -29,8 +29,8 @@ Read by the `system-architecture` skill (Phase 5). This file carries the Flutter
 ├── apps/                       # Flutter applications, names from the brief
 │   └── {app-name}/
 │
-├── functions/                  # Cloud Functions (Node 20 + TypeScript)
-│   └── src/
+├── functions/                  # Cloud Functions (2nd gen, Node 22 + TypeScript)
+│   └── src/                    # index.ts is generated at build time from the folders below
 │       ├── callable/           # client → server
 │       ├── triggers/           # Firestore, Auth, Storage triggers
 │       ├── scheduled/          # cron-like jobs
@@ -43,7 +43,7 @@ Read by the `system-architecture` skill (Phase 5). This file carries the Flutter
 └── docs/                       # the spec documents
 ```
 
-Each top-level path belongs to one agent lane; see `agents.md` in this folder.
+Each top-level path, root file, lockfile and CI workflow belongs to one agent lane; see `agents.md` in this folder. CI is split per lane (`flutter.yml`, `firebase.yml`, `admin.yml`), so a workflow belongs to the lane it validates.
 
 ## Dependency rules
 
@@ -59,15 +59,21 @@ admin             depends on: packages-ts/types
 packages-ts/types depends on: nothing
 ```
 
-Dart and TypeScript share types through mirrored definitions (`packages/core/types/` and `packages-ts/types/`), kept in sync by a script that validates both against the schema document. Drift fails the build. Never share types by copy-paste: drift is the first cause of "works on the emulator, fails in production".
+Dart and TypeScript share types through mirrored definitions (`packages/core/types/` and `packages-ts/types/`), both checked against the schema document. No parity script ships with the profile: `qa-tester` checks parity on every change that touches either side, and a project that wants the check automated adds a parity script as a Sprint 0 issue (then drift fails CI). Never share types by copy-paste: drift is the first cause of "works on the emulator, fails in production".
 
 ## Workflow-engine guard: defaults for this stack
 
-Default: **no workflow engine** (Temporal, Inngest, Step Functions). Cloud Functions plus Pub/Sub plus Firestore as the state machine cost about $0/month at MVP scale. Justify an engine only with the skill's four questions. Reference cost when justified: Temporal Cloud from $200/month plus $30-50/month for a worker on Cloud Run. Known calls: AI generation pipelines with human review, justified; audio or video processing over 5 minutes, justified; simple marketplace, social or internal B2B, functions are enough.
+Default: **no workflow engine** (Temporal, Inngest, Step Functions). Cloud Functions plus Pub/Sub plus Firestore as the state machine cost about $0/month at MVP scale. Justify an engine only with the skill's four questions. Reference cost when justified: Temporal Cloud from $200/month plus $30-50/month for a worker on Cloud Run. Known calls: AI generation pipelines with human review, justified; audio or video processing over 5 minutes, justified; simple marketplace, social or internal B2B, functions are enough. A wait held as a status plus an admin queue screen (a venue awaiting review, a refund awaiting approval) is not a workflow-engine case, even when a person acts days later: Firestore holds the wait, a callable resumes it, a scheduled function handles its timeout, so question 2 reads no. It counts only for a multi-step process that must resume mid-flight with its context, timers and compensations.
 
 ## Execution-unit block (Cloud Function inventory)
 
 One block per function. Patterns: callable, trigger, scheduled, https.
+
+- **One owner per cause.** The schema names one owning function per transition cause (from-state, to-state and cause; see `data-layer.md` in this folder). The architecture copies that owner into the block's side effects; any other function only reads `status`. When a block would transition a status the schema gives to another function, the architecture raises it for the coherence check instead of adding a second owner.
+- **One cause, two routes, one handler.** The same fact can arrive twice: the payment provider's webhook (push) and a status poll or the return-page check (pull). That is one cause, not two: both routes call one shared handler (for example `functions/src/lib/payments/applyPaymentResult.ts`), keyed by the provider's payment or event id, which re-reads the status in a transaction, so whichever arrives first applies and the other is a no-op. The schema's owner stays the primary route; the block of the other route says it calls the shared handler.
+- **Auth triggers.** 2nd gen has no Auth user-created or user-deleted trigger; it has blocking functions (`beforeUserCreated`, `beforeUserSignedIn`), which run inside sign-up and can reject it (check the current Firebase docs for their requirements). A non-blocking on-create (create the profile document, send a welcome) is either a 1st-gen function (`firebase-functions/v1`, `auth.user().onCreate`), written as `Pattern: trigger (Auth, 1st gen)`, or a callable the app calls after the first sign-in. Both generations can live in one functions codebase.
+- **Idempotency** names the container from the schema (`idempotencyKeys`) and the dedup window. If the schema has no such container, raise it for the coherence check; do not invent one here.
+- **Triggers are at-least-once.** Firestore, Storage, Pub/Sub and Eventarc triggers can fire more than once for one event, so every trigger block has an idempotency line too: a deterministic write (set a field to a value computed from the event, a document id derived from the source) needs nothing more, say so; anything else (an increment, a push, an email, a call to a provider) records the event id (`event.id`) in the dedup container (`idempotencyKeys`, id `trigger_${eventId}`, or a `processedEvents` collection) in the same transaction as the effect, and skips an event it has seen. Scheduled functions re-read state, so a re-run finds nothing left to do.
 
 ```
 acceptBooking
@@ -107,11 +113,22 @@ Required fields: pattern, owner, trigger (or fires-when, or schedule), validates
 | Eventual consistency via trigger | Denormalization that tolerates lag | provider.acceptedCount |
 | No transaction | Single-document write | A user updates their own profile |
 
-## End-user permissions: custom claims
+## End-user permissions: claims or membership documents
 
-- Claims are set at signup by a callable function (`updateUserClaims`), never by the client. Clients refresh their token after privileged actions (about 1 s of lag is fine).
-- `role` is an enum derived from the personas: marketplace customer/provider/admin; content reader/author/admin; education student/teacher/parent/school_admin; B2B SaaS member/admin/owner per tenant; internal employee/manager/admin. Add `verificationTier` when needed (not for B2B or internal) and `tenantId` for multi-tenant products.
-- Owner-based: `request.auth.uid == resource.data.ownerId`. Role-based: `request.auth.token.role == 'admin'`.
+Two models; the schema (Phase 3) picks one per role, and most products combine them.
+
+| | Custom claims | Membership documents |
+|---|---|---|
+| Use for | Global roles that rarely change: `admin`, `verificationTier`, a single-tenant `role` | Roles scoped to a tenant, venue or team; users in several of them; roles that must change at once (staff added or removed) |
+| Lives in | The ID token (`request.auth.token.role`) | A document per membership, for example `venueMembers/{venueId}_{uid}` with `role` |
+| Rule check | `request.auth.token.role == 'admin'`, no read cost | `get(/databases/$(database)/documents/venueMembers/$(venueId + '_' + request.auth.uid)).data.role == 'owner'`, one document read per evaluation |
+| A change applies | After the client refreshes its token | On the next request |
+| Limits | Small payload (check the current Firebase docs for the size limit); not a list of tenants | Rules can read only a limited number of documents per evaluation (check the current docs) |
+
+- Claims are written only by a Cloud Function (for example `updateUserClaims`, called by an admin) or an admin script, never by the client. Clients refresh their token after a claim changes. Only a project that uses claims for roles has such a function.
+- Membership documents are written only by Cloud Functions; rules deny client writes to them.
+- `role` values derive from the personas: marketplace customer/provider/admin; content reader/author/admin; education student/teacher/parent/school_admin; B2B SaaS member/admin/owner per tenant; internal employee/manager/admin. Per-tenant roles are memberships, not a `tenantId` claim, unless a user can belong to exactly one tenant for life.
+- Owner-based: `request.auth.uid == resource.data.ownerId`.
 - `status`, `total`, `commission`, `verificationTier` are function-only writes regardless of role.
 - Collection-group queries are listed explicitly.
 
@@ -119,23 +136,59 @@ Required fields: pattern, owner, trigger (or fires-when, or schedule), validates
 
 End-user claims and service identity are independent layers. Mixing them is a privilege escalation waiting to happen.
 
-**Projects:** one Google Cloud project per environment, `{product}-dev`, `{product}-staging`, `{product}-prod`, never sharing resources. Region `us-central1` unless data residency says otherwise.
+**Projects:** one Google Cloud project per environment, `{product}-dev`, `{product}-staging`, `{product}-prod`, never sharing resources. **Region:** `us-central1` by default; choose another for data residency or for latency to where the users are (for example `us-east1` for users in Panama or the Caribbean). Write the reason. The Firestore location cannot be changed after the database is created, so the region is decided before Sprint 0, and functions run in the same region as Firestore.
 
-**APIs to enable**, only what the architecture uses (each one is a future quota and deprecation concern): firestore, cloudfunctions, run (gen2 functions), firebase, identitytoolkit, firebasestorage, secretmanager (always), cloudbuild, logging and monitoring (always); eventarc and pubsub only when used.
+**APIs to enable** (`<name>.googleapis.com`), each listed with the units that need it; every one is a future quota and deprecation concern, so nothing "just in case". Check the current Firebase and Google Cloud docs for exact service names.
 
-**Service accounts**, three at minimum:
+| API | When |
+|---|---|
+| `firebase`, `firestore`, `identitytoolkit` (Auth), `secretmanager`, `logging`, `monitoring`, `clouderrorreporting` | Always |
+| `cloudfunctions`, `run`, `cloudbuild`, `artifactregistry` | Always: 2nd gen functions build with Cloud Build, store images in Artifact Registry and run on Cloud Run |
+| `eventarc`, `pubsub` | Any 2nd gen event trigger, Firestore triggers included (Pub/Sub is Eventarc's transport), and any topic |
+| `cloudscheduler` | Any scheduled function |
+| `iamcredentials`, `sts` | CI deploys through OIDC (Workload Identity Federation) |
+| `firebaserules` | Deploying Firestore and Storage rules |
+| `fcm` | Push notifications |
+| `firebaseappcheck` | App Check |
+| `firebasestorage`, `storage` | Cloud Storage |
+| `firebasedatabase` | Realtime Database |
+| `firebasehosting` | Firebase Hosting: the admin dashboard (the scaffold's `firebase.json` deploys `admin/dist`), App Links and Universal Links files |
+| `firebaseremoteconfig` (plus `firebaseremoteconfigrealtime` for realtime updates) | App settings and kill switches in Remote Config |
+| `cloudtasks` | Task-queue functions only |
+
+**Service accounts.** Grant each role at the narrowest resource that works (one bucket, one secret), not the project. Role names below are the usual ones; check the current IAM docs for the exact role before provisioning.
 
 ```
-cf-runtime-sa  runtime identity for all functions (default)
-  roles: datastore.user, firebaseauth.admin, storage.objectAdmin,
-         cloudtasks.enqueuer, secretmanager.secretAccessor, logging.logWriter
-deploy-sa      CI/CD deploys through OIDC (a JSON key only as a last resort)
-  roles: cloudfunctions.developer, firebase.admin, iam.serviceAccountUser,
-         run.admin, cloudbuild.builds.editor
-eventarc-sa    only with Eventarc: run.invoker, eventarc.eventReceiver
+cf-runtime-sa       default runtime identity
+  roles: datastore.user (Firestore), logging.logWriter
+  only when a function on it needs it, scoped to the resource:
+    storage.objectUser or objectViewer on the one bucket
+    monitoring.metricWriter (custom metrics)
+    firebasecloudmessaging.admin or the current FCM send role (push)
+    pubsub.publisher on the topic, cloudtasks.enqueuer on the queue
+    firebaseremoteconfig.viewer (a function reads app settings)
+  no secret access at project level
+<name>-runtime-sa   a dedicated account per function group with sensitive
+                    permissions, for example:
+  auth-admin-sa       firebaseauth.admin, only for functions that set claims
+                      or manage users
+  payments-runtime-sa secretmanager.secretAccessor on the payment secrets only
+deploy-sa           CI deploys through OIDC; a JSON key only as a last resort
+  roles: cloudfunctions.developer, iam.serviceAccountUser on each runtime
+         account (not project-wide), firebaserules.admin (rules),
+         datastore.indexAdmin (indexes), cloudscheduler.admin (scheduled
+         functions), eventarc.admin (2nd gen triggers),
+         secretmanager.viewer (binding secrets to functions),
+         firebasehosting.admin (Hosting: the admin dashboard, the
+         .well-known link files),
+         artifactregistry.reader if the build needs it
+  bound to the CI identity through Workload Identity Federation
+  (iam.workloadIdentityUser for the repository's principal)
 ```
 
-Custom accounts only where isolation is justified. Every role on the runtime account traces to a specific function's `IAM permissions` field: never `roles/owner` or `roles/editor` "to be safe". Drop a listed role that no function needs.
+- **Secrets:** `secretmanager.secretAccessor` is granted on each secret to the one account that reads it, never at project level. Otherwise a dedicated account isolates nothing.
+- **Eventarc:** 2nd gen event triggers need an identity that can receive events and invoke the function (`eventarc.eventReceiver`, `run.invoker`); the Firebase CLI usually sets this up on deploy. Check the current docs, and list what it granted.
+- Every role on a runtime account traces to a specific function's `IAM permissions` field: never `roles/owner`, `roles/editor` or `roles/firebase.admin` "to be safe". Drop a role that no function needs.
 
 **Sections of the document:**
 
@@ -146,7 +199,15 @@ Custom accounts only where isolation is justified. Every role on the runtime acc
 - **Storage buckets**: default-deny, no `allUsers`, no CORS wildcards, signed URLs from functions for anything public-facing, lifecycle rules per prefix.
 - **Secrets**: Secret Manager only, never env vars or code. Each with purpose, readers and rotation policy. Orphan secrets are flagged.
 - **Eventarc and Pub/Sub topics**: publishers and subscribers, all present in the inventory.
-- **HTTPS endpoints**: ingress and auth strategy for each. A webhook bypasses IAM auth only with a signature check on the body and an in-body rate limit.
+- **HTTPS endpoints and Hosting sites**: ingress and auth strategy for each endpoint; what each Hosting site serves (static files only). A webhook bypasses IAM auth only with a signature check on the body and an in-body rate limit.
+
+## App settings: Remote Config
+
+Non-secret settings that operations changes without a release (an ops contact number, the minimum supported app version, kill switches for payments or a feature, a feature's limits) live in **Firebase Remote Config**: one template per project, defaults bundled in the apps so they start offline, realtime updates for kill switches. A function that reads a setting reads the template through the Admin SDK (`firebaseremoteconfig.viewer` on its runtime account) and caches it briefly. A project that cannot use Remote Config keeps a single `config/app` document, readable by signed-in clients and written only by an admin path; never both. Secrets never go here: they are Secret Manager. The architecture lists every setting with its default, who may change it, and the units and screens that read it. Remote Config is edited in the console by the people named, not deployed by CI; their role (`firebaseremoteconfig.admin`) is a human grant in `IAM_REQUIREMENTS.md`.
+
+## Returning to the app from a web page
+
+A hosted payment page, an email link or an OAuth hand-off returns to the app through **App Links (Android) and Universal Links (iOS)**: an `https` URL on a domain the project controls that opens the app when installed and a fallback web page when not. Firebase Dynamic Links is shut down; do not design on it. Hosting serves the two association files, `/.well-known/assetlinks.json` (the Android package and signing-certificate fingerprints, one per environment and signing key) and `/.well-known/apple-app-site-association` (team id and bundle id, served as `application/json`, no redirect), plus the fallback page that shows the result and offers to open the app. Either the admin site's `public` folder carries them (Vite copies `admin/public/.well-known/` into `admin/dist`) or a second Hosting site does; the scaffold's `firebase.json` does not ignore dotfiles, so `.well-known` deploys. The app never trusts the return URL for the outcome: on return it reads the status the webhook wrote (or triggers the poll route above). Custom URL schemes only as a fallback; they are not verified.
 
 ## Performance budget implications
 
@@ -163,11 +224,13 @@ Custom accounts only where isolation is justified. Every role on the runtime acc
 
 ```bash
 melos bootstrap && pnpm install && firebase use {project-id}
-firebase emulators:start --import=./emulator-data --export-on-exit
-cd functions && pnpm dev          # tsc --watch with reload
+firebase emulators:start --import=./emulator-data --export-on-exit   # the one emulator suite, functions included
+pnpm --dir functions run build:watch   # tsc --watch; the functions emulator reloads the compiled output
 cd apps/{app} && flutter run      # connects to the emulator through env
-cd admin && pnpm dev
+pnpm --dir admin run dev           # Vite dev server
 ```
+
+Only one command starts emulators. The functions package has `build` and `build:watch` scripts and no script that starts a second functions emulator (two of them clash on port 5001).
 
 Apps detect the emulator through environment flags (`FIREBASE_EMULATOR_HOST` and similar); document the setup. Running functions against production Firestore "for speed" corrupts data and burns quota.
 
@@ -175,7 +238,7 @@ Apps detect the emulator through environment flags (`FIREBASE_EMULATOR_HOST` and
 
 | Trigger | What runs |
 |---|---|
-| Pull request | Lint, types, unit tests, build of every package |
+| Pull request | Lint, types, unit tests and build, one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`), each limited to its lane's paths |
 | Merge to `develop` | The above, then deploy to the staging project |
 | Tag `v*` on `main` | The above, manual approval, deploy to production |
 | Daily | Integration tests of scheduled functions against staging |
@@ -206,12 +269,16 @@ P0 alerts to `#alerts-prod` or PagerDuty: critical function error rate above 1% 
 
 - Clients writing `status` directly.
 - Clients writing denormalized copies (clients write the source of truth; functions fan out).
-- Callable functions without idempotency (`clientRequestId` mandatory, dedup window of at least 1 h).
+- Callable functions without idempotency (`clientRequestId` mandatory, stored in the schema's `idempotencyKeys` container, dedup window of at least 1 h).
+- Triggers that assume exactly-once delivery (an increment or a push with no event-id dedup).
+- Two functions owning the same cause of a transition, including a webhook and a poll that each apply the same provider result instead of sharing one handler.
+- Firebase Dynamic Links for returning to the app; app settings hardcoded in the app or scattered across documents.
 - Skipping emulator-first development.
 - One function doing everything (a 500-line callable handling six actions).
 - Cyclic package dependencies (`core → ui → core`).
 - Temporal by default.
 - Confusing custom claims with cloud IAM.
-- Inflating the runtime account, or `roles/owner` "to be safe".
+- Per-tenant roles in custom claims for users who belong to several tenants.
+- Inflating the runtime account, project-wide secret access, or `roles/owner` "to be safe".
 - Secrets in env vars or code.
 - Public buckets or `allUsers` IAM bindings.

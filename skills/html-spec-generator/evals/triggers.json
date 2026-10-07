@@ -1,9 +1,10 @@
 [
-  { "query": "Ya tenemos docs/ARCHITECTURE.md y el FIREBASE_SCHEMA.md del marketplace de canchas. Genera la arquitectura en HTML navegable para compartir con los devs.", "should_trigger": true },
-  { "query": "Turn our architecture doc into a single HTML page with a sticky nav and Mermaid diagrams: system overview, booking sequence, ER diagram, deployment.", "should_trigger": true },
-  { "query": "quiero un spec navegable de la arquitectura del app de pedidos para restaurantes, con el modelo de datos y los flujos de auth, que se abra con doble click", "should_trigger": true },
-  { "query": "We changed the payment flow in ARCHITECTURE.md; regenerate docs/architecture.html so the sequence diagrams match.", "should_trigger": true },
-  { "query": "Prepara una propuesta comercial para Grupo Rey con el alcance, cronograma e inversión, con la marca de Aiuda Labs, en PDF.", "should_trigger": false, "use_instead": "aiuda-brand" },
-  { "query": "Diseñemos la arquitectura del sistema: qué servicios, qué funciones, cómo se despliega y qué riesgos tiene.", "should_trigger": false, "use_instead": "system-architecture" },
-  { "query": "Make clickable mockups of the five key screens of the provider app with a phone frame.", "should_trigger": false, "use_instead": "navegable-mockups" }
+  {"query": "Ya tenemos docs/ARCHITECTURE.md y el FIREBASE_SCHEMA.md del marketplace de canchas. Genera la arquitectura en HTML navegable para compartir con los devs.", "should_trigger": true},
+  {"query": "Turn our architecture doc into a single HTML page with a sticky nav and Mermaid diagrams: system overview, booking sequence, ER diagram, deployment.", "should_trigger": true},
+  {"query": "quiero un spec navegable de la arquitectura del app de pedidos para restaurantes, con el modelo de datos y los flujos de auth, que se abra con doble click", "should_trigger": true},
+  {"query": "We changed the payment flow in ARCHITECTURE.md; regenerate docs/architecture.html so the sequence diagrams match.", "should_trigger": true},
+  {"query": "Quiero ver todas las especificaciones en una sola página: el resumen del brief, la tabla de decisiones D-xx, el índice de requisitos del PRD y las pantallas, además de la arquitectura.", "should_trigger": true},
+  {"query": "Prepara una propuesta comercial para Grupo Rey con el alcance, cronograma e inversión, con la marca de Aiuda Labs, en PDF.", "should_trigger": false, "use_instead": "aiuda-brand"},
+  {"query": "Diseñemos la arquitectura del sistema: qué servicios, qué funciones, cómo se despliega y qué riesgos tiene.", "should_trigger": false, "use_instead": "system-architecture"},
+  {"query": "Make clickable mockups of the five key screens of the provider app with a phone frame.", "should_trigger": false, "use_instead": "navegable-mockups"}
 ]

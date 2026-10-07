@@ -4,7 +4,7 @@ description: "Runs one sprint of docs/ISSUES.md with coding agents, wave by wave
 license: MIT
 compatibility: Dispatches developer agents and qa-tester as subagents in separate git worktrees, so it needs a harness with subagents, git 2.5 or later and Node.js 20 or later. Without subagents, run the same loop sequentially in one session, one issue at a time.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires: spec-guard issue-delivery issue-review execution-router
   agents: qa-tester
@@ -21,14 +21,14 @@ Runs one sprint of the backlog with agents. The workflow plays the **orchestrato
 - The sprint number (default: the one `spec.mjs status` reports as in progress or next)
 - The base branch (default `develop`)
 
-If the tools are missing, stop and ask the user to install them with the `spec-guard` skill: lane checks and waves are what make parallel work safe. If this sprint's prompts are missing or marked stale, run `execution-router` for this sprint first.
+If the tools are missing, stop and ask the user to install them with the `spec-guard` skill: lane checks and waves are what make parallel work safe. After a `spec-guard` update, ask the user to run its installer again before the sprint (`node <spec-guard skill folder>/scripts/install.mjs`; safe to repeat, it replaces `tools/spec-guard/` and keeps hooks and settings). If this sprint's prompts are missing or marked stale, run `execution-router` for this sprint first.
 
 ## Phase 0: Preflight
 
 1. Run `node tools/spec-guard/spec.mjs check --strict`. Any error stops the sprint.
 2. Run `node tools/spec-guard/spec.mjs status`. Note the sprint, its waves, what is already merged and the next ready wave. Issues already merged are never re-run.
 3. Check the base branch is clean and up to date: `git status --short`, `git fetch`, and that it matches its remote.
-4. Run the full test gate from `AGENTS.md` on the base branch. A red base means every issue would start red: stop and report.
+4. Run the full test gate from `AGENTS.md` on the base branch. A red base means every issue would start red: stop and report. A command counts as green only when its output shows it ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", so treat those as failures and report the command as broken.
 
 **Gate: show the sprint plan (waves, issues, owners, which issues need a human checkpoint) and wait for explicit approval.**
 
@@ -54,7 +54,7 @@ For each issue, dispatch the agent named in its `owner` field as a subagent work
 
 For an issue with `autonomous: false`, the owner posts its plan and stops. **Gate: show that plan to the person and wait for approval before the owner writes code.** Relay the answer; do not answer for them.
 
-If an owner reports it cannot finish (the spec contradicts itself, a dependency is missing, the change needs a file outside its lane), do not reassign it and do not fix it yourself. Mark the issue blocked, let the rest of the wave continue, and bring the blocker to the person at the barrier.
+If an owner reports it cannot finish (the spec contradicts itself, a dependency is missing, the change needs a file outside its lane), do not reassign it and do not fix it yourself. Mark the issue blocked, let the rest of the wave continue, and bring the blocker to the person at the barrier. A change in another lane (a lockfile refresh, a shared type, a CI workflow) becomes, with the person's approval, an issue for the lane that owns the file, added to `docs/ISSUES.md` with the blocked issue depending on it, then `spec.mjs waves --write`; never a commit across lanes.
 
 ### 4. Review each finished issue
 

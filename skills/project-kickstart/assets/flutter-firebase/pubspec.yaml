@@ -1,4 +1,4 @@
-name: {{project_name}}_workspace
+name: {{package_name}}_workspace
 description: Root workspace for {{project_title}} Flutter packages
 publish_to: 'none'
 

@@ -1,20 +1,20 @@
 # {{project_title}}
 
-_To be filled in after Phase 1 (`product-discovery`)._
+_`product-discovery` replaces this line with the brief's tagline at the end of Phase 1._
 
 ## Quick start
 
 ```bash
 melos bootstrap
 pnpm install
-firebase emulators:start --import=./emulator-data --export-on-exit
+pnpm emulators
 ```
 
 See `AGENTS.md` for the full setup, the conventions and how to work on this repo.
 
 ## Project status
 
-See `STATUS.md` for the current sprint and what is in flight, or run `node tools/spec-guard/spec.mjs status`.
+Run `node tools/spec-guard/spec.mjs status`: it reads the documents and reports which phases are done, the sprint progress and the next wave. `STATUS.md` records the outcome of each finished sprint, and `docs/SESSION.md` holds the narrative for the next working session.
 
 ## Documentation
 

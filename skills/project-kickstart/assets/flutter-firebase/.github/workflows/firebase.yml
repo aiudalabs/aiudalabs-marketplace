@@ -1,0 +1,53 @@
+# Owner: firebase-dev. Validates the backend lane: functions/**, the security
+# rules and the shared TypeScript types. One workflow per lane; see docs/AGENT_ROSTER.md.
+name: firebase
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths: ['functions/**', 'packages-ts/**', '*.rules', 'firestore.indexes.json', 'database.rules.json', 'firebase.json', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/firebase.yml']
+  push:
+    branches: [develop]
+    paths: ['functions/**', 'packages-ts/**', '*.rules', 'firestore.indexes.json', 'database.rules.json', 'firebase.json', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/firebase.yml']
+
+jobs:
+  functions:
+    name: Cloud Functions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4   # version from "packageManager" in package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '{{node_version}}'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir functions run typecheck
+      - run: pnpm --dir functions run lint
+      - run: pnpm --dir functions run test
+      - run: pnpm --dir functions run build
+      # Each shared types package that exists must have a typecheck script:
+      # `--dir ... run` fails when it is missing, where `--filter` passes checking nothing.
+      - name: Type-check shared TypeScript packages
+        run: |
+          for pkg in packages-ts/*/; do
+            [ -f "${pkg}package.json" ] || continue
+            pnpm --dir "$pkg" run typecheck
+          done
+
+  rules:
+    name: Security rules tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '{{node_version}}'
+          cache: 'pnpm'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec firebase emulators:exec --only firestore "pnpm --dir functions run test:rules"
