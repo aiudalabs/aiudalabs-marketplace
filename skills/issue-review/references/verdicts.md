@@ -5,20 +5,22 @@
 ```markdown
 ## Approved — S3-07
 
-**Acceptance criteria:** 3 / 3 met
-1. Rejects unauthenticated calls — functions/src/callable/createBooking.ts:18; test `createBooking rejects unauthenticated` (ran, pass)
-2. Moves requested to confirmed in one transaction — createBooking.ts:41-67; test `createBooking confirms atomically` (ran, pass)
-3. Duplicate request returns the cached response — createBooking.ts:24-30; test `createBooking is idempotent on clientRequestId` (ran, pass)
+**Acceptance criteria:** 3 / 5 met, 1 pending human action, 1 deferred to S3-09
+1. Rejects unauthenticated calls — functions/src/callable/createBooking.ts:18; test `createBooking rejects unauthenticated` (ran, pass; red with the auth check removed)
+2. Moves requested to confirmed in one transaction — createBooking.ts:41-67; test `createBooking confirms atomically` (ran, pass; red with each comparison mutated, 4/4)
+3. Duplicate request returns the cached response — createBooking.ts:24-30; test `createBooking is idempotent on clientRequestId` (ran, pass; red with the cache lookup removed)
+4. human: App Check enforced in the console — pending human action: the project owner attaches a screenshot of the enforcement page (approved at the plan gate)
+5. Booking confirmation email — deferred by amendment `9f8e7d6` (on develop) to S3-09
 
-**Gate:** every command in AGENTS.md run locally, each one ran its script (tests counted), all pass.
-**Lane check:** `spec.mjs verify S3-07` pass.
-**Commits:** all carry the issue id and refs.
+**Gate:** the issue's `gate:` list and every command in AGENTS.md run locally, each one ran its script and counted its tests, all pass. (A suite that found no tests is written `ran, 0 tests` and is acceptable only when the issue adds nothing it could test. A command marked `from <id>` is listed as skipped while that issue is unmerged.)
+**Lane check:** `spec.mjs verify S3-07` pass, on a clean tree.
+**Commits:** all carry the issue id and refs (merges from the base exempt).
 **Hard rules:** no violations.
 
 **Suggestions (non-blocking):**
 - The validation block could move to a helper shared with `cancelBooking`.
 
-Ready for merge.
+Ready for merge. The issue stays open until criterion 4's attachment exists.
 ```
 
 ## Changes requested
@@ -44,6 +46,10 @@ Ready for merge.
 
 Re-request review when addressed.
 ```
+
+## Where the verdict goes
+
+In the issue or PR thread. Without a tracker or PR, in the log path the orchestrator gave (one file per issue and round, such as `<log dir>/S3-07-qa.md`), and in the final report when the review runs as a subagent.
 
 ## Spec inconsistency note
 
