@@ -264,7 +264,7 @@ Spanish in the conversation, English in the document. Be pictorial when words fa
 
 Run the `spec-guard` check from the project root: `node tools/spec-guard/spec.mjs check`, or the same `scripts/spec.mjs` from the `spec-guard` skill's folder when the project has no `tools/spec-guard/` yet. It works before a backlog exists and checks the decisions, the PRD and the roster on disk; fix any error before closing. If it stops with "no backlog at docs/ISSUES.md", the project's copy is older than the `spec-guard` skill: re-run its installer (`node <spec-guard skill folder>/scripts/install.mjs`, safe to repeat) and check again.
 
-Overwrite the whole of `docs/SESSION.md` with the shape every phase skill writes:
+Overwrite the whole of `docs/SESSION.md` with the shape every phase skill writes (skip it when `product-spec-orchestrator` re-runs this skill to apply a coherence fix or a build result: the orchestrator updates `docs/SESSION.md` itself, so it never rewinds to this phase):
 
 ```markdown
 # Session — {project title}

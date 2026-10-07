@@ -217,6 +217,44 @@ export function screenLinks(text) {
 
 const screenDefined = (ids, id) => (id.endsWith('.x') ? [...ids].some((other) => other.startsWith(id.slice(0, -1))) : ids.has(id));
 
+// ---------------------------------------------------------------- anchors
+
+// GitHub's heading slug: the heading's text as rendered (code, emphasis, links and HTML tags unwrapped),
+// lowercased, every character that is not a letter, a digit, a space, `-` or `_` removed, each space
+// turned into `-`. A repeated slug gets `-1`, `-2`, ... in document order.
+export function slugify(heading) {
+  return heading
+    .replace(/<[^>]*>/g, '')
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .split('`')
+    // Outside code spans, `_emphasis_` loses its underscores; `*` goes with the punctuation below.
+    .map((part, index) => (index % 2 ? part : part.replace(/(^|[^\p{L}\p{N}_])_+(\S(?:.*?\S)?)_+(?=[^\p{L}\p{N}_]|$)/gu, '$1$2')))
+    .join('')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}\p{Pc} -]/gu, '')
+    .replace(/ /g, '-');
+}
+
+// Every anchor a Markdown document offers: its ATX heading slugs and its explicit `<a id="...">` or `<a name="...">`.
+export function markdownAnchors(text) {
+  const anchors = new Set();
+  const counts = new Map();
+  let fenced = false;
+  for (const line of text.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) { fenced = !fenced; continue; }
+    if (fenced) continue;
+    for (const match of line.matchAll(/<a\s[^>]*?\b(?:id|name)=["']([^"']+)["']/gi)) anchors.add(match[1]);
+    const heading = /^ {0,3}#{1,6}\s+(.*?)(?:\s+#+)?\s*$/.exec(line);
+    if (!heading) continue;
+    const base = slugify(heading[1]);
+    const seen = counts.get(base) ?? 0;
+    counts.set(base, seen + 1);
+    anchors.add(seen ? `${base}-${seen}` : base);
+  }
+  return anchors;
+}
+
 // ---------------------------------------------------------------- brief
 
 export const BRIEF_HEADINGS = ['Tagline', 'Apps', 'Market', 'User groups', 'Core value loop', 'Personas and jobs', 'Adversarial analysis', 'Do-not-build list'];
@@ -615,6 +653,11 @@ export function checkProject(project, { strict = false } = {}) {
     if (decisions) for (const ref of data.decision_refs ?? []) if (!decisions.has(ref)) found.push(error('unknown-decision', where, `${issue.id} cites ${ref}, which is not in ${DOCS.decisions}`));
     if (requirements) for (const ref of data.requirement_refs ?? []) if (!requirements.has(ref)) found.push(error('unknown-requirement', where, `${issue.id} cites ${ref}, which is not in ${DOCS.requirements}`));
 
+    for (const read of data.reads ?? []) {
+      const problem = unresolvedRead(project, String(read));
+      if (problem) found.push(error('unresolved-read', where, `${issue.id} reads ${read}: ${problem}`));
+    }
+
     if ('commit_strategy' in data && !['atomic', 'squash'].includes(data.commit_strategy)) found.push(error('commit-strategy', where, `${issue.id} commit_strategy must be atomic or squash`));
     if ('autonomous' in data && typeof data.autonomous !== 'boolean') found.push(error('autonomous', where, `${issue.id} autonomous must be true or false`));
     if (issue.criteria === 0) found.push(error('no-criteria', where, `${issue.id} has no numbered list under "### Acceptance criteria"`));
@@ -649,6 +692,19 @@ export function checkProject(project, { strict = false } = {}) {
     }
   }
   return found;
+}
+
+// A `reads:` entry into a Markdown document must name a file that exists and, after `#`, an anchor it has.
+// Screen links into docs/UI_SCREENS.md and mockup links are checked by checkScreens; other paths may not exist yet.
+function unresolvedRead(project, read) {
+  const [path, anchor] = read.split('#', 2);
+  if (!/\.md$/i.test(path) || /^(?:https?:)?\/\//.test(path)) return null;
+  if (path === DOCS.screens && anchor?.startsWith('s-') && project.screens) return null;
+  const anchors = project.anchorsOf?.(path);
+  if (anchors === undefined) return null;
+  if (anchors === null) return path.startsWith('docs/') ? 'the file does not exist' : null;
+  if (anchor === undefined || anchor === '' || anchors.has(anchor)) return null;
+  return `no heading or <a id> in ${path} has the anchor #${anchor} (heading anchors are GitHub slugs, see formats.md)`;
 }
 
 // docs/UI_SCREENS.md and every link into it or into a mockup. FR and D ids are checked as citations, above.
@@ -754,9 +810,17 @@ export function readProject(root) {
     if (html) mockups.set(app, new Set([...html.matchAll(/\bid=["']s-([^"']+)["']/g)].map((match) => match[1])));
   }
 
+  const anchorCache = new Map();
+  const anchorsOf = (path) => {
+    if (path.includes('..')) return undefined;
+    if (!anchorCache.has(path)) { const text = read(root, path); anchorCache.set(path, text === null ? null : markdownAnchors(text)); }
+    return anchorCache.get(path);
+  };
+
   return {
     root,
     problems,
+    anchorsOf,
     screens,
     screenLinks: linking,
     mockups,

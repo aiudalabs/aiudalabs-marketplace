@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { ROOT } from '../lib/components.mjs';
 import {
-  assignWaves, checkProject, globCovers, globsOverlap, matches, mergedIds, nextWave, parseDecisions, parseIssues,
-  parseRequirements, parseRoster, parseScreens, readProject, toCsv, toGithubScript, writeWavesInto,
+  assignWaves, checkProject, globCovers, globsOverlap, markdownAnchors, matches, mergedIds, nextWave, parseDecisions, parseIssues,
+  parseRequirements, parseRoster, parseScreens, readProject, slugify, toCsv, toGithubScript, writeWavesInto,
 } from '../skills/spec-guard/scripts/lib.mjs';
 
 const SKILL = join(ROOT, 'skills/spec-guard');
@@ -353,4 +353,33 @@ test('install and hooks: commits and agent edits stay inside the active issue', 
   assert.equal(settings.hooks.PreToolUse.length, 1);
   run([join(SCRIPTS, 'install.mjs'), '--claude'], dir);
   assert.equal(JSON.parse(readFileSync(join(dir, '.claude/settings.json'), 'utf8')).hooks.PreToolUse.length, 1, 'installing twice adds the hook once');
+});
+
+test('anchors: GitHub heading slugs and explicit <a id>', () => {
+  assert.equal(slugify('5.3 Checkout and payment'), '53-checkout-and-payment');
+  assert.equal(slugify('Architecture — Canchas Pa'), 'architecture--canchas-pa');
+  assert.equal(slugify('The `bookings_count` field and _emphasis_ **here**'), 'the-bookings_count-field-and-emphasis-here');
+  assert.equal(slugify('[Cloud Functions](x.md) inventory (CF-*)'), 'cloud-functions-inventory-cf-');
+  assert.equal(slugify('Reservas: año'), 'reservas-año');
+  const anchors = markdownAnchors('# Notes\n## Notes\n```\n# fenced\n```\n<a id="cf-inventory"></a>\n### Inventory ###\n');
+  assert.deepEqual([...anchors], ['notes', 'notes-1', 'cf-inventory', 'inventory']);
+});
+
+test('check: issue reads resolve to a document and one of its anchors', (t) => {
+  const dir = copyExample(t);
+  const reads = (...entries) => edit(dir, 'ISSUES.md', '---\n**Objetivo:** Las reservas', `reads:\n${entries.map((entry) => `  - ${entry}`).join('\n')}\n---\n**Objetivo:** Las reservas`);
+  reads('docs/PRD.md#fr-booking-2--the-owner-confirms-and-the-player-is-charged', 'docs/PRD.md', 'mockups/player-app.html#s-1.2.1', 'functions/README.md#later', 'AGENTS.md#anything');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'slugs, whole files, mockups and files outside docs/ that do not exist yet');
+
+  edit(dir, 'ISSUES.md', 'docs/PRD.md#fr-booking-2--', 'docs/PRD.md#fr-booking-2-');
+  const found = checkProject(readProject(dir));
+  assert.deepEqual(codes(found), ['unresolved-read']);
+  assert.match(found[0].message, /anchor #fr-booking-2-the-owner/);
+  assert.match(found[0].where, /^docs\/ISSUES\.md:\d+$/);
+
+  edit(dir, 'PRD.md', '### FR-BOOKING-2', '<a id="fr-booking-2-the-owner-confirms-and-the-player-is-charged"></a>\n### FR-BOOKING-2');
+  assert.deepEqual(codes(checkProject(readProject(dir))), [], 'an explicit anchor resolves it');
+
+  edit(dir, 'ISSUES.md', '  - docs/PRD.md\n', '  - docs/SCHEMA.md\n');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unresolved-read'], 'a document under docs/ must exist');
 });

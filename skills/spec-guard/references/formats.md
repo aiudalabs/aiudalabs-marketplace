@@ -54,6 +54,10 @@ One heading per functional requirement:
   never in another heading, or they count as definitions.
 - `(deferred)` in the heading takes the requirement out of this release;
   `(existing)` marks one the code already meets.
+- `**Traces:**` names the brief's job ids the requirement serves. A requirement
+  imposed from outside (a store policy, a law) traces to its source instead:
+  `**Traces:** compliance: Apple App Store Review Guideline 5.1.1(v)`. A traced
+  job id that is not in the brief is an error; a compliance trace is not checked.
 
 ## Citations in other documents
 
@@ -155,7 +159,7 @@ wave: 2
 owner: firebase-dev
 files_touched:
   - functions/src/callable/createBooking.ts
-  - functions/test/createBooking.test.ts
+  - functions/test/unit/createBooking.test.ts
 depends_on:
   - S1-04   # bookings collection schema
 decision_refs: [D-03, D-07]
@@ -184,13 +188,32 @@ reads:
 | `requirement_refs` | `FR-...` ids this issue implements. May be empty for setup work |
 | `commit_strategy` | `atomic` (default) or `squash` |
 | `autonomous` | `false` when a person must approve mid-way (migrations, money, deletes) |
-| `reads` | Documents the executor reads first. Optional |
+| `reads` | Documents the executor reads first, `path` or `path#anchor`. Optional; see below |
 
 The frontmatter is a small YAML subset: `key: value`, `key: [a, b]`, or `key:`
 followed by `  - item` lines. `#` starts a comment.
 
 After the frontmatter: a one-line `**Objetivo:**` (or `**Goal:**`) in plain
 language, then `### Acceptance criteria` with a numbered list.
+
+### `reads` anchors
+
+A `reads` entry into a Markdown file must resolve, or it is an
+`unresolved-read` error: a file under `docs/` must exist, and the part after
+`#` must be one of that file's anchors. A Markdown file outside `docs/` is
+checked only once it exists. The anchors are:
+
+- **Heading slugs**, as GitHub renders them: take the heading's text with code
+  spans, emphasis, links and HTML tags unwrapped; lowercase it; drop every
+  character that is not a letter, a digit, a space, `-` or `_`; turn each space
+  into `-`. `## 5.3 Checkout and payment` is `#53-checkout-and-payment`,
+  `# Architecture — Canchas Pa` is `#architecture--canchas-pa` (the dash goes,
+  both spaces stay). A repeated heading gets `-1`, `-2`, ... in document order.
+- **Explicit anchors**: `<a id="cf-inventory"></a>` (or `name=`) anywhere in
+  the file. Use one when the heading text may change or is long.
+
+Screen links (`docs/UI_SCREENS.md#s-1.2.3`, `mockups/<app-id>.html#s-1.2.3`)
+follow the screen rules above; a mockup file may not exist yet.
 
 ## Globs
 

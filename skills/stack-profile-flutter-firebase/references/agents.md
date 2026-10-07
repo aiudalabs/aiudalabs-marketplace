@@ -9,12 +9,14 @@ Lane rules:
 - No path is owned by two agents. Shared files are a design smell: one agent owns them, the others ask for changes.
 - Every path an issue will write sits in exactly one lane, and so does every root and generated file. The ones that are easy to miss are assigned here:
   - **Lockfiles** go with the workspace file that produces them: `pnpm-lock.yaml` to `firebase-dev` (owner of the root `package.json` and `pnpm-workspace.yaml`), `pubspec.lock` and every Dart lockfile to `flutter-dev`.
-  - **CI workflows** belong to the lane they validate, one file per lane: `.github/workflows/flutter.yml` (`flutter-dev`), `.github/workflows/firebase.yml` (`firebase-dev`), `.github/workflows/admin.yml` (`react-dev`). Deploy workflows and `.github/workflows/spec-guard.yml` belong to `firebase-dev`; the `spec-guard` installer writes `spec-guard.yml`, and a reinstall may rewrite it.
+  - **CI workflows** belong to the lane they validate, one file per lane: `.github/workflows/flutter.yml` (`flutter-dev`), `.github/workflows/firebase.yml` (`firebase-dev`), `.github/workflows/admin.yml` (`react-dev`). Deploy workflows and `.github/workflows/spec-guard.yml` belong to `firebase-dev`. The `spec-guard` installer writes `spec-guard.yml`, and `install.mjs --ci` rewrites it while it keeps the spec-guard marker comment; a `firebase-dev` issue that customizes it removes that line.
   - **Root configuration** (`.gitignore`, `.tool-versions`, `.env.example`, `README.md`) belongs to `firebase-dev`.
   - **Generated barrels** are generated, not edited. The functions entry point `functions/src/index.ts` is written at build time from the files in `functions/src/callable/`, `triggers/`, `scheduled/` and `https/` (by `functions/scripts/gen-index.mjs`, shipped with the scaffold). No issue lists it in `files_touched`, so function issues do not serialize on one file.
-  - **Installed tooling** (`tools/spec-guard/**`, `.githooks/**`, `.claude/**`, `.aiudalabs-marketplace.json`) is written by its installer, never by an issue.
 - **A change to a file outside the lane is requested, not made.** The issue that needs it declares a dependency on an issue in the owning lane (a new type in `packages-ts/types/`, a CI step, a rules change). For dependencies: `react-dev` edits `admin/package.json` in its own issue, and the `pnpm-lock.yaml` refresh is a `firebase-dev` issue in the same or the next wave; governance plans the known additions in one Sprint 0 lockfile issue so later refreshes stay rare.
-- The spec documents (`docs/**`, `mockups/**`) and the root `AGENTS.md` and `CLAUDE.md` belong to the spec workflow, not to a build lane. Build issues read them and never write them.
+- **Paths outside every lane**, listed under `## Paths outside every lane` at the end of the roster; build issues read them and never list them in `files_touched`:
+  - The spec workflow's files: `docs/**`, `mockups/**`, the root `AGENTS.md` and `CLAUDE.md`. A build result that changes a spec document (a spike's vendor choice, the real IAM roles) is recorded in the issue's own lane and summary, and the spec workflow applies it.
+  - Installed tooling, written by its installer: `tools/spec-guard/**`, `.githooks/**`, `.claude/**`, `.aiudalabs-marketplace.json`.
+  - `STATUS.md`, written by `sprint-runner` when a sprint closes.
 - Domain-driven agents (a payments agent, an ML agent) are added per project by governance when the domain demands one, each with its own carved-out lane.
 
 ---

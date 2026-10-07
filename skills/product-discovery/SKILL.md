@@ -219,7 +219,7 @@ Write `docs/PRODUCT_BRIEF.md` and `docs/OPINIONATED_DEFAULTS.md`. If the root `A
 
 Run the `spec-guard` check from the project root: `node tools/spec-guard/spec.mjs check`, or the same `scripts/spec.mjs` from the `spec-guard` skill's folder when the project has no `tools/spec-guard/` yet. It works before a backlog exists: it checks the decisions, the PRD and the roster that are on disk, and ends with "No backlog yet". Fix every error it reports on the decisions file (ids, headings, stack profile line). If it stops with "no backlog at docs/ISSUES.md", the project's copy is older than the `spec-guard` skill: re-run its installer (`node <spec-guard skill folder>/scripts/install.mjs`, safe to repeat) and check again. If `spec-guard` is not installed at all, check the decisions against the format above by reading them, and say so.
 
-Then overwrite the whole of `docs/SESSION.md` with exactly this shape (every phase skill writes the same one):
+Then overwrite the whole of `docs/SESSION.md` with exactly this shape (every phase skill writes the same one; skip it when `product-spec-orchestrator` re-runs this skill to apply a coherence fix or a build result, such as a new decision from a Sprint 0 spike: the orchestrator updates `docs/SESSION.md` itself):
 
 ```markdown
 # Session — {project title}

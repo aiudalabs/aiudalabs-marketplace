@@ -4,7 +4,7 @@ Skeletons for the documents `multi-agent-governance` writes. The field rules and
 
 ## Agent roster
 
-`docs/AGENT_ROSTER.md` for the `flutter-firebase` profile. The lanes are copied from the profile's `references/agents.md`, adjusted to this project's real folders; where this example and the profile differ, the profile wins. This example shows two project choices on top of the profile: `flutter.yml` split out to the lane it validates (so `.github/**` becomes a list of workflow files), and the root lockfiles and dotfiles assigned explicitly.
+`docs/AGENT_ROSTER.md` for the `flutter-firebase` profile: the lanes of the profile's `references/agents.md`, which wins where this example and it differ. A project adjusts them only to its real folders (an architecture-added Hosting folder, a nightly workflow) and lists each workflow file by name.
 
 ```markdown
 # Agent roster — {Project}
@@ -18,13 +18,13 @@ Builds the Flutter apps and shared Dart packages; obsessive about tap targets, e
 
 **Owns:** `apps/**`, `packages/core/**`, `packages/data/**`, `packages/ui/**`, `packages/feature_*/**`, `melos.yaml`, `pubspec.yaml`, `pubspec.lock`, `.github/workflows/flutter.yml`
 **Reads:** `docs/**`, `mockups/**`, `packages-ts/types/**`, `firestore.rules`
-**Refuses:** Cloud Functions, security rules and indexes, the admin dashboard, the pnpm workspace
+**Refuses:** Cloud Functions, security rules and indexes, the admin dashboard, the TypeScript workspace and its lockfile
 
 ## firebase-dev
 
-Paranoid about security rules, methodical about idempotency; owns everything that runs on the server, the pnpm workspace root and the deploy pipeline.
+Paranoid about security rules, methodical about idempotency; owns everything that runs on the server, the TypeScript workspace and the deploy pipeline.
 
-**Owns:** `functions/**`, `firestore.rules`, `firestore.indexes.json`, `database.rules.json`, `storage.rules`, `firebase.json`, `.firebaserc`, `emulator-data/**`, `packages-ts/types/**`, `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `.tool-versions`, `.env.example`, `.gitignore`, `.github/workflows/ci.yml`, `.github/workflows/deploy-staging.yml`, `.github/workflows/deploy-prod.yml`
+**Owns:** `functions/**`, `firestore.rules`, `firestore.indexes.json`, `database.rules.json`, `storage.rules`, `firebase.json`, `.firebaserc`, `emulator-data/**`, `packages-ts/types/**`, `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `.github/workflows/firebase.yml`, `.github/workflows/deploy-*.yml`, `.github/workflows/spec-guard.yml`, `.gitignore`, `.tool-versions`, `.env.example`, `README.md`
 **Reads:** `docs/**`, `apps/**`, `packages/**`, `admin/**`
 **Refuses:** Flutter code, the admin dashboard
 
@@ -32,7 +32,7 @@ Paranoid about security rules, methodical about idempotency; owns everything tha
 
 Builds the admin dashboard; data-dense tables, keyboard-first, typed end to end against the shared types.
 
-**Owns:** `admin/**`
+**Owns:** `admin/**`, `.github/workflows/admin.yml`
 **Reads:** `docs/**`, `mockups/**`, `packages-ts/types/**`
 **Refuses:** Flutter code, Cloud Functions, security rules, changes to `packages-ts/types/` or `pnpm-lock.yaml` (asks `firebase-dev`)
 
@@ -46,7 +46,11 @@ Reviews every deliverable against its acceptance criteria and its lane.
 
 ## Paths outside every lane
 
-`docs/**`, `mockups/**`, `AGENTS.md`, `CLAUDE.md`, `tools/spec-guard/**`, `.githooks/**` and `.github/workflows/spec-guard.yml` belong to the spec workflow and its tools. Build issues read them and never write them; the `spec-guard` installer rewrites its own files.
+- Spec workflow: `docs/**`, `mockups/**`, `AGENTS.md`, `CLAUDE.md`. A build result that changes a spec document goes back through the spec workflow.
+- Installed tooling, rewritten by its installer: `tools/spec-guard/**`, `.githooks/**`, `.claude/**`, `.aiudalabs-marketplace.json`.
+- `STATUS.md`: sprint outcomes, written by `sprint-runner` when a sprint closes.
+
+Build issues read them and never list them in `files_touched`.
 ```
 
 The heading `## Paths outside every lane` is not an agent name, so the checks do not read it as one. A heading in agent-name form (`## shared-files`) would be read as an agent with no lane.
@@ -63,8 +67,9 @@ Every path an issue will write sits in exactly one lane. These files are the one
 
 | File | Owner | How the other lanes get a change |
 |---|---|---|
-| CI workflows | A workflow that validates one lane belongs to it; one that spans lanes, and every deploy, belongs to the pipeline lane of the profile | The owning lane's issue edits it. When the kickstart's `ci.yml` mixes lanes, keep it with the pipeline lane or plan a Sprint 0 issue that splits it |
-| `.github/workflows/spec-guard.yml`, `tools/spec-guard/**`, `.githooks/**` | No lane: the `spec-guard` installer writes them | Re-run the installer; no issue edits them |
+| CI workflows | A workflow that validates one lane belongs to it; one that spans lanes, and every deploy, belongs to the pipeline lane of the profile | The owning lane's issue edits it. The flutter-firebase scaffold already ships one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`) |
+| `.github/workflows/spec-guard.yml` | The pipeline lane (`firebase-dev` for flutter-firebase). The installer writes it, and `install.mjs --ci` rewrites it while it keeps the spec-guard marker comment | An owner issue that customizes it removes the marker line, so a reinstall leaves it alone |
+| `tools/spec-guard/**`, `.githooks/**`, `.claude/**`, `.aiudalabs-marketplace.json`, `STATUS.md` | No lane: installers write the tooling, `sprint-runner` writes `STATUS.md` | Re-run the installer; no issue edits them |
 | Lockfiles (`pnpm-lock.yaml`, `pubspec.lock`, `uv.lock`, `poetry.lock`, `package-lock.json`) | The lane that owns the workspace manifest they belong to (root `package.json` and `pnpm-workspace.yaml`; `melos.yaml` and the root `pubspec.yaml`) | Put every dependency the plan already knows into the Sprint 0 setup issues of the lockfile owner. A later need: the requesting issue declares the dependency in its own package manifest, and an issue of the lockfile owner that depends on it refreshes the lockfile |
 | Aggregators: a functions barrel `src/index.ts`, a route or DI registry, a Dart library barrel | The lane that owns the folder | Make it generated at build time (a Sprint 0 issue writes the generator) or discovered by convention, so unit issues never list it. If it must be hand-edited, one wiring issue per sprint edits it after the units; never put it in every unit issue's `files_touched`, which turns the sprint into one serial chain of waves |
 | Generated code (`*.g.dart`, `*.freezed.dart`, generated API clients, the Dart mirror of shared types) | The lane that owns the source it is generated from, unless the consumer generates it in its own folder | The issue that changes the source lists the generated paths too, or a follow-up issue of the consuming lane regenerates them |
@@ -133,11 +138,11 @@ The owner posts: files changed, commits, deviations from the spec, how to run it
 ## Validation per lane
 | Lane | Commands |
 |---|---|
-| flutter-dev | `melos run analyze && melos run test` |
-| firebase-dev | `pnpm --dir functions run lint && pnpm --dir functions run typecheck && pnpm --dir functions run test && pnpm run rules:test` |
-| react-dev | `pnpm --dir admin run lint && pnpm --dir admin run typecheck && pnpm --dir admin run test` |
+| flutter-dev | `melos run analyze && melos run format-check && melos run test` |
+| firebase-dev | `pnpm --dir functions run typecheck && pnpm --dir functions run lint && pnpm --dir functions run test && pnpm rules:test` |
+| react-dev | `pnpm --dir admin run lint && pnpm --dir admin run typecheck && pnpm --dir admin run test && pnpm --dir admin run build` |
 
-Use the scripts the packages actually define (read each `package.json` and `melos.yaml`). A command is green only when its output shows the script ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", which is why the commands use `--dir <folder> run`, which fails on a missing script, instead of `--filter <name>`.
+Use the scripts the packages actually define (read each `package.json` and `melos.yaml`); these are the flutter-firebase scaffold's. A command is green only when its output shows the script ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", which is why the commands use `--dir <folder> run`, which fails on a missing script, instead of `--filter <name>`. A test command that reports "No test files found" verified nothing: it is pending until the package's first test exists.
 
 ## Anti-patterns
 - The orchestrator writing code instead of routing.
@@ -159,7 +164,7 @@ owner: firebase-dev
 files_touched:
   - functions/src/callable/createBooking.ts
   - functions/src/_lib/bookingState.ts
-  - functions/test/createBooking.test.ts
+  - functions/test/unit/createBooking.test.ts   # where the unit-test config looks
 depends_on:
   - S1-04   # bookings collection schema
   - S3-02   # shared booking types

@@ -12,14 +12,14 @@ This file is the repository constitution. Every coding agent reads it first: Cod
 - **Flutter** mobile (Dart 3.6+, Flutter {{flutter_version}}+)
 - **Firebase** (Firestore, RTDB, Storage, Auth, Functions, Cloud Messaging)
 - **Node {{node_version}}** + TypeScript Cloud Functions (2nd gen)
-- **React + Vite + TypeScript** admin dashboard, from the Vite `react-ts` template. Tailwind, shadcn/ui or a test runner are added by an issue when `docs/ARCHITECTURE.md` chooses them.
+- **React + Vite + TypeScript** admin dashboard, from the Vite `react-ts` template plus Vitest. Tailwind or shadcn/ui are added by an issue when `docs/ARCHITECTURE.md` chooses them.
 - **Monorepo** via Melos 6 (Flutter) + pnpm workspaces (TypeScript)
 
 Apps included: {{apps_included}}
 
 ## How to work on this repo
 
-Every command below exists in the scaffold. An issue that adds a command (a test runner, a type-parity check) adds it here too. Package scripts run with `pnpm --dir <folder> run <script>`, which fails when the script is missing; `pnpm --filter` exits 0 when nothing matches, so it can pass without running anything.
+Every command below exists in the scaffold. An issue that adds a command (a type-parity check, an end-to-end runner) adds it here too. Package scripts run with `pnpm --dir <folder> run <script>`, which fails when the script is missing; `pnpm --filter` exits 0 when nothing matches, so it can pass without running anything.
 
 ```bash
 # One-time setup
@@ -41,15 +41,20 @@ melos run format-check
 melos run test
 pnpm --dir functions run typecheck
 pnpm --dir functions run lint
-pnpm --dir functions run test
-pnpm rules:test                            # security rules tests in the Firestore emulator
+pnpm --dir functions run test               # unit tests: functions/src/**/*.test.ts, functions/test/unit/**
+pnpm rules:test                            # security rules tests (functions/test/rules/**) in the Firestore emulator
+pnpm emulators:test                        # integration tests (functions/test/integration/**) against the emulators
 pnpm --dir admin run lint
+pnpm --dir admin run typecheck              # tsc -b
+pnpm --dir admin run test
 pnpm --dir admin run build                  # tsc -b && vite build
 
 # Spec guardrails
 node tools/spec-guard/spec.mjs status
 node tools/spec-guard/spec.mjs check
 ```
+
+The test scripts run with `--passWithNoTests` only so the empty scaffold passes CI: until a package has its first test, "No test files found" verifies nothing. The Sprint 0 issue that adds a package's first test removes the flag. A test file outside the globs above never runs.
 
 CI is one workflow per lane, each owned by that lane: `.github/workflows/flutter.yml` (flutter-dev), `firebase.yml` (firebase-dev), `admin.yml` (react-dev), plus `spec-guard.yml` written by the spec-guard installer (firebase-dev).
 
@@ -63,6 +68,8 @@ Default roster of the `flutter-firebase` profile. The final roster and lanes liv
 - **`qa-tester`**: reviews everything, owns no file, never edits code
 
 File ownership is exclusive. An issue that needs two lanes is split into two issues.
+
+Outside every lane, never in an issue's `files_touched`: the spec workflow's `docs/**`, `mockups/**`, `AGENTS.md` and `CLAUDE.md`; installed tooling (`tools/spec-guard/**`, `.githooks/**`, `.claude/**`, `.aiudalabs-marketplace.json`); and `STATUS.md`, written by `sprint-runner`.
 
 Shared and generated files have one owner too:
 

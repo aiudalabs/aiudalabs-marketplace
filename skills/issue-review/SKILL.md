@@ -50,7 +50,7 @@ Open each section the issue cites and read it whole. If the issue implements "AR
 node tools/spec-guard/spec.mjs verify S3-07 --base <base>
 ```
 
-A failure is a blocker: a file outside `files_touched` or outside the owner's lane is a violation even when the change looks right. That includes a lockfile, a CI workflow or a generated barrel owned by another lane, and any change to `tools/spec-guard/**`, `.githooks/**` or `.github/workflows/spec-guard.yml`, which only the `spec-guard` installer writes. The fix is an amended issue or a new issue for the right owner, never a quiet approval. If `tools/spec-guard/` is missing, say so; compare the diff with `files_touched` by hand and mark the verdict "lane check: manual".
+A failure is a blocker: a file outside `files_touched` or outside the owner's lane is a violation even when the change looks right. That includes a lockfile, a CI workflow or a generated barrel owned by another lane, any change to `tools/spec-guard/**` or `.githooks/**`, which only the `spec-guard` installer writes, and a change to `.github/workflows/spec-guard.yml` outside its owner's lane (the roster names it). The fix is an amended issue or a new issue for the right owner, never a quiet approval. If `tools/spec-guard/` is missing, say so; compare the diff with `files_touched` by hand and mark the verdict "lane check: manual".
 
 ## Step 5: Evidence for every acceptance criterion
 

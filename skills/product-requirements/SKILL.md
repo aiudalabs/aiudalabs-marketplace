@@ -82,6 +82,7 @@ The `spec-guard` scripts and the backlog read this exact shape:
 - **FR ids appear in a heading only where the requirement is defined.** Everywhere else (user stories, traces, out of scope, open questions) mention them in plain text, never in a heading of any level: the `spec-guard` scripts read every heading that starts with an FR id as a definition, so a second one is reported as a duplicate.
 - One or more Given/When/Then groups follow. A requirement with several outcomes may have several groups.
 - `**Traces:**` names the job ids from the brief and the D-xx ids the requirement depends on. Cite both exactly as they appear in the source documents.
+- A requirement imposed from outside the product (a store policy, a law, a payment network rule) that serves no persona's job traces to its source instead of a job: `**Traces:** compliance: Apple App Store Review Guideline 5.1.1(v) · D-07`. Name the policy or law precisely; never attach a nominal job id to it.
 - `(deferred)` in the heading takes a requirement that was written for this release out of it: `### FR-LOYALTY-1 — Customer earns points per order (deferred)`. It keeps its id, because issues and commits may already cite it, and needs no implementation issue. Ids are never reused or renumbered.
 - **In a first PRD, deferred features are not deferred FRs.** A feature from the defaults' deferral list or the do-not-build list goes to Out of scope with its bucket, not to a `(deferred)` requirement. Write a deferred FR only when the behavior was specified for this release and then postponed, or when the user wants a deferred decision's behavior specified now so it is ready later. A first PRD usually has none.
 
@@ -105,7 +106,7 @@ A long closed list that several requirements depend on (sports, cancellation rea
 
 ### Step 4: Trace every requirement
 
-Each FR cites the job id it serves and any decision it depends on. A requirement with no traceable purpose is scope creep: drop it or move it to Out of scope. A requirement that contradicts a locked decision is a **blocker**: show it to the user, do not override the decision.
+Each FR cites the job id it serves (or, for a store policy or a law, `compliance: <source>`) and any decision it depends on. A requirement with no traceable purpose is scope creep: drop it or move it to Out of scope. A requirement that contradicts a locked decision is a **blocker**: show it to the user, do not override the decision.
 
 Amending a decision follows the rule every later phase shares: only with the user's explicit approval at this phase's gate, by editing the decision in place in `OPINIONATED_DEFAULTS.md` (same `D-xx` id, never renumbered) and adding under its `**Lock:**` line `**Amended (Phase 2, product-requirements):** {what changed and why}.` Never silently: an amendment the user did not approve at the gate is not made.
 
@@ -121,7 +122,7 @@ Amending a decision follows the rule every later phase shares: only with the use
 
 Check that:
 
-- Every job id in the brief has at least one FR, and every FR traces to a job id that exists.
+- Every job id in the brief has at least one FR, and every FR traces to a job id that exists or to `compliance: <source>`.
 - Every FR has acceptance criteria and a `**Traces:**` line.
 - Every D-xx cited exists and is not contradicted.
 - Every non-deferred decision that changes what a user or operator can do or see is served by at least one FR. The stack-profile decision (D-01) and purely technical decisions need none; list them in the gate on one line, `Decisiones sin FR (no son comportamiento): D-01 (perfil de stack), ...`, so the gap is visible rather than silent. D-01 is always on it.
@@ -134,7 +135,7 @@ Run the `spec-guard` check from the project root: `node tools/spec-guard/spec.mj
 
 For a critical second look, the user can ask the `product-advisor` agent, if installed, to review the PRD.
 
-Overwrite the whole of `docs/SESSION.md` with the shape every phase skill writes:
+Overwrite the whole of `docs/SESSION.md` with the shape every phase skill writes (skip it when `product-spec-orchestrator` re-runs this skill to apply a coherence fix or a build result: the orchestrator updates `docs/SESSION.md` itself, so it never rewinds to this phase):
 
 ```markdown
 # Session — {project title}

@@ -51,7 +51,7 @@ Every file you create or modify must match a path or glob in the issue's `files_
 
 When the work needs a file outside that list (a type in another package, an extra test helper, a rule file, a lockfile, a CI workflow, a barrel `index.ts`), stop. Tell the orchestrator which file, why, and whose lane it is in, and ask for the issue to be amended or for a new issue. Never widen the scope silently, never "just fix it" in another lane, and never move code into your lane to avoid asking.
 
-A new dependency is declared in your own package manifest only. If installing it rewrites a lockfile your lane does not own, do not commit that lockfile: list the refresh under "Cross-lane follow-ups" in the SUMMARY so the lockfile's owner gets an issue. Never edit `tools/spec-guard/**`, `.githooks/**` or `.github/workflows/spec-guard.yml`; the `spec-guard` installer writes them.
+A new dependency is declared in your own package manifest only. If installing it rewrites a lockfile your lane does not own, do not commit that lockfile: list the refresh under "Cross-lane follow-ups" in the SUMMARY so the lockfile's owner gets an issue. Never edit `tools/spec-guard/**` or `.githooks/**`; the `spec-guard` installer writes them. `.github/workflows/spec-guard.yml` is edited only by its owner in the roster, and an issue that customizes it removes the spec-guard marker line so a reinstall leaves it alone.
 
 Implement with the conventions of your stack: [references/stack-conventions.md](references/stack-conventions.md) has the patterns, test expectations and gate commands for each default developer agent.
 

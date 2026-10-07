@@ -85,7 +85,7 @@ If the user says "es como X pero para Y", ask which decisions transfer and which
 
 ## Step 2: Phases 1 to 5
 
-Run each phase skill in order, passing it every document produced so far (in Phase 1, the intake answers), and close each with the phase gate below before starting the next. Each phase skill writes `docs/SESSION.md` and runs `spec.mjs check` itself, except agents running in parallel (Step 5).
+Run each phase skill in order, passing it every document produced so far (in Phase 1, the intake answers), and close each with the phase gate below before starting the next. Each phase skill writes `docs/SESSION.md` and runs `spec.mjs check` itself, except agents running in parallel (Step 5) and re-runs for a coherence fix (Step 3), where you write `docs/SESSION.md`.
 
 1. **Discovery.** Follow `product-discovery`. It writes the brief (with user groups and job ids) and the numbered defaults, with `**Stack profile:** <id>` inside D-01.
 2. **Requirements.** Follow `product-requirements`. It is conversational and may ask before writing. This is where scope gets pinned before any data modeling.
@@ -107,7 +107,21 @@ Common contradictions: a screen needing a container the schema lacks; an executi
 
 If there are contradictions, list them numbered and stop. Ask which document is right. Never reconcile silently.
 
-Once the user decides, apply each fix through the phase that owns the document: re-run that phase's skill on that point only (`product-requirements` for an FR, `schema-design` for a container or a transition, `ui-screens-spec` for a screen), re-reading the current documents, and close it with that phase's gate. A one-line correction (a renamed reason code, a number, a version) may be edited in place instead; show each such edit, as a before and after, at the coherence gate. Then run `check` again and mark the architecture's "Changes to earlier documents" items as applied. If `docs/UI_SCREENS.md` changed and mockups already exist, refresh the affected mockups with `navegable-mockups`.
+Once the user decides, apply each fix through the phase that owns the document: re-run that phase's skill on that point only (`product-requirements` for an FR, `schema-design` for a container or a transition, `ui-screens-spec` for a screen), re-reading the current documents. Tell it that it runs for a coherence fix: it skips its own `docs/SESSION.md` write and its closing message. A one-line correction (a renamed reason code, a number, a version) may be edited in place instead. Show one coherence gate for all of it: each phase's changes and each in-place edit as a before and after. Then run `check` again.
+
+Mark each of the architecture's "Changes to earlier documents" items with one state:
+
+- **Applied.** The owning phase changed its document.
+- **Deferred to build.** Only the build can answer it (a vendor spike, real IAM roles, a measured latency). Name the issue that answers it and the document it will change; governance plans that issue. Docs cite an id it will create as `D-13 (proposed)` until it exists.
+- **Rejected.** The user kept the current document; say why in one line.
+
+Then update `docs/SESSION.md` yourself (the phase skills did not): keep Last phase, add the applied fixes to its bullets, and put the deferred-to-build items under Open questions.
+
+**Affected mockups.** A mockup is affected when the spec change alters what a key screen shows: its layout, content, copy, states, navigation or the data it displays, including a data-only change that is visible on screen (a new field in a timeline). A change only to a screen's data source or permissions, invisible on screen, does not affect it. Regenerate each affected mockup with `navegable-mockups` before the handoff, or, when the user postpones it, list it as stale under Open questions in `docs/SESSION.md` and in the gate.
+
+## Build results that change the spec
+
+After the handoff, a build issue may answer a deferred-to-build item (a spike picks the payment gateway, a setup issue finds the real IAM roles). Build issues never write `docs/**`: the issue records the result in its own lane and its done summary. When the user brings it back, apply it like a coherence fix: re-run the owning phase skill on that point (`product-discovery` for a new or amended decision, `schema-design`, `system-architecture`), with the skill skipping its `docs/SESSION.md` write; run `check`, mark the item Applied, update `docs/SESSION.md`, refresh `docs/architecture.html` and commit (`docs: apply S0-10 result to D-13`). Then the issues that depend on it may start.
 
 ## Step 4: Phase 6, governance
 
@@ -125,7 +139,7 @@ If yes, follow `navegable-mockups`, then gate it like any phase, and return to t
 
 - The parallel agents do not write `docs/SESSION.md`; tell each one so in its prompt. Each returns its closing counts and the decisions worth checking.
 - After both finish, rebuild `docs/SESSION.md` yourself in the shared shape, with each phase's State taken from `node tools/spec-guard/spec.mjs status`, Last phase naming both (`5 and 7 — system-architecture, navegable-mockups`) and Open questions merged.
-- Show one combined gate: both phases' counts and one "Decisiones tomadas en Fases 5 y 7 que vale la pena verificar" list. Never two gates open at once. The mockup of each app is `mockups/<app-id>.html` with one `#s-<screen-id>` anchor per key screen; UI issues cite that anchor for key screens, so the mockups stop being orphans. If `docs/UI_SCREENS.md` changes after the mockups were built (an iteration, a coherence fix), refresh the affected mockups before the handoff. If no, go to the handoff.
+- Show one combined gate: both phases' counts and one "Decisiones tomadas en Fases 5 y 7 que vale la pena verificar" list. Never two gates open at once. The mockup of each app is `mockups/<app-id>.html` with one `#s-<screen-id>` anchor per key screen; UI issues cite that anchor for key screens, so the mockups stop being orphans. If `docs/UI_SCREENS.md` changes after the mockups were built (an iteration, a coherence fix), refresh the affected mockups (Step 3 defines them) before the handoff. If no, go to the handoff.
 
 ## Step 6: Handoff
 
@@ -176,9 +190,11 @@ Never advance on silence.
 
 Without an answer, ask again: "Esperando tu visto bueno para la Fase {N+1}, o cambios en la Fase {N}." "Se ve bien" without engaging the bullets is not approval of eight specific decisions; ask about the risky ones.
 
-### 3. Confirm the deliverable
+### 3. Confirm the deliverable and commit
 
 The phase's file exists on disk (`spec.mjs status` shows it). If it does not, the phase is not closed.
+
+Once approved, commit the phase's documents on the base branch, one commit per gate: `git add docs/ mockups/ && git commit -m "docs: phase {N} {skill}"` (`docs: phase 3 schema-design`; a combined gate is `docs: phases 5 and 7 …`, the coherence gate `docs: coherence fixes before phase 6`). Phase 6 commits `AGENTS.md` and `CLAUDE.md` too. When the `spec-guard` hooks are installed, the pre-commit hook runs `spec.mjs check` whenever `docs/ISSUES.md` is staged and blocks the commit on errors: fix them, never `--no-verify`. Without a repository yet, say the commit waits for `project-kickstart`.
 
 ## When the user deviates
 
@@ -202,7 +218,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 ├── AGENTS.md                    ← kickstart, rewritten in Phase 6 (constitution)
 ├── CLAUDE.md                    ← kickstart (@AGENTS.md)
 ├── docs/
-│   ├── SESSION.md               ← rewritten by every phase skill (by the orchestrator after a parallel 5 and 7)
+│   ├── SESSION.md               ← rewritten by every phase skill (by the orchestrator after a parallel 5 and 7, a coherence fix or a build result)
 │   ├── PRODUCT_BRIEF.md         ← Phase 1
 │   ├── OPINIONATED_DEFAULTS.md  ← Phase 1
 │   ├── PRD.md                   ← Phase 2
