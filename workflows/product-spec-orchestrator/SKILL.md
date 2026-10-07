@@ -5,7 +5,7 @@ license: MIT
 metadata:
   version: "1.1.0"
   author: aiudalabs
-  requires: product-discovery product-requirements schema-design ui-screens-spec system-architecture multi-agent-governance navegable-mockups spec-guard operational-readiness
+  requires: product-discovery product-requirements schema-design ui-screens-spec system-architecture multi-agent-governance navegable-mockups spec-guard operational-readiness html-spec-generator
 ---
 
 # Product Spec Orchestrator
@@ -129,6 +129,8 @@ If yes, follow `navegable-mockups`, then gate it like any phase, and return to t
 
 ## Step 6: Handoff
 
+**Spec page.** First run `html-spec-generator`: it writes `docs/architecture.html` from the documents (also when the user exits after Phase 5). From then on, after any approved change to a source document (an iteration, an amended decision, a coherence or mockup-driven fix), run it again so the page matches.
+
 Close with:
 
 - Every document and mockup produced, as a file tree
@@ -207,6 +209,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 │   ├── {SCHEMA_DOC}.md          ← Phase 3
 │   ├── UI_SCREENS.md            ← Phase 4
 │   ├── ARCHITECTURE.md          ← Phase 5
+│   ├── architecture.html        ← html-spec-generator, at the handoff and after each approved change
 │   ├── AGENT_ROSTER.md          ← Phase 6
 │   ├── ORCHESTRATOR.md          ← Phase 6
 │   ├── ISSUES.md                ← Phase 6

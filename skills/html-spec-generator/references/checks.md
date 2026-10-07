@@ -6,7 +6,11 @@ make a copy whose diagrams need no network.
 ## Headless checks
 
 Any headless browser works. With Playwright for Node (not a dependency of this
-skill; use it when the machine has it, for example through `NODE_PATH`):
+skill; use it when the machine has it). The script is an ES module, and ES
+modules ignore `NODE_PATH`: put it in a folder where `import 'playwright'`
+resolves (a scratch folder with `npm i playwright`, or a `node_modules` symlink
+to an existing install). When the browsers are installed outside Playwright's
+default cache, set `PLAYWRIGHT_BROWSERS_PATH` to their folder.
 
 ```javascript
 // check-page.mjs: node check-page.mjs docs/architecture.html
@@ -25,19 +29,22 @@ for (const width of [1280, 375]) {
   const report = await page.evaluate(() => {
     const blocks = [...document.querySelectorAll('pre.mermaid')];
     const offline = document.documentElement.classList.contains('no-mermaid');
-    // rendered height of each label, in screen pixels: under ~10 px the text is too small to read
+    // rendered height of each label, in screen pixels: under 11 px the text is too small to read
     const tiny = [...document.querySelectorAll('pre.mermaid svg text, pre.mermaid svg foreignObject span')]
-      .filter((el) => el.textContent.trim() && el.getBoundingClientRect().height > 0 && el.getBoundingClientRect().height < 10).length;
+      .filter((el) => el.textContent.trim() && el.getBoundingClientRect().height > 0 && el.getBoundingClientRect().height < 11).length;
+    const cards = [...document.querySelectorAll('.diagram-card')];
     return {
       offline,
       diagrams: blocks.length,
-      rendered: blocks.filter((b) => b.querySelector('svg')).length,
+      // an error diagram is an SVG too: count it as a syntax error, not as rendered
+      rendered: blocks.filter((b) => b.querySelector('svg') && !/Syntax error/i.test(b.textContent)).length,
       syntaxErrors: blocks.filter((b) => /Syntax error/i.test(b.textContent)).length,
       tinyText: tiny,
       deadNavLinks: [...document.querySelectorAll('nav.site-nav a[href^="#"]')].filter((a) => !document.getElementById(a.getAttribute('href').slice(1))).map((a) => a.getAttribute('href')),
       pageScrollsSideways: document.documentElement.scrollWidth > window.innerWidth,
       background: getComputedStyle(document.body).backgroundColor,
-      wideCards: [...document.querySelectorAll('.diagram-card')].filter((c) => c.scrollWidth > c.clientWidth).length,
+      wideCards: cards.filter((c) => c.scrollWidth > c.clientWidth).length,
+      overWide: cards.filter((c) => c.scrollWidth > 2 * c.clientWidth).length,
       // document.fonts.check() answers true for a family with no @font-face at all, so read the faces instead
       fonts: ['Satoshi', 'Instrument Serif', 'JetBrains Mono'].map((f) => [f, [...document.fonts].some((face) => face.family.replace(/"/g, '') === f && face.status === 'loaded')])
     };
@@ -55,21 +62,25 @@ Read the report as:
 - `tinyText` is 0 at 1280 px. A wide diagram that fails it needs
   `useMaxWidth: false` for its type, or a split into two diagrams.
 - `deadNavLinks` is empty, `pageScrollsSideways` is false at both widths,
-  `background` is `rgb(250, 248, 244)`.
-- `fonts`: all true with network (a face loads only once text uses it, so the
-  page must use all three). A false entry with the font host blocked is
-  expected; the text then uses the fallback stack.
-- `wideCards` counts diagrams that scroll sideways inside their card: expected
-  for long `flowchart LR` diagrams, never for the page itself.
+  `background` is `rgb(250, 248, 244)` (house style) or `rgb(247, 247, 245)`
+  (neutral style).
+- `fonts` (house style only): all true with network (a face loads only once
+  text uses it, so the page must use all three). A false entry with the font
+  host blocked is expected; the text then uses the fallback stack.
+- `wideCards` counts diagrams that scroll sideways inside their card: fine,
+  never the page itself. `overWide` is 0 at 1280 px: a diagram more than twice
+  its card's width is compacted or split (SKILL.md Step 3). At 375 px every
+  diagram scrolls; ignore `overWide` there.
 - The only console errors are requests to an unreachable font or Mermaid host.
 
 To check that a Mermaid block parses without rendering the page, call
 `await mermaid.parse(source)` in the page for each block's source; it throws
 on a syntax error.
 
-Links into other files (`UI_SCREENS.md#s-1.2.3`, `../mockups/player-app.html#s-1.2.3`)
-are checked from the file system: the file exists, and the document contains
-`id="s-1.2.3"`.
+Links into other files (`UI_SCREENS.md#s-1.2.3`, `../mockups/player-app.html#s-1.2.3`,
+or the Git host URL of a document) are checked from the file system: the file
+exists under `docs/` (for a host URL, the path after `blob/<branch>/`), and it
+contains `id="s-1.2.3"`.
 
 ## A fully offline copy
 

@@ -749,7 +749,7 @@
     },
     {
       "name": "html-spec-generator",
-      "description": "Turns a project's spec documents into one navigable HTML reference (docs/architecture.html) with a sticky section nav, in the Aiuda Labs house style: the product layer when present (brief summary, D-xx decisions table, PRD requirements index with ids, screens index linked to the mockups) and the architecture (Mermaid diagrams of the system, core flows, data model, auth and deployment, tables, open questions), stamped with the date of each source document. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero ver las especificaciones en una página', 'quiero el documento de arquitectura para compartir con el equipo', or to regenerate the page after a phase changed the docs. Architecture sections need docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`).",
+      "description": "Turns a project's spec documents into one navigable HTML reference (docs/architecture.html) with a sticky section nav, in the Aiuda Labs house style or a neutral one: the product layer when present (brief summary, D-xx decisions table, PRD requirements index with ids, screens index linked to the mockups) and the architecture (Mermaid diagrams of the system, core flows, data model, auth and deployment, tables, open questions), stamped with each source version. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero ver las especificaciones en una página', 'quiero el documento de arquitectura para compartir con el equipo', or to regenerate the page after a phase changed the docs. Architecture sections need docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`).",
       "version": "1.1.0",
       "license": "MIT",
       "requires": [
@@ -761,6 +761,7 @@
         "SKILL.md",
         "evals/triggers.json",
         "references/DESIGN_SYSTEM.md",
+        "references/NEUTRAL_STYLE.md",
         "references/checks.md"
       ]
     },
@@ -1575,7 +1576,8 @@
         "multi-agent-governance",
         "navegable-mockups",
         "spec-guard",
-        "operational-readiness"
+        "operational-readiness",
+        "html-spec-generator"
       ],
       "tools": [],
       "path": "workflows/product-spec-orchestrator",

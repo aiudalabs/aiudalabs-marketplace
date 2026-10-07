@@ -116,7 +116,7 @@ Replace `color:#0D0D0F` → `color:#FAF8F4` and `color:#8A8A92` → `color:rgba(
 
 ```css
 h1 {
-  font-family: 'Satoshi', system-ui, sans-serif;
+  font-family: var(--display);
   font-weight: 900;
   font-size: clamp(40px, 5.5vw, 64px);
   line-height: 1.02;
@@ -126,7 +126,7 @@ h1 {
 }
 
 h2 {
-  font-family: 'Satoshi', system-ui, sans-serif;
+  font-family: var(--display);
   font-weight: 900;
   font-size: clamp(28px, 3.8vw, 44px);
   line-height: 1.08;
@@ -136,7 +136,7 @@ h2 {
 }
 
 h3 {
-  font-family: 'Satoshi', system-ui, sans-serif;
+  font-family: var(--display);
   font-weight: 700;
   font-size: 18px;
   letter-spacing: -0.01em;
@@ -148,7 +148,7 @@ p { color: var(--ink3); margin: 0 0 16px; line-height: 1.65; }
 
 /* Italic accent text — used inside headings */
 em {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
   color: var(--accent);
@@ -379,8 +379,8 @@ mermaid.initialize({
 ## Rules for HTML-generating skills
 
 1. **Always load all three fonts.** Satoshi via Fontshare + Instrument Serif + JetBrains Mono via Google Fonts.
-2. **Use CSS variables**, never hardcoded hex values in component styles.
-3. **No Tailwind, no React, no frameworks** — all HTML outputs are self-contained with inline `<style>`.
+2. **Use CSS variables**, never hardcoded hex values in component styles. The `rgba()` translucencies and `white` written in this file's own components (nav, footer, cards, buttons) are part of the style: copy them as they are. Every `font-family` goes through `var(--display)`, `var(--serif)` or `var(--mono)`; only the logo markup and the favicon spell font names out.
+3. **No Tailwind, no React, no frameworks** — one HTML file with one inline `<style>`; the only external requests are the font links and, per rule 4, Mermaid.
 4. **No external JS** except Mermaid CDN when diagrams are needed.
 5. **Background is `--bg` (#FAF8F4)** — never white (#FFFFFF), never --bg2 for the page background.
 6. **Include the noise texture** (`body::before`) — it's subtle but part of the brand feel.

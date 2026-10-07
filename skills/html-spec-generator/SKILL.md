@@ -1,6 +1,6 @@
 ---
 name: html-spec-generator
-description: "Turns a project's spec documents into one navigable HTML reference (docs/architecture.html) with a sticky section nav, in the Aiuda Labs house style: the product layer when present (brief summary, D-xx decisions table, PRD requirements index with ids, screens index linked to the mockups) and the architecture (Mermaid diagrams of the system, core flows, data model, auth and deployment, tables, open questions), stamped with the date of each source document. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero ver las especificaciones en una página', 'quiero el documento de arquitectura para compartir con el equipo', or to regenerate the page after a phase changed the docs. Architecture sections need docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`)."
+description: "Turns a project's spec documents into one navigable HTML reference (docs/architecture.html) with a sticky section nav, in the Aiuda Labs house style or a neutral one: the product layer when present (brief summary, D-xx decisions table, PRD requirements index with ids, screens index linked to the mockups) and the architecture (Mermaid diagrams of the system, core flows, data model, auth and deployment, tables, open questions), stamped with each source version. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero ver las especificaciones en una página', 'quiero el documento de arquitectura para compartir con el equipo', or to regenerate the page after a phase changed the docs. Architecture sections need docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`)."
 license: MIT
 metadata:
   version: "1.1.0"
@@ -12,12 +12,21 @@ metadata:
 
 Produce one HTML file that an engineer or a stakeholder double-clicks to navigate the spec of a project: what the product is and what was decided, what it must do, which screens it has, and how the system is built. No server, no build step. The content comes only from the spec documents.
 
-The page uses the Aiuda Labs house style, defined in [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md). Read that file before writing any HTML; it is the canonical source of every token, font, component class, the nav and the logo. Where this skill and the design system seem to disagree on a style, the design system wins. A project's `docs/AIUDA_HOUSE_STYLE.md` (written by `project-kickstart` when the user chose the Aiuda Labs look) is a copy of the same file; this skill's reference is canonical. The house style styles this page only; the product's own tokens (docs/UI_SCREENS.md) never replace it, and it never becomes the product's identity.
+**Style.** The project chooses it once, in `project-kickstart` (question "Aiuda Labs look"). Read the answer, first match wins:
+
+1. The `**Spec page style:**` line in `AGENTS.md`, or the "Aiuda Labs look for the spec page" line in `docs/SESSION.md`.
+2. Neither line (later phases rewrite both files): `docs/AIUDA_HOUSE_STYLE.md` exists means yes, otherwise no.
+3. Not a kickstarted project (no `AGENTS.md`): ask once ("¿La página lleva el estilo Aiuda Labs o uno neutro?"); neutral by default.
+
+- **yes**: the Aiuda Labs house style, [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md). Always read this bundled copy; `docs/AIUDA_HOUSE_STYLE.md` only records the choice and may be older.
+- **no**: the neutral style, [references/NEUTRAL_STYLE.md](references/NEUTRAL_STYLE.md): the same layout and components with a neutral palette and system fonts. Read DESIGN_SYSTEM.md too, for the components.
+
+Read the chosen file before writing any HTML. Where this skill and the design system seem to disagree on a style, the design system wins. Either style is for this page only: the product's own tokens (docs/UI_SCREENS.md) never style it, and it never becomes the product's identity.
 
 ## When to use it
 
 - The user wants the spec, or the architecture, as a shareable, navigable HTML page.
-- After `docs/ARCHITECTURE.md` is approved (Phase 5 of the product-spec workflow).
+- Under `product-spec-orchestrator`: at the handoff, after Phase 6, and again after every approved change to a source document.
 - **Again after any phase or coherence fix that changes a source document** (the brief, the decisions, the PRD, the schema, the screens, the architecture, the IAM requirements). The page is generated: it is only as current as its last run, and its stamp says which versions it shows.
 
 Stop and redirect when:
@@ -42,7 +51,7 @@ Read every one that exists; each feeds the sections listed.
 | The schema document | `docs/FIREBASE_SCHEMA.md` or `docs/DATA_SCHEMA.md`, whichever the stack profile produced: entities, state machines, access rules |
 | `docs/IAM_REQUIREMENTS.md` | Service accounts and roles, when the profile produced it |
 | `mockups/*.html` | Which key screens have a mockup to link to |
-| [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md) | Tokens, fonts, logo, nav, components, Mermaid theme |
+| [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md), [references/NEUTRAL_STYLE.md](references/NEUTRAL_STYLE.md) | Tokens, fonts, logo, nav, components, Mermaid theme, per the chosen style |
 
 ## Output
 
@@ -53,15 +62,15 @@ Read every one that exists; each feeds the sections listed.
 | 0 | TL;DR | all | What the product does, for whom, how many apps, what backend; key counts as badges (decisions, requirements, screens, execution units) |
 | 1 | Product | Brief | Tagline, apps table (id, users, platform), user groups and personas with their job ids |
 | 2 | Decisions | Defaults | Table: id, title, the lock line; `deferred` and `existing` as badges |
-| 3 | Requirements | PRD | Index table grouped by capability: id, title, the job ids it traces to, `deferred` badge; then the user stories by `US-<n>` id (by persona in a PRD written before story ids); the count of non-functional requirements |
-| 4 | Screens | UI screens | Per app: id, title, a `key` badge for key screens; each id links to `UI_SCREENS.md#s-<screen-id>`, each key screen with a mockup also to `../mockups/<app-id>.html#s-<screen-id>` |
+| 3 | Requirements | PRD | Index table grouped by capability: id, title, the job ids it traces to, `deferred` badge; then the user stories by `US-<n>` id (by persona in a PRD written before story ids); the non-functional requirements summarized by kind as the PRD groups them ("9 budgets, 4 yes/no checks"), never one invented total |
+| 4 | Screens | UI screens | Per app: id, title, a `key` badge for key screens; each id links to `UI_SCREENS.md#s-<screen-id>` (Step 6, links), each key screen with a mockup also to `../mockups/<app-id>.html#s-<screen-id>` |
 | 5 | System overview | Architecture | `flowchart TB` of apps, backend services and external integrations |
 | 6 | Core flows | Architecture, schema | One `sequenceDiagram` per key journey |
 | 7 | Data model | Schema | `erDiagram`, then a field table |
 | 8 | Auth and security | Architecture, schema, IAM | Auth flow, roles table, service accounts, summary of the access rules |
 | 9 | Deployment | Architecture | `flowchart LR` of environments and CI/CD, environment table |
-| 10 | Open questions and risks | all | The architecture's open questions and risks with their severity, its changes to earlier documents, the PRD's assumptions (Step 1) |
-| 11 | Sources | all | Each source document with its date (Step 6) |
+| 10 | Open questions and risks | all | The architecture's open questions and risks with their severity, its changes to earlier documents, the PRD's open questions and assumptions (Step 1) |
+| 11 | Sources | all | Each source document with its version (Step 1) |
 
 The product sections are indexes, not copies: they give the ids and titles and point to the document for the full text. A reader finds `FR-BOOKING-2` and its title here, and reads its acceptance criteria in `PRD.md`.
 
@@ -73,19 +82,25 @@ Read each input in full, at the start of the run. Extract, per section: apps; pe
 
 **Open items** come from the documents, in this order:
 
-- `ARCHITECTURE.md` "Open questions and risks" (§16 of the `system-architecture` outline): every row, with the severity badge the row gives (`high` as `.badge-accent`, `medium` as `.badge-navy`, `low` as `.badge-neutral`) and its mitigation and status.
-- `ARCHITECTURE.md` "Changes to earlier documents" (§15): each change with a `resolved` or `pending` badge, as the section states it.
+- `ARCHITECTURE.md` "Open questions and risks" (§16 of the `system-architecture` outline): every row, with the severity badge it gives (`high` as `.badge-accent`, `medium` as `.badge-navy`, `low` as `.badge-neutral`) and what would resolve it.
+- `ARCHITECTURE.md` "Changes to earlier documents" (§15): each item with its document and change.
 - The PRD's open questions and assumptions, and every `[SUPUESTO]` marker in the other documents, with a kind badge (`assumption`, `open`, `deferred`).
+
+Add a `resolved` badge (`.badge-emerald`) to any item the document itself marks resolved or applied (the orchestrator's coherence check marks §15 items applied). Show no status the document does not state.
 
 An architecture written before that outline has no §16: then take its open, coherence or deferred-complexity section instead, and show a kind badge, never an invented severity.
 
-Note each document's date for the stamp: the date of its last commit (`git log -1 --format=%cs -- <file>`), or its modification date when it has uncommitted changes or the project has no git history.
+Note each document's version for the stamp and the Step 7 check:
+
+- Committed and unchanged: short hash and date of its last commit (`git log -1 --format='%h %cs' -- <file>`).
+- Uncommitted changes, or no git: `uncommitted` and its modification time to the minute (`date -r <file> '+%Y-%m-%d %H:%M'`).
+- Also a content hash (`git hash-object <file>` or `sha256sum`), kept for Step 7, not printed.
 
 ### 2. Read the design system
 
-Read [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md). Copy its `:root` variables verbatim into the page's `<style>`, load the three fonts exactly as it shows, and use its component classes: `.eyebrow`, `.tldr`, `.callout` and its variants, `.badge-*`, `.table-wrap`, `.diagram-card`, `nav.site-nav`, `footer.site-footer`.
+Read [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md), and [references/NEUTRAL_STYLE.md](references/NEUTRAL_STYLE.md) for the neutral style. Copy the chosen style's `:root` variables verbatim into the page's `<style>`, load the fonts exactly as it shows (none for the neutral style), and use its component classes: `.eyebrow`, `.tldr`, `.callout` and its variants, `.badge-*`, `.table-wrap`, `.diagram-card`, `nav.site-nav`, `footer.site-footer`.
 
-The variables carry the fallback stacks (`system-ui`, `Georgia`, `monospace`), so the page stays readable when a font host is unreachable. Write every `font-family` through those variables, never a bare `"Satoshi"`.
+The variables carry the fallback stacks (`system-ui`, `Georgia`, `monospace`), so the page stays readable when a font host is unreachable. Write every `font-family` through those variables, as the design system's own CSS does; only the logo markup and the favicon spell font names out.
 
 Rule 12 of the design system (realistic LATAM placeholder data) is for deliverables that need illustrative data. This page has none: every name, number and label comes from the documents.
 
@@ -99,6 +114,8 @@ Every node and entity maps to something in the documents; nothing is invented. R
 - Leave cross-cutting services out of a diagram when they connect to everything (logging, error reporting, monitoring), and list them in a table under it instead.
 
 Say what was grouped or left out in the diagram's caption.
+
+**Width ceiling.** A diagram whose natural width exceeds about twice its card's width (about 2,200 px at a 1,280 px viewport) is unreadable even scrolling. Compact it first: edges between subgraphs rather than between every node, long labels wrapped with `<br/>`, `TB` instead of `LR`. Still too wide: split it (one overview of groups, then one diagram per group; one sequence per phase of a long flow).
 
 ### 4. Wire Mermaid
 
@@ -114,6 +131,8 @@ mermaid.initialize({
   er: { useMaxWidth: false }
 });
 ```
+
+**Escape the source.** Inside `<pre class="mermaid">`, write `&` as `&amp;`, `<` as `&lt;` and `>` as `&gt;` (so `<br/>` is `&lt;br/&gt;`). Mermaid decodes them before parsing, and the offline view then shows the source as written.
 
 **Diagrams need the network.** Mermaid comes from a CDN, so on a machine with no network, or behind a proxy that blocks jsDelivr, the diagrams cannot render. The page degrades instead of breaking: each `<pre class="mermaid">` holds the diagram source, which stays visible as text, and the script tag's `onerror` shows a note saying so:
 
@@ -133,11 +152,18 @@ Put one `<div class="callout diagram-offline">Diagrams need a network connection
 
 ### 5. Build the sticky nav
 
-`nav.site-nav` exactly as the design system defines it: `position: sticky`, links in the design system's nav style (Satoshi through `var(--display)`, 14 px, weight 500, `var(--ink3)`).
+`nav.site-nav` exactly as the design system defines it: `position: sticky`, links in the design system's nav style (`var(--display)`, 14 px, weight 500, `var(--ink3)`).
 
-- The `<span>`-based logo from the design system on the left, copied as it is there, inline colors included (not the SVG favicon).
-- One link per section on the right. With many sections, the link list scrolls horizontally on narrow screens (`overflow-x: auto; white-space: nowrap`) rather than wrapping.
-- The section in view highlighted with `color: var(--accent)`, using an `IntersectionObserver`.
+- On the left, the `<span>`-based logo from the design system, copied as it is there, inline colors included (not the SVG favicon); in the neutral style, the project's name.
+- On the right, one link per section inside a wrapper that scrolls sideways when the links do not fit, at any width:
+
+```css
+nav.site-nav { gap: 24px; }
+nav.site-nav > :first-child { flex-shrink: 0; }
+.nav-links { display: flex; gap: 20px; min-width: 0; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+```
+
+- The section in view highlighted with `color: var(--accent)`, using an `IntersectionObserver`, which also scrolls the active link into view inside `.nav-links`.
 
 ### 6. Build the sections
 
@@ -146,40 +172,42 @@ Every section opens with an eyebrow (`PRODUCT`, `DECISIONS`, `SYSTEM OVERVIEW`, 
 - **TL;DR**: `.tldr` block, two or three sentences, key counts as `.badge-accent`.
 - **Product**: the tagline as a lead paragraph, the apps table, the personas table with their job ids.
 - **Decisions**: every `D-xx`, in order, with its lock line. Ids in `var(--mono)`.
-- **Requirements**: the index table grouped by area, then the user stories table. Link the section heading to `PRD.md`.
+- **Requirements**: the index table grouped by area, then the user stories table, then the non-functional summary. Link the section heading to `PRD.md`.
 - **Screens**: one table per app; link targets as in the Output table, relative to `docs/`. Link a mockup only when its file exists. When `UI_SCREENS.md` has no `<a id="s-<screen-id>">` anchors (a document written before that convention), link the document without an anchor rather than to a dead one.
 - **System overview**: real app, service and integration names.
 - **Core flows**: one H3 per flow, one sentence of context ("When a player books a court..."), a `sequenceDiagram` that follows the state machine in the schema document.
 - **Data model**: `erDiagram`, then a table of entity, key fields, types (as `.badge-neutral`), description.
 - **Auth and security**: auth flow as `flowchart LR`, a roles table (role, claim or membership, can read, can write), the service accounts from `IAM_REQUIREMENTS.md` when it exists, a `.callout-navy` with the philosophy of the access rules.
 - **Deployment**: `flowchart LR` from laptop to CI to emulators or test environment to staging to production; a table of environment, project or alias, deploy trigger.
-- **Open questions and risks**: the open items from Step 1, with their severity or kind badge, source document and status.
-- **Sources**: a table of each source document, its date, and what it feeds.
+- **Open questions and risks**: the open items from Step 1, with their severity or kind badge, source document, and the `resolved` badge where the document gives one.
+- **Sources**: a table of each source document, its version, and what it feeds.
 
-**Stamp.** Under the page title and in the footer: `Generated {YYYY-MM-DD} from {document} ({date}), ...`, with the dates from Step 1. A reader who sees a document dated after the page knows it is stale.
+**Links to documents.** A browser opening the page from disk shows a `.md` file as raw text and ignores its anchors. When the project has a Git host remote (`git remote get-url origin`), link each document to its rendered page there (`https://<host>/<owner>/<repo>/blob/<default branch>/docs/UI_SCREENS.md#s-<screen-id>`). Without one, keep the relative links and say under the Sources table that they open on the Git host or in a Markdown viewer. Mockup links stay relative: they work from disk.
+
+**Stamp.** Under the page title and in the footer: `Generated {YYYY-MM-DD HH:MM} from {document} ({version}), ...`, with the versions from Step 1. A reader who sees a newer commit, or a later modification, of a listed document knows the page is stale.
 
 ### 7. Assemble
 
 One `<!DOCTYPE html>` file: `<head>` with charset, viewport, title, font links, the favicon SVG from the design system as a data URI, and one `<style>`; `<body>` with the nav, the stamp, the offline note, the sections with `id`s matching the nav links, the dark footer with the dark-background logo and the stamp, the Mermaid script, and one `<script>` with Mermaid initialization and the nav highlight.
 
-Before writing, check that no source document changed since Step 1 (compare the dates). If one did, as when a coherence fix runs while this skill works, read it again and update the affected sections. Then write `docs/architecture.html`.
+Before writing, hash each source document again and compare with Step 1 (dates cannot see a change made the same day). If one changed, as when a coherence fix runs while this skill works, read it again, update the affected sections and its version in the stamp. Then write `docs/architecture.html`.
 
-The page is committed with the docs. Whoever changes a source document later (a phase skill, the orchestrator's coherence check, a fix during the build) regenerates it with this skill, or leaves the stamp saying how old it is.
+The page is committed with the docs. Whoever changes a source document later (an approved phase iteration, a coherence fix, a fix during the build) regenerates it with this skill, or leaves the stamp saying how old it is.
 
 ### 8. Check before handing off
 
 Run the checks in [references/checks.md](references/checks.md), in a browser or headless:
 
 - Every Mermaid block rendered to an SVG with no "Syntax error" text (Mermaid 10.9 draws an error diagram instead of blanking), or, with no network, the offline note shows and every source is readable.
-- No diagram text smaller than about 11 px; wide diagrams scroll inside their card.
-- Every nav anchor matches a section `id`, and every link to `UI_SCREENS.md#s-...` or a mockup points to an anchor or file that exists.
+- No diagram text smaller than 11 px; wide diagrams scroll inside their card, and none is wider than twice it (Step 3).
+- Every nav anchor matches a section `id`, and every link to a document or a mockup points to a file, and an anchor, that exists.
 - Every id in the decisions, requirements and screens tables appears in its source document, and every id in the source appears in the table.
-- Component styles use only CSS variables. Hex values appear only in `:root`, the design system's logo markup, the favicon data URI and the Mermaid `themeVariables`.
+- Component colors come from the variables; the only literals are the design system's own `rgba()` translucencies and `white`, copied as it writes them. Hex values appear only in `:root`, the design system's logo markup, the favicon data URI and the Mermaid `themeVariables`.
 - The page background is `var(--bg)`, never white.
-- The three fonts load when the network allows; without it, text renders in the fallback stacks with no broken layout.
+- House style: the three fonts load when the network allows; without it, text renders in the fallback stacks with no broken layout.
 - No horizontal page scroll at 1280 px and 375 px (cards and tables scroll inside themselves).
 - No console errors other than unreachable font or Mermaid hosts, which the page handles.
-- The stamp lists every source document read, with its date.
+- The stamp lists every source document read, with its version.
 
 ## Anti-patterns
 
@@ -187,6 +215,7 @@ Run the checks in [references/checks.md](references/checks.md), in a browser or 
 - **JavaScript beyond Mermaid** and the nav highlight. No jQuery, no chart libraries.
 - **White page background.**
 - **Hex values in component styles** instead of variables.
+- **The house style without the project's yes**, or the product's tokens on this page.
 - **Diagrams of components that are not in the spec.** The page documents reality; grouping is fine, inventing is not.
 - **Truncated diagrams.** A half-drawn diagram is worse than none; write each one in full.
 - **Copying the documents.** The product sections are indexes with ids; the documents hold the text.
