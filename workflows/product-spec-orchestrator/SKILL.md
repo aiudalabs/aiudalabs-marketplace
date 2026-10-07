@@ -3,7 +3,7 @@ name: product-spec-orchestrator
 description: "Takes a product idea to a buildable spec through seven gated phases: discovery, requirements (PRD), data schema, UI screens, architecture, multi-agent governance and optional navigable mockups, for the flutter-firebase or fastapi-react stack profile. It sequences the phase skills, stops for explicit approval after each one, surfaces the decisions worth checking, checks cross-phase coherence and resumes a half-finished spec from the files on disk. Use when the user wants the full treatment for a new product: \"quiero diseñar un producto de cero\", \"tengo una idea de app\", \"espec completa\", \"lleva esto hasta que sea buildable\". For one phase only, use that phase's skill (product-discovery for just the idea and the decisions); for an existing codebase, use project-adopt; to build, use sprint-runner."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires: product-discovery product-requirements schema-design ui-screens-spec system-architecture multi-agent-governance navegable-mockups spec-guard operational-readiness
 ---
@@ -38,7 +38,9 @@ Do not use it when:
 | 4 | `ui-screens-spec` | `docs/UI_SCREENS.md` |
 | 5 | `system-architecture` | `docs/ARCHITECTURE.md` |
 | 6 | `multi-agent-governance` | `AGENTS.md` + `CLAUDE.md` + `docs/AGENT_ROSTER.md`, `ORCHESTRATOR.md`, `ISSUES.md`, `WAVE_DAG.md`, `SPRINT_PROMPTS.md` |
-| 7 | `navegable-mockups` | `mockups/<app>-app.html` per app (optional) |
+| 7 | `navegable-mockups` | `mockups/<app-id>.html` per app, `<app-id>` as the brief names it (optional) |
+
+Phase 7 needs only `docs/UI_SCREENS.md`, so it may run right after Phase 4 when the user wants to see screens before the architecture (Step 5). The numbering is the default order, not a dependency.
 
 Phase 2 may be folded into discovery for a very thin MVP whose brief already pins the scope, but the default is to run it: the PRD is what the schema traces entities to and what governance turns into acceptance criteria.
 
@@ -48,17 +50,21 @@ This workflow produces no document of its own: only gate summaries, coherence re
 
 The `spec-guard` skill reads the documents with code. From the project root, run `node tools/spec-guard/spec.mjs <command>` when the tools are installed in the project, or the same `scripts/spec.mjs` from the `spec-guard` skill's folder before that. If `spec-guard` is not installed, say so and fall back to `docs/SESSION.md` and reading the files.
 
+`check` works before a backlog exists: it validates the decisions, the PRD and the roster that are on disk and ends with "No backlog yet". If it instead stops with "no backlog at docs/ISSUES.md", the project's copy is older than the `spec-guard` skill: re-run its installer (`node <spec-guard skill folder>/scripts/install.mjs`, safe to repeat; it keeps hooks and settings) and run it again.
+
+`status` reports each phase from its own document, independently: Phase 7 shows done once a mockup exists even if Phase 5 or 6 is still open. That is expected when the mockups ran after Phase 4.
+
 ## Step 0: Resume or start
 
 Run `spec.mjs status`. It reports which phases have their documents on disk and, once there is a backlog, sprint progress.
 
 - **Phases are done:** read `docs/SESSION.md` too for the narrative (decisions, open questions), but trust `status` for what exists. When they disagree, say so ("SESSION.md dice Fase 4, pero no hay `UI_SCREENS.md`"). Then:
 
-  > 📍 Proyecto en progreso. Fases completas según los archivos: **1-{N}**. Última: **{skill}**.
+  > 📍 Proyecto en progreso. Fases completas según los archivos: **{list, e.g. 1-4 y 7}**. Última: **{skill}**.
   >
   > Decisiones locked: {3-5 bullets}
   >
-  > ¿Continuamos desde la Fase {N+1} o empezamos de cero?
+  > ¿Continuamos con la Fase {first pending phase} o empezamos de cero?
 
   Wait for the answer. Never auto-advance.
 
@@ -66,28 +72,30 @@ Run `spec.mjs status`. It reports which phases have their documents on disk and,
 
 ## Step 1: Intake
 
-Ask in one message:
+This is the only intake. Ask in one message:
 
-1. **What does the product do?** (one sentence)
-2. **Who uses it?** (customer, provider, admin: which apps are needed?)
+1. **What does the product do?** (one sentence: the verb and the object, not a feature list)
+2. **Who uses it?** Every kind of user and what each does, including whoever operates the product (admins, support, finance), and from which app (mobile, tablet, web).
 3. **Which market?** (Panamá, LATAM in general, elsewhere)
-4. **Which stack profile?** `flutter-firebase` (default: mobile-first, realtime, managed backend) or `fastapi-react` (Python API, Postgres, self-hosted, workers). Phase 1 locks it as a decision.
+4. **Which stack profile?** `flutter-firebase` (default: mobile-first, realtime, managed backend) or `fastapi-react` (Python API, Postgres, self-hosted, workers). Phase 1 locks it as decision D-01.
+
+These are `product-discovery`'s intake questions. Hand the answers to it in Phase 1: it reuses them and asks only what is missing or too vague, never the four again.
 
 If the user says "es como X pero para Y", ask which decisions transfer and which do not. If they cannot say what the product does in one sentence, that is a Phase 1 problem, not a blocker: `product-discovery` forces the decisions.
 
 ## Step 2: Phases 1 to 5
 
-Run each phase skill in order, passing it every document produced so far, and close each with the phase gate below before starting the next.
+Run each phase skill in order, passing it every document produced so far (in Phase 1, the intake answers), and close each with the phase gate below before starting the next. Each phase skill writes `docs/SESSION.md` and runs `spec.mjs check` itself.
 
-1. **Discovery.** Follow `product-discovery`. It writes the brief and the numbered defaults, including `**Stack profile:** <id>`.
+1. **Discovery.** Follow `product-discovery`. It writes the brief (with user groups and job ids) and the numbered defaults, with `**Stack profile:** <id>` inside D-01.
 2. **Requirements.** Follow `product-requirements`. It is conversational and may ask before writing. This is where scope gets pinned before any data modeling.
 3. **Schema.** Follow `schema-design`.
-4. **UI screens.** Follow `ui-screens-spec`. At the gate, verify that every state machine in the schema has at least one screen that drives or displays its transitions.
-5. **Architecture.** Follow `system-architecture`.
+4. **UI screens.** Follow `ui-screens-spec`. At the gate, verify that every state machine in the schema has at least one screen that drives or displays its transitions. After approval, offer the mockups now or later (Step 5).
+5. **Architecture.** Follow `system-architecture`. Its section "Changes to earlier documents" feeds the coherence check.
 
 ## Step 3: Coherence check (before Phase 6)
 
-First run `spec.mjs check` (without `--strict`; there is no backlog yet) and fix malformed decision and requirement ids. Then walk the documents for what code cannot judge:
+First run `spec.mjs check` (without `--strict`; there is no backlog yet) and fix malformed decision and requirement ids. Then take every item of the architecture's "Changes to earlier documents" section, and walk the documents for what code cannot judge:
 
 1. **PRD → schema:** every non-deferred `FR-...` has an entity, field or state machine to hold its data.
 2. **Defaults → schema:** every locked `D-xx` is reflected (a "0% commission in the MVP" does not get a `commissions` table unless flagged for later).
@@ -99,15 +107,17 @@ Common contradictions: a screen needing a container the schema lacks; an executi
 
 If there are contradictions, list them numbered and stop. Ask which document is right. Never reconcile silently.
 
+Once the user decides, apply each fix through the phase that owns the document: re-run that phase's skill on that point only (`product-requirements` for an FR, `schema-design` for a container or a transition, `ui-screens-spec` for a screen), re-reading the current documents, and close it with that phase's gate. A one-line correction (a renamed reason code, a number, a version) may be edited in place instead; show each such edit, as a before and after, at the coherence gate. Then run `check` again and mark the architecture's section 15 items as applied. If `docs/UI_SCREENS.md` changed and mockups already exist, refresh the affected mockups with `navegable-mockups`.
+
 ## Step 4: Phase 6, governance
 
 Follow `multi-agent-governance`. It writes the constitution, roster, orchestrator, backlog and the Sprint 0 and 1 prompts, installs the `spec-guard` guardrails and does not hand off until `spec.mjs check --strict` passes. Phase gate.
 
 ## Step 5: Phase 7, mockups (optional)
 
-Ask: **"¿Quieres mockups HTML navegables antes del build, o vamos directo a construir?"**
+Phase 7 needs only `docs/UI_SCREENS.md`. Offer it after the Phase 4 gate ("¿Quieres ver mockups HTML navegables de las pantallas clave antes de la arquitectura, o seguimos?") and, if not done by then, after Phase 6: **"¿Quieres mockups HTML navegables antes del build, o vamos directo a construir?"**
 
-If yes, follow `navegable-mockups`. UI issues already point at `mockups/<app>-app.html#s-<screen-id>`, so the mockups stop being orphans. If no, go to the handoff.
+If yes, follow `navegable-mockups`, then gate it like any phase, and return to the next pending phase. The mockup of each app is `mockups/<app-id>.html` with one `#s-<screen-id>` anchor per key screen; UI issues cite that anchor for key screens, so the mockups stop being orphans. If `docs/UI_SCREENS.md` changes after the mockups were built (an iteration, a coherence fix), refresh the affected mockups before the handoff. If no, go to the handoff.
 
 ## Step 6: Handoff
 
@@ -124,7 +134,7 @@ Stop. The spec is done. Building is not this workflow's job.
 
 ## Phase gates
 
-After every phase:
+After every phase. This gate **replaces** the phase skill's own closing message: show one gate, not two. It opens with the skill's closing counts (for example "Fase 2 cerrada. 51 requisitos en 9 áreas, 0 diferidos, 4 supuestos") and continues with the steps below.
 
 ### 1. Surface the decisions worth checking
 
@@ -172,7 +182,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 ├── AGENTS.md                    ← Phase 6 (constitution)
 ├── CLAUDE.md                    ← Phase 6 (@AGENTS.md)
 ├── docs/
-│   ├── SESSION.md               ← updated after every phase
+│   ├── SESSION.md               ← rewritten by every phase skill
 │   ├── PRODUCT_BRIEF.md         ← Phase 1
 │   ├── OPINIONATED_DEFAULTS.md  ← Phase 1
 │   ├── PRD.md                   ← Phase 2
@@ -186,7 +196,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 │   └── SPRINT_PROMPTS.md        ← Phase 6 (Sprints 0 and 1)
 ├── tools/spec-guard/            ← Phase 6 (guardrails)
 └── mockups/
-    └── {app}-app.html           ← Phase 7
+    └── {app-id}.html            ← Phase 7 (any time after Phase 4)
 ```
 
 If there is no project folder yet, create one named after the project in the current working directory and tell the user where it is.
