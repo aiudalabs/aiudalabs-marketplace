@@ -38,7 +38,7 @@ Ask in one message:
    - **TBD**: the scaffold creates no app folders; Phase 1 names the apps.
 4. **Issue tracker**: `github`, `bitbucket` or `none`.
 5. **Harness**: the coding agent the team works in, which receives the agents and skills in Step 6. `claude-code` (default), or another id that `npx github:aiudalabs/aiudalabs-marketplace harnesses` lists (`cursor`, `codex`, `gemini-cli`, `opencode`, ...).
-6. **Aiuda Labs look**: should the HTML deliverables (navigable mockups, HTML specs) use the Aiuda Labs design system? `yes` keeps `docs/DESIGN_SYSTEM.md`; `no` (default) leaves the visual identity to `ui-screens-spec`, which asks for it in Phase 4.
+6. **Aiuda Labs look**: should the generated spec page (`html-spec-generator`) carry the Aiuda Labs house style? `yes` copies it to `docs/AIUDA_HOUSE_STYLE.md`; `no` (default) copies nothing. Either way it never styles the product or its mockups: `ui-screens-spec` asks for the product's visual identity in Phase 4.
 
 Wait for all answers; ask follow-ups for anything ambiguous.
 
@@ -58,7 +58,7 @@ PROFILE        = "flutter-firebase" | "fastapi-react"
 STACK          = "aiuda-stack" (flutter-firebase) | "aiuda-stack-fastapi" (fastapi-react)
 HARNESS        = "claude-code" | ...
 AIUDA_LOOK     = yes | no
-AIUDA_LOOK_TEXT = "yes (docs/DESIGN_SYSTEM.md)" | "no (ui-screens-spec asks for the visual identity)"
+AIUDA_LOOK_TEXT = "yes, spec page only (docs/AIUDA_HOUSE_STYLE.md); the product identity is asked in Phase 4" | "no; the product identity is asked in Phase 4"
 APPS           = list, or TBD
 TRACKER        = "github" | "bitbucket" | "none"
 PROJECT_DIR    = absolute path, e.g. "$(pwd)/marketplace-pa"
@@ -75,7 +75,7 @@ Substitutions in every template:
 | `{{project_title}}` | `PROJECT_TITLE` |
 | `{{apps_included}}` | comma-separated apps, or "TBD" |
 | `{{profile}}`, `{{harness}}` | `PROFILE`, `HARNESS` |
-| `{{aiuda_look}}` | `yes (docs/DESIGN_SYSTEM.md)` or `no (ui-screens-spec asks for the visual identity)` |
+| `{{aiuda_look}}` | `AIUDA_LOOK_TEXT` |
 | `{{year}}` | current year |
 | `{{node_version}}` | `22` |
 | `{{flutter_version}}` | `3.27.0` |
@@ -92,7 +92,7 @@ The templates are in this skill's folder, under `assets/flutter-firebase/`. Copy
 mkdir -p "$PROJECT_DIR"
 cp -R "<this skill's folder>/assets/flutter-firebase/." "$PROJECT_DIR/"
 mkdir -p "$PROJECT_DIR/docs" && mv "$PROJECT_DIR/SESSION.md" "$PROJECT_DIR/docs/SESSION.md"
-if [ "$AIUDA_LOOK" = yes ]; then mv "$PROJECT_DIR/DESIGN_SYSTEM.md" "$PROJECT_DIR/docs/"; else rm "$PROJECT_DIR/DESIGN_SYSTEM.md"; fi
+if [ "$AIUDA_LOOK" = yes ]; then mv "$PROJECT_DIR/AIUDA_HOUSE_STYLE.md" "$PROJECT_DIR/docs/"; else rm "$PROJECT_DIR/AIUDA_HOUSE_STYLE.md"; fi
 
 # Substitutions (GNU sed; on macOS write `sed -i ''`). Values with a `/` need another delimiter.
 grep -rlI '{{' "$PROJECT_DIR" --exclude-dir=node_modules | while read -r file; do
@@ -111,7 +111,7 @@ What lands where:
 | `CLAUDE.md` | root: the single line `@AGENTS.md`, so Claude Code imports the constitution |
 | `README.md`, `STATUS.md` | root. `STATUS.md` holds sprint outcomes (written by `sprint-runner`); phase progress comes from `spec.mjs status` |
 | `SESSION.md` | `docs/SESSION.md`, every phase pending, the kickstart answers under "Last phase: 0" |
-| `DESIGN_SYSTEM.md` | `docs/DESIGN_SYSTEM.md` when `AIUDA_LOOK` is yes; otherwise delete it |
+| `AIUDA_HOUSE_STYLE.md` | `docs/AIUDA_HOUSE_STYLE.md` when `AIUDA_LOOK` is yes, otherwise delete it. It styles the spec page only, never the product; the name keeps `ui-screens-spec` from reading it as the product's design system |
 | `melos.yaml`, `pubspec.yaml`, `package.json`, `pnpm-workspace.yaml` | root: Melos 6 for Dart, pnpm for TypeScript (`packageManager` pins the pnpm version CI uses) |
 | `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`, `database.rules.json`, `storage.rules` | root |
 | `functions/` (`package.json`, `tsconfig.json`, `eslint.config.mjs`, three `vitest*.config.ts`, `.gitignore`, `scripts/gen-index.mjs`, `src/init.ts`) | `functions/`. `gen-index.mjs` generates `src/index.ts` before every build, typecheck, lint and test, so no issue edits the barrel; git ignores it |
@@ -143,7 +143,7 @@ find "$PROJECT_DIR" -type d -empty -not -path '*/.git/*' -not -path '*/node_modu
 
 Load the `stack-profile-fastapi-react` skill and read its `references/kickstart.md`. It specifies the layout (src-layout package with the API and the worker, Alembic, React frontend, Docker Compose deploy, a seed test) and the post-scaffold checks. Follow it exactly; this skill adds only the common steps below. The Python package is `PACKAGE_NAME`.
 
-Write the root `AGENTS.md` constitution with the same sections as the flutter-firebase template (read it in `assets/flutter-firebase/AGENTS.md` for the shape), filled with this profile: `**Stack profile:** fastapi-react`, the roster from the profile skill's `references/agents.md` (`python-dev`, `react-dev`, `qa-tester`), only the commands that exist after the scaffold (`pip install -e ".[dev]"`, `python -m pytest -q`, the frontend's `pnpm` scripts, `docker compose`), and hard rules that name endpoints and the shared transitions module instead of Cloud Functions. Write `CLAUDE.md` with the single line `@AGENTS.md`. Copy `README.md`, `STATUS.md` and `SESSION.md` (to `docs/`) from `assets/flutter-firebase/`, replace the quick-start commands, and copy `DESIGN_SYSTEM.md` to `docs/` when `AIUDA_LOOK` is yes. Add `.gitkeep` to empty folders as above.
+Write the root `AGENTS.md` constitution with the same sections as the flutter-firebase template (read it in `assets/flutter-firebase/AGENTS.md` for the shape), filled with this profile: `**Stack profile:** fastapi-react`, the roster from the profile skill's `references/agents.md` (`python-dev`, `react-dev`, `qa-tester`), only the commands that exist after the scaffold (`pip install -e ".[dev]"`, `python -m pytest -q`, the frontend's `pnpm` scripts, `docker compose`), and hard rules that name endpoints and the shared transitions module instead of Cloud Functions. Write `CLAUDE.md` with the single line `@AGENTS.md`. Copy `README.md`, `STATUS.md` and `SESSION.md` (to `docs/`) from `assets/flutter-firebase/`, replace the quick-start commands, and copy `AIUDA_HOUSE_STYLE.md` to `docs/` when `AIUDA_LOOK` is yes. Add `.gitkeep` to empty folders as above.
 
 ### Common to both
 

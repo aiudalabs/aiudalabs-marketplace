@@ -2,7 +2,7 @@
 
 > One-sentence description of what this product does. `product-discovery` replaces this line with the brief's tagline at the end of Phase 1.
 
-**HTML deliverables:** Aiuda Labs look {{aiuda_look}}.
+**Spec page style:** Aiuda Labs look {{aiuda_look}}.
 
 This file is the repository constitution. Every coding agent reads it first: Codex, Copilot, Cursor and OpenCode read `AGENTS.md` natively, and the root `CLAUDE.md` imports it for Claude Code. `multi-agent-governance` (Phase 6) rewrites it with the final roster and rules; until then it holds the scaffold defaults.
 

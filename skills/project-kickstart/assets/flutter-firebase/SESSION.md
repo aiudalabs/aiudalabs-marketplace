@@ -18,7 +18,7 @@ _Narrative for the next session. What is done is decided by `node tools/spec-gua
 
 - Repository scaffolded with the {{profile}} profile; apps: {{apps_included}}.
 - Agents and skills installed for the {{harness}} harness; spec-guard tools, hooks and CI installed.
-- Aiuda Labs look for HTML deliverables: {{aiuda_look}}.
+- Aiuda Labs look for the spec page: {{aiuda_look}}.
 
 ## Open questions
 

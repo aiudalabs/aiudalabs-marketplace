@@ -1,6 +1,8 @@
-# Aiuda Labs — Design System
+# Aiuda Labs — House Style (spec page only)
 
-> Canonical design tokens for the HTML outputs of the spec skills (mockups, HTML specs). Verified against the live website source at `aiudalabs.com`. When generating HTML, apply these patterns exactly.
+> Styles the generated spec page (`html-spec-generator`, `docs/architecture.html`) and nothing else. It is **not** the product's visual identity: the product's tokens come from `ui-screens-spec` (docs/UI_SCREENS.md), and the apps and mockups never use this file.
+>
+> Canonical design tokens for the Aiuda Labs house style. Verified against the live website source at `aiudalabs.com`. When generating HTML, apply these patterns exactly.
 
 ## Font Loading (exact, from layout.tsx)
 
