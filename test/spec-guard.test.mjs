@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { ROOT } from '../lib/components.mjs';
 import {
-  assignWaves, checkProject, globCovers, globsOverlap, markdownAnchors, matches, mergedIds, nextWave, parseDecisions, parseIssues,
-  parseRequirements, parseRoster, parseScreens, readProject, slugify, toCsv, toGithubScript, writeWavesInto,
+  amendIssue, assignWaves, checkProject, globCovers, globsOverlap, markdownAnchors, matches, mergedIds, nextWave, parseDecisions, parseIssues,
+  parseRequirements, parseRoster, parseScreens, readProject, refsProblems, slugify, syncPrompts, toCsv, toGithubScript, writeWavesInto,
 } from '../skills/spec-guard/scripts/lib.mjs';
 
 const SKILL = join(ROOT, 'skills/spec-guard');
@@ -349,6 +349,45 @@ test('install and hooks: commits and agent edits stay inside the active issue', 
 
   const verified = run([join(dir, 'tools/spec-guard/spec.mjs'), 'verify', 'S1-01'], dir);
   assert.equal(verified.status, 0, verified.stdout);
+
+  git('add', '-A');
+  const badRefs = git('commit', '--allow-empty', '-qm', 'S1-01 task-2: more [refs: setup]');
+  assert.notEqual(badRefs.status, 0, '[refs: setup] is not a decision or requirement');
+  assert.match(badRefs.stderr, /"setup" is not a decision or requirement id/);
+  assert.notEqual(git('commit', '--allow-empty', '-qm', 'S1-01 task-2: more [refs: D-01]').status, 0, 'D-01 is not one of S1-01\'s refs');
+  assert.equal(git('commit', '--allow-empty', '-qm', 'S1-01 task-2: more [refs: D-03, FR-BOOKING-1]').status, 0);
+
+  writeFileSync(join(dir, 'pubspec_overrides.yaml'), 'x');
+  const local = run([join(dir, 'tools/spec-guard/spec.mjs'), 'verify', 'S1-01'], dir);
+  assert.equal(local.status, 0, 'an untracked file a tool wrote is not part of the verdict');
+  assert.match(local.stdout, /warning \(uncommitted\).*pubspec_overrides\.yaml/);
+  assert.equal(run([join(dir, 'tools/spec-guard/spec.mjs'), 'verify', 'S1-01', '--worktree'], dir).status, 1, '--worktree counts it');
+  rmSync(join(dir, 'pubspec_overrides.yaml'));
+
+  writeFileSync(join(dir, '.gitignore'), 'packages-ts/\n');
+  const ignored = run([join(dir, 'tools/spec-guard/spec.mjs'), 'check', '--json'], dir);
+  assert.deepEqual(JSON.parse(ignored.stdout).filter((p) => p.code === 'ignored-path').map((p) => p.message), ["S1-01: git ignores packages-ts/types/booking.ts, so its files cannot be committed; fix .gitignore in the issue that owns it"]);
+  rmSync(join(dir, '.gitignore'));
+
+  assert.ok(existsSync(join(dir, '.githooks/pre-merge-commit')));
+  assert.doesNotMatch(readFileSync(join(dir, '.githooks/pre-commit'), 'utf8'), /Skip once/);
+  git('checkout', '-q', 'develop');
+  writeFileSync(join(dir, 'docs/NOTES.md'), 'notes\n');
+  git('add', '-A');
+  git('commit', '-qm', 'docs: notes');
+  git('checkout', '-qb', 'side');
+  writeFileSync(join(dir, 'docs/SIDE.md'), 'side\n');
+  git('add', '-A');
+  git('commit', '-qm', 'docs: side');
+  git('checkout', '-q', 'wt/S1-01');
+  const foreign = git('merge', '--no-ff', '--no-edit', 'side');
+  assert.notEqual(foreign.status, 0, 'a branch that is not on develop cannot be merged into an issue branch');
+  assert.match(foreign.stderr, /merge refused/);
+  git('merge', '--abort');
+  assert.equal(git('merge', '--no-ff', '--no-edit', 'develop').status, 0, 'syncing with develop is fine');
+  const synced = run([join(dir, 'tools/spec-guard/spec.mjs'), 'verify', 'S1-01'], dir);
+  assert.equal(synced.status, 0, synced.stdout);
+  assert.doesNotMatch(synced.stdout, /docs\/NOTES\.md|merge .* brings/);
   const settings = JSON.parse(readFileSync(join(dir, '.claude/settings.json'), 'utf8'));
   assert.equal(settings.hooks.PreToolUse.length, 1);
   run([join(SCRIPTS, 'install.mjs'), '--claude'], dir);
@@ -382,4 +421,124 @@ test('check: issue reads resolve to a document and one of its anchors', (t) => {
 
   edit(dir, 'ISSUES.md', '  - docs/PRD.md\n', '  - docs/SCHEMA.md\n');
   assert.deepEqual(codes(checkProject(readProject(dir))), ['unresolved-read'], 'a document under docs/ must exist');
+});
+
+test('check: criteria numbering, human: criteria, gate and merge_with', (t) => {
+  const dir = copyExample(t);
+  edit(dir, 'ISSUES.md', '1. Moves `requested` to `confirmed` in one transaction.\n2. Charges', '2. Moves `requested` to `confirmed` in one transaction.\n1. Charges');
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['criteria-order']);
+  edit(dir, 'ISSUES.md', '2. Moves `requested`', '1. Moves `requested`');
+  edit(dir, 'ISSUES.md', '1. Charges', '2. human: Charges');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'S2-02 is autonomous: false');
+  edit(dir, 'ISSUES.md', '1. Refunds in full', '1. **human:** Refunds in full');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['human-criterion'], 'S2-03 is autonomous');
+  edit(dir, 'ISSUES.md', '1. **human:** Refunds in full', '1. Refunds in full');
+  edit(dir, 'ISSUES.md', 'requirement_refs: [FR-BOOKING-3]', 'requirement_refs: [FR-BOOKING-3]\ngate:\n  - pnpm --dir functions run test\nmerge_with: S2-02');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
+  edit(dir, 'ISSUES.md', 'gate:\n  - pnpm --dir functions run test\nmerge_with: S2-02', 'gate: pnpm test\nmerge_with: S9-01');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['gate', 'merge-with']);
+});
+
+test('check: criteria that name files or sections the issue does not list', (t) => {
+  const dir = copyExample(t);
+  edit(dir, 'ISSUES.md', '2. Rejects a slot that is already taken.', '2. Rejects a slot that is already taken; `firebase.json` and `functions/src/index.ts` export it, `functions/src/callable/requestBooking.ts` holds it, and `packages-ts/types/**` gains a type.\n3. Adds `apps/player/lib/x.dart`, `@scope/pkg`, `us-east1` and `pnpm run build`, per ARCHITECTURE §3 and docs/PRD.md#fr-booking-1.');
+  writeFileSync(join(dir, 'docs/ARCHITECTURE.md'), '# Architecture\n\n## 3. Dependency rules\n');
+  const found = checkProject(readProject(dir)).filter((p) => p.code.startsWith('criterion-'));
+  assert.deepEqual(found.map((p) => p.message), [
+    'S2-01 criterion 2 names `firebase.json`, which no files_touched entry covers',
+    'S2-01 criterion 2 names `functions/src/index.ts`, which no files_touched entry covers',
+    'S2-01 criterion 2 names `packages-ts/types/**`, which no files_touched entry covers',
+    "S2-01 criterion 3 names `apps/player/lib/x.dart`, which no files_touched entry covers; it is outside firebase-dev's lane, so another issue must own it",
+    'S2-01 criterion 3 cites ARCHITECTURE §3, which is not in its reads; add the section so the executor reads it',
+    'S2-01 criterion 3 cites docs/PRD.md#fr-booking-1, which is not in its reads; add the section so the executor reads it',
+  ]);
+  assert.ok(found.every((p) => p.level === 'warning'));
+  edit(dir, 'ISSUES.md', 'requirement_refs: [FR-BOOKING-1]\n---\n**Objetivo:** El jugador pide', 'requirement_refs: [FR-BOOKING-1]\nreads:\n  - docs/ARCHITECTURE.md#3-dependency-rules\n  - docs/PRD.md\n---\n**Objetivo:** El jugador pide');
+  assert.equal(checkProject(readProject(dir)).filter((p) => p.code === 'criterion-read').length, 0, 'the section and the whole document are read');
+});
+
+test('amend: edits one issue\'s lists and nothing else', () => {
+  const text = [
+    '## S1-01 — A', '---', 'id: S1-01', 'files_touched:', '  - a.ts   # keep this note', '  - database.rules.json', 'depends_on: []', 'reads: [docs/X.md]', '---', 'body',
+    '## S1-02 — B', '---', 'id: S1-02', 'files_touched:', '  - database.rules.json', 'depends_on: [S1-01]', '---', '',
+  ].join('\n');
+  const { text: out, problems } = amendIssue(text, 'S1-02', [{ op: 'remove', key: 'files_touched', value: 'database.rules.json' }, { op: 'add', key: 'files_touched', value: './b.ts' }, { op: 'remove', key: 'depends_on', value: 'S1-01' }]);
+  assert.deepEqual(problems, []);
+  assert.ok(out.startsWith(text.split('## S1-02')[0]), 'S1-01 keeps database.rules.json: only the named issue changes');
+  assert.match(out, /id: S1-02\nfiles_touched:\n {2}- b\.ts\ndepends_on: \[\]\n---/);
+  const first = amendIssue(text, 'S1-01', [{ op: 'add', key: 'depends_on', value: 'S0-01' }, { op: 'add', key: 'reads', value: 'docs/Y.md#z' }, { op: 'add', key: 'files_touched', value: 'c.ts' }]);
+  assert.match(first.text, /- a\.ts {3}# keep this note\n {2}- database\.rules\.json\n {2}- c\.ts\ndepends_on: \[S0-01\]\nreads: \[docs\/X\.md, docs\/Y\.md#z\]/);
+  assert.deepEqual(amendIssue(text, 'S1-01', [{ op: 'remove', key: 'files_touched', value: 'z.ts' }, { op: 'add', key: 'files_touched', value: 'a.ts' }]).problems, ['S1-01 files_touched has no entry z.ts', 'S1-01 files_touched already has a.ts']);
+  assert.deepEqual(amendIssue(text, 'S9-01', []).problems, ['S9-01 is not in docs/ISSUES.md']);
+});
+
+test('commit subjects: [refs: ...] names only the issue\'s refs', () => {
+  const issue = { id: 'S1-01', data: { decision_refs: ['D-03'], requirement_refs: ['FR-BOOKING-1'] } };
+  assert.deepEqual(refsProblems(issue, 'S1-01 task-1: x'), []);
+  assert.deepEqual(refsProblems(issue, 'S1-01 task-1: x [refs: D-03, FR-BOOKING-1]'), []);
+  assert.equal(refsProblems(issue, 'S1-01 task-1: x [refs: D-04]').length, 1);
+  assert.equal(refsProblems(issue, 'S1-01 task-1: x [refs: setup]').length, 1);
+  assert.equal(refsProblems(issue, 'S1-01 task-1: x [refs: ]').length, 1);
+});
+
+// docs/SPRINT_PROMPTS.md as multi-agent-governance's templates write it, for the example backlog's sprint 2.
+function promptsFor(dir) {
+  const text = readFileSync(join(dir, 'docs/ISSUES.md'), 'utf8');
+  const section = (id) => text.slice(text.indexOf(`## ${id} `)).split(/\n(?=##? )/)[0].trimEnd();
+  const fence = '```';
+  return [
+    '# Sprint prompts', '', '## Sprint 2 — Booking flow', '', '### Orchestrator prompt — Sprint 2', '', fence,
+    'You are playing the orchestrator role for Sprint 2: Booking flow.', '', 'This sprint has 4 issues in 2 waves:',
+    '- Wave 1: S2-01 (firebase-dev, wt/S2-01)', '- Wave 2: S2-02 (firebase-dev, wt/S2-02), S2-03 (firebase-dev, wt/S2-03), S2-04 (flutter-dev, wt/S2-04)',
+    'Within each wave files_touched are disjoint.', fence, '', '### Executor prompt — S2-03', '', fence,
+    'You are firebase-dev. You will deliver issue S2-03 in worktree wt/S2-03.', '', 'Read these files first, in order, and nothing else:', '  docs/PRD.md', '',
+    'The issue:', '', section('S2-03'), '', 'Commits: one task, one commit:', '  S2-03 task-{k}: {summary} [refs: D-02, D-03, FR-BOOKING-3]', fence, '',
+  ].join('\n');
+}
+
+test('prompts: the executor and orchestrator prompts follow docs/ISSUES.md', (t) => {
+  const dir = copyExample(t);
+  edit(dir, 'ISSUES.md', 'requirement_refs: [FR-BOOKING-3]', 'requirement_refs: [FR-BOOKING-3]\nreads:\n  - docs/PRD.md');
+  writeFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), promptsFor(dir));
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
+
+  edit(dir, 'ISSUES.md', '1. Refunds in full more than 24 hours ahead, nothing later.', '1. Refunds in full more than 48 hours ahead, nothing later.');
+  edit(dir, 'ISSUES.md', '  - docs/PRD.md', '  - docs/PRD.md\n  - docs/OPINIONATED_DEFAULTS.md');
+  const found = checkProject(readProject(dir));
+  assert.deepEqual(found.map((p) => [p.code, p.where]), [['prompt-drift', 'docs/SPRINT_PROMPTS.md:21'], ['prompt-drift', 'docs/SPRINT_PROMPTS.md:26']]);
+  const { text, drift } = syncPrompts(readFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), 'utf8'), readProject(dir).issues);
+  assert.equal(drift.length, 2);
+  assert.match(text, /nothing else:\n {2}docs\/PRD\.md\n {2}docs\/OPINIONATED_DEFAULTS\.md\n\nThe issue:/);
+  assert.match(text, /48 hours ahead, nothing later\.\n\nCommits:/);
+  writeFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), text);
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
+
+  const prompts = readFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), 'utf8');
+  writeFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), prompts.replace('## Sprint 2 — Booking flow\n', '## Sprint 2 — Booking flow\n\nStale: regenerate with `execution-router` before running.\n').replace('wave: 2\nowner: firebase-dev\nfiles_touched:\n  - functions/src/callable/cancelBooking.ts', 'wave: 3\nowner: firebase-dev\nfiles_touched:\n  - functions/src/callable/cancelBooking.ts'));
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'a section marked stale is not checked');
+});
+
+test('spec.mjs amend: one issue, the waves and its prompt in one step; refuses new errors', (t) => {
+  const dir = copyExample(t);
+  writeFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), promptsFor(dir));
+  const spec = (...args) => run([join(SCRIPTS, 'spec.mjs'), ...args, '--root', dir]);
+  const before = readFileSync(join(dir, 'docs/ISSUES.md'), 'utf8');
+
+  const outside = spec('amend', 'S2-03', '--add-file', 'apps/player/lib/x.dart');
+  assert.equal(outside.status, 2);
+  assert.match(outside.stdout, /outside firebase-dev's lane/);
+  assert.equal(readFileSync(join(dir, 'docs/ISSUES.md'), 'utf8'), before, 'a refused amendment writes nothing');
+  assert.equal(spec('amend', 'S2-03', '--remove-file', 'nope.ts').status, 2);
+
+  const ok = spec('amend', 'S2-03', '--add-file', 'functions/src/callable/confirmBooking.ts', '--add-dep', 'S1-02');
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.match(ok.stdout, /Waves moved: S2-03 2 -> 3\./);
+  const issues = readFileSync(join(dir, 'docs/ISSUES.md'), 'utf8');
+  assert.match(issues, /id: S2-03\nsprint: 2\nwave: 3\nowner: firebase-dev\nfiles_touched:\n {2}- functions\/src\/callable\/cancelBooking\.ts\n {2}- functions\/test\/cancelBooking\.test\.ts\n {2}- functions\/src\/callable\/confirmBooking\.ts\ndepends_on: \[S2-01, S1-02\]/);
+  const prompts = readFileSync(join(dir, 'docs/SPRINT_PROMPTS.md'), 'utf8');
+  assert.match(prompts, /This sprint has 4 issues in 3 waves:\n- Wave 1: S2-01 \(firebase-dev, wt\/S2-01\)\n- Wave 2: S2-02 \(firebase-dev, wt\/S2-02\), S2-04 \(flutter-dev, wt\/S2-04\)\n- Wave 3: S2-03 \(firebase-dev, wt\/S2-03\)\n/);
+  assert.match(prompts, /wave: 3\nowner: firebase-dev\nfiles_touched:\n {2}- functions\/src\/callable\/cancelBooking\.ts\n {2}- functions\/test\/cancelBooking\.test\.ts\n {2}- functions\/src\/callable\/confirmBooking\.ts\n/);
+  assert.match(readFileSync(join(dir, 'docs/WAVE_DAG.md'), 'utf8'), /### Wave 3/);
+  assert.equal(spec('check', '--strict').status, 0);
+  assert.equal(spec('prompts').status, 0);
 });

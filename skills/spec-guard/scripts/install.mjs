@@ -4,6 +4,7 @@
 //   tools/spec-guard/         spec.mjs, guard.mjs and lib.mjs, committed with the project
 //   .githooks/pre-commit      staged files stay inside the active issue and its lane
 //   .githooks/commit-msg      commit subjects on an issue branch start with the issue id
+//   .githooks/pre-merge-commit  an issue branch merges only commits already on the base branch
 //   git config core.hooksPath .githooks   (local to this clone; every clone runs it once)
 //
 // Options:
@@ -67,7 +68,9 @@ node ${TOOLS}/spec.mjs waves --write    # compute waves into docs/ISSUES.md and 
 node ${TOOLS}/spec.mjs status           # phases, sprint progress, the next wave
 node ${TOOLS}/spec.mjs impact D-03      # what a decision, requirement or issue reaches
 node ${TOOLS}/spec.mjs why <file>       # the issues and decisions behind a file
-node ${TOOLS}/spec.mjs verify S3-07     # the issue's changes stay inside its files and lane
+node ${TOOLS}/spec.mjs verify S3-07     # the issue's commits stay inside its files and lane
+node ${TOOLS}/spec.mjs amend S3-07 --add-file <path>   # amend an issue; never edit its frontmatter by hand
+node ${TOOLS}/spec.mjs prompts --write  # docs/SPRINT_PROMPTS.md matches docs/ISSUES.md
 \`\`\`
 
 After cloning, enable the git hooks once: \`git config core.hooksPath .githooks\`.
@@ -75,9 +78,10 @@ After cloning, enable the git hooks once: \`git config core.hooksPath .githooks\
 report.push(`wrote    ${TOOLS}/ (lib.mjs, spec.mjs, guard.mjs, README.md)`);
 
 // Git hooks, committed under .githooks so every clone can enable them.
-const hook = (args) => `#!/bin/sh\n# ${MARK}: keeps commits inside the active issue. Skip once with --no-verify.\nexec node "$(git rev-parse --show-toplevel)/${TOOLS}/guard.mjs" ${args}\n`;
+const hook = (args) => `#!/bin/sh\n# ${MARK}: keeps commits inside the active issue. If this blocks you, ask the orchestrator to amend files_touched; never --no-verify.\nexec node "$(git rev-parse --show-toplevel)/${TOOLS}/guard.mjs" ${args}\n`;
 writeOwned('.githooks/pre-commit', hook('pre-commit'), 0o755);
 writeOwned('.githooks/commit-msg', hook('commit-msg "$1"'), 0o755);
+writeOwned('.githooks/pre-merge-commit', hook('pre-merge-commit'), 0o755);
 const hooksPath = git(['config', '--get', 'core.hooksPath'], root);
 if (hooksPath && hooksPath !== '.githooks') {
   report.push(`kept     core.hooksPath=${hooksPath} (already set; point it at .githooks or call the hooks from yours)`);
