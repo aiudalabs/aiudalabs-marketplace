@@ -4,7 +4,7 @@ description: "Reviews one implemented backlog issue as the gate before merge: ch
 license: MIT
 compatibility: Needs git and Node.js 20 or later for the spec-guard commands, plus the toolchain of the project's test gate.
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
   author: aiudalabs
   requires: spec-guard
 ---
@@ -40,7 +40,7 @@ git log --oneline <base>..HEAD
 
 Note which files changed and whether the change matches the issue's intent, not something adjacent to it. Every commit subject must start with the issue id and carry `[refs: ...]` when the issue has refs (format: `S3-07 task-1: validate input [refs: D-03, FR-BOOKING-2]`). Refs come from the issue's `decision_refs` and `requirement_refs`; a placeholder such as `[refs: setup]` is a finding. The issue id is what `spec.mjs` traces.
 
-A merge from the base is exempt from the id rule: its second parent is on the base (`git merge-base --is-ancestor <commit>^2 <base>`) and it brings only what the base already has. Any other merge, or one whose second parent is not on the base, is a blocker.
+A merge from the base is exempt from the id rule: its second parent is on the base (`git merge-base --is-ancestor <commit>^2 <base>`) and it brings only what the base already has. So is the merge of `wt/<manifest id>` into a lockfile-refresh issue paired with it through `merge_with`. Any other merge, or one whose second parent is not on the base, is a blocker.
 
 ## Step 3: Read the cited spec
 
@@ -120,6 +120,7 @@ Walk through every hard rule in the root `AGENTS.md` and check the diff against 
 - No hardcoded environment values: grep for project ids, URLs and keys.
 - No commit with red tests: Step 6 settles it.
 - No check-then-act race: a value read, checked and then written in two steps outside one transaction (a balance, a slot, a refund state, a counter). Tests and mutations rarely find these; read every write that depends on an earlier read.
+- Architecture enforced by tests stays put: a change to an allowed-dependency set, a lane allowlist or a boundary test (melos `deps-check`, a vendor-SDK boundary test) is an architecture change. It needs an amendment of `docs/ARCHITECTURE.md` section 3, never a quiet edit of the test.
 
 ## Step 8: Write the verdict
 
@@ -130,7 +131,7 @@ Use the formats in [references/verdicts.md](references/verdicts.md). The rules:
 - Approval lists the evidence for every criterion. An approval with no findings at all deserves a second look before posting.
 - No softening: a broken hard rule is stated as broken.
 
-Post the verdict in the issue or PR thread. Without a tracker or PR, write it to the log path the orchestrator gave you (one file per issue and round), and, when you run as a subagent, return it as your final report too; never leave it only in a chat the orchestrator cannot read. Do not commit, push or merge. On re-review, check only what changed since the last verdict plus the gate and the lane check, which always run again.
+Post the verdict in the issue or PR thread. Without a tracker or PR, write it to the log path the orchestrator gave you (`sprint-runner` uses `../<repo>-wt/reviews/<id>.md`, outside every worktree; one file per issue and round), and, when you run as a subagent, return it as your final report too; never leave it only in a chat the orchestrator cannot read. Do not commit, push or merge. On re-review, check only what changed since the last verdict plus the gate and the lane check, which always run again.
 
 ## Spec gaps
 

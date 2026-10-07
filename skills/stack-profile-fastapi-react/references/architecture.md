@@ -148,9 +148,9 @@ SQLite by default (zero infrastructure); `DATABASE_URL` switches to Postgres; th
 | Pull request, `backend.yml` | ruff, typecheck, `pytest -q` on SQLite, and a second job with pytest against a Postgres service container |
 | Pull request, `frontend.yml` | Frontend lint, typecheck and build |
 | Merge to main | The above, build the image, deploy to staging (pull, migrate, up) |
-| Tag `v*` | Manual approval, production deploy (migrate, then up) |
+| Tag `vMAJOR.MINOR.PATCH` (`^v[0-9]+\.[0-9]+\.[0-9]+$`) on main | A check that the tagged commit is on main, manual approval, production deploy (migrate, then up) |
 
-One workflow per lane, each limited to its lane's paths, so a workflow belongs to the lane it validates (`agents.md` in this folder). Versions pinned in `pyproject.toml` and the lockfiles; CI mirrors dev. Secrets in the CI provider's store.
+One workflow per lane, each limited to its lane's paths, so a workflow belongs to the lane it validates (`agents.md` in this folder). Versions pinned in `pyproject.toml` and the lockfiles; CI mirrors dev. Secrets in the CI provider's store; production ones in a CI environment whose deployment rule admits only version tags, with required reviewers and a tag ruleset, because the workflow file runs from the tagged commit and a tag pusher could edit it. Deploy jobs set a timeout.
 
 ## Observability stack
 

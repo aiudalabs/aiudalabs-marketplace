@@ -49,7 +49,7 @@ Re-request review when addressed.
 
 ## Where the verdict goes
 
-In the issue or PR thread. Without a tracker or PR, in the log path the orchestrator gave (one file per issue and round, such as `<log dir>/S3-07-qa.md`), and in the final report when the review runs as a subagent.
+In the issue or PR thread. Without a tracker or PR, in the log path the orchestrator gave (one file per issue and round, such as `../<repo>-wt/reviews/S3-07.md`, the path `sprint-runner` uses), and in the final report when the review runs as a subagent.
 
 ## Spec inconsistency note
 

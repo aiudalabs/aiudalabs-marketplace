@@ -9,7 +9,7 @@ The scaffold is done by the `project-kickstart` skill, which reads the locked pr
 ├── AGENTS.md                 # repository constitution (stack, commands, lanes, rules)
 ├── CLAUDE.md                 # one line: @AGENTS.md
 ├── README.md
-├── .gitignore, .tool-versions, .env.example
+├── .gitignore, .tool-versions, .env.example   # .env.example hosts use 127.0.0.1
 ├── melos.yaml                # Flutter packages
 ├── pubspec.yaml              # root Flutter workspace
 ├── package.json              # root TypeScript workspace
@@ -22,8 +22,9 @@ The scaffold is done by the `project-kickstart` skill, which reads the locked pr
 ├── packages/core/, packages/data/, packages/ui/
 ├── packages-ts/types/
 ├── apps/{app}/               # one per mobile or tablet app named in the brief
-├── functions/                # package.json (engines node 22; build, build:watch), tsconfig.json,
-│   └── src/callable/, src/triggers/, src/scheduled/, src/https/   # src/index.ts generated at build time
+├── functions/                # package.json (engines node 22; build, build:watch), tsconfig.json, .env.local.example
+│   ├── scripts/              # gen-index.mjs, bundle.mjs, stage-deploy.mjs
+│   └── src/init.ts, src/callable/, src/triggers/, src/scheduled/, src/https/   # src/index.ts generated at build time
 ├── admin/                    # only when the brief has an admin dashboard (Vite + React + TS)
 ├── .github/workflows/        # one workflow per lane: flutter.yml, firebase.yml, admin.yml (only with admin/)
 ├── emulator-data/
@@ -37,8 +38,12 @@ The scaffold is done by the `project-kickstart` skill, which reads the locked pr
 - **Every rules file starts default-deny.** The real rules come from the schema in Sprint 1.
 - **Versions:** Node 22 everywhere: `"engines": { "node": "22" }` in `functions/package.json`, `"runtime": "nodejs22"` in `firebase.json`, `nodejs 22.x` in `.tool-versions` and `node-version: 22` in every CI workflow. The Flutter stable version pinned in `.tool-versions`, the same in CI.
 - **CI per lane:** each workflow runs only its lane's checks and is limited to its lane's paths, so it belongs to one agent (`agents.md` in this folder). `spec-guard.yml` is added by the `spec-guard` installer, not by the scaffold.
-- **Functions scripts:** `build` (generate `src/index.ts`, then `tsc`) and `build:watch` (`tsc --watch`). No `dev` script that starts an emulator: the dev loop starts emulators once from the root (`architecture.md` in this folder).
+- **Functions scripts:** `build` (generate `src/index.ts`, `tsc --noEmit`, then `scripts/bundle.mjs`, esbuild inlining `@<project>/types` into `lib/`) and `build:watch` (the bundler's watch mode plus restaging). esbuild is a devDependency. No `dev` script that starts an emulator: the dev loop starts emulators once from the root (`architecture.md` in this folder).
 - **Generated entry point:** `functions/src/index.ts` re-exports every function file and is written by the build from the folders under `src/`; no issue edits it. The scaffold ships the generator, `functions/scripts/gen-index.mjs`, which runs before build, typecheck, lint and test; `src/index.ts` is in `functions/.gitignore`.
+- **Deploy source:** `firebase.json` `functions.source` is `functions/.deploy`, written by `scripts/stage-deploy.mjs` as the last functions predeploy (registry-only `dependencies`, the bundle, the env files, a `node_modules` link) and failing on a function without a region. `functions/.gitignore` ignores `/lib/`, `/.deploy/` and `src/index.ts` with anchored patterns, never a bare `lib/`.
+- **Region:** `functions/src/init.ts` calls `initializeApp()` and `setGlobalOptions({ region: '{{functions_region}}' })`, substituted from the architecture's region.
+- **Env files:** `functions/.env.local.example` is committed; `*.local` (`.env.local`, `.secret.local`) is ignored. No `.env.<alias>` ships with fake or emulator values.
+- **Emulators:** every emulator and the hub in `firebase.json` has `"host": "127.0.0.1"`, and `.env.example` uses `127.0.0.1`.
 - **Lockfiles are committed** (`pnpm-lock.yaml`, `pubspec.lock`) with the scaffold, because CI installs with a frozen lockfile.
 - **Substitutions:** project name in kebab-case for folders and package names, and as the suggested Firebase project id prefix (`{project-name}-dev`, `-staging`, `-prod`).
 - **The root `AGENTS.md`** states the stack, the dev commands from `architecture.md` in this folder (emulator-first), the test gate, and points to `docs/AGENT_ROSTER.md` for lanes. The root `CLAUDE.md` contains only `@AGENTS.md`, so Claude Code imports the same constitution that Codex, Copilot, Cursor and OpenCode read natively.

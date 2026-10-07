@@ -3,7 +3,7 @@ name: ui-screens-spec
 description: "Specifies every screen of every app in text before anything is built, writing UI_SCREENS.md: numbered screen ids (X.Y.Z), six fixed blocks per screen (header, body, primary CTA, navigation, data, permissions) with empty, loading and error states, a navigation graph per app, locked design tokens and tap targets per app context, a reusable component inventory, [COPY] placeholders, and the five key screens per app chosen for mockups. Use when the user says 'diseñemos las pantallas', 'qué pantallas necesito', 'wireframes en texto', 'screen spec' or 'componentes reutilizables', or as Phase 4 after the schema is approved. It needs the brief, the decisions and the schema document. It writes specs, not visuals: clickable HTML mockups of the key screens are navegable-mockups, which reads this document."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: aiudalabs
 ---
 
@@ -212,6 +212,8 @@ Mandatory for every screen with data:
 
 A missing state is a Phase 4 bug: the UI agents will invent it, differently on each screen.
 
+**App-shell states, once per app.** Under the app's navigation graph, specify the states no single screen owns, each with its layout, recovery action and `[COPY]`: not found (an unknown route or a deleted record's link), unexpected error (the route-level error boundary), missing configuration (a build without its required settings) and offline. A web app adds session expired; a mobile app adds update required when the architecture has a minimum app version.
+
 ### Step 8: Microcopy placeholders
 
 Mark all user-facing text `[COPY: "draft"]`. Final copy depends on tone, voice and tests that have not happened; drafts are enough for mockups and development. Each draft reads right in every state the screen shows it in (a payment label shown during the match does not say "not played yet").
@@ -237,6 +239,7 @@ List the picks with one sentence of rationale each, and give each its **mockup b
 - Every PRD user story is realized by at least one screen: a table `US-<n>` → screen ids, with no story left without one.
 - **Every write a screen makes has an owner**: a unit in the schema's server-writes table, or a row of its Direct client writes table (`direct (schema: Direct client writes)`). A write with no owner (starting a payment, emailing a statement) is marked `[SUPUESTO] needs a server unit (Phase 5)`, listed under Open questions and raised at the gate; never invent the unit's contract here.
 - Every screen has all six blocks and its `<a id="s-<screen-id>">` anchor; every screen with data has empty, loading and error.
+- Every app has its shell states (not found, unexpected error, missing configuration, offline) with copy.
 - Every app has exactly five key screens, each with a mockup back-link.
 - The navigation graph is connected, and each app's global navigation (tab bar, sidebar) is specified once in its graph.
 - The example data follows the one story: the same record has the same values in every app, and distinct records have distinct codes.
