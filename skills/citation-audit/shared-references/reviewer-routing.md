@@ -394,7 +394,7 @@ The mainline reviewer contract is `mcp__codex__codex` + `mcp__codex__codex-reply
 If Codex MCP is broken in your setup, prefer in order:
 
 1. Fix the MCP registration: `claude mcp add codex -s user -- codex mcp-server`, then `/mcp` in-session to (re)connect.
-2. Codex-CLI-as-executor: use the native mirror pack [`skills/skills-codex/`](../skills-codex/) — designed to run inside Codex CLI without Claude-side MCP.
+2. Codex-CLI-as-executor: use the native mirror pack `skills/skills-codex/` — designed to run inside Codex CLI without Claude-side MCP.
 3. One-shot `codex exec` only for skills whose review is a single call with no follow-up reply.
 
 ## Copilot CLI Native Rubber Duck (default for auto-review-loop)

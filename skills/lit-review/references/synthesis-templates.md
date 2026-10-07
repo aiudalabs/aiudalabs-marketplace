@@ -124,6 +124,6 @@ If using Mermaid, prefer `flowchart TD` or `mindmap`. Keep it under 30 nodes; ot
 
 ## Authoring discipline
 
-- Synthesis prose follows `manuscript:manuscript-writing` discipline: no em-dashes, abbreviations defined on first use, descriptive voice not exhortatory.
+- Synthesis prose follows `manuscript-drafting` discipline: no em-dashes, abbreviations defined on first use, descriptive voice not exhortatory.
 - Every concrete claim cites a card path. The synthesis is a summary of the corpus, not a summary of the author's prior knowledge.
 - If a synthesis claim cannot be cited to a card, it is a hint that a card is missing from the corpus. Either add the card (loop to Phase 1) or drop the claim.

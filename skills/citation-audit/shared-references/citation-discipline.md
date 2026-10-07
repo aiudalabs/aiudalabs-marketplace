@@ -11,8 +11,8 @@ This is an intentionally longer reference. It is not meant to replace the main w
 - or you need to clean and standardize a bibliography in a more disciplined way.
 
 > **Quick map**: pre-search filter → `Pre-Search Verification Protocol` (this
-> file); submission-time bibliography audit → [`/citation-audit`](../citation-audit/SKILL.md);
-> numerical-claim audit → [`/paper-claim-audit`](../paper-claim-audit/SKILL.md).
+> file); submission-time bibliography audit → [`/citation-audit`](../SKILL.md);
+> numerical-claim audit → `/paper-claim-audit`.
 
 ## Contents
 

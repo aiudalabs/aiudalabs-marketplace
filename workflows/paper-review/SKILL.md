@@ -2,12 +2,12 @@
 name: "paper-review"
 description: "Use this skill for \"review this paper\", \"review this manuscript\", \"peer review\", \"review my paper\", \"critique this manuscript\", \"review this submission\", \"give me feedback on my paper\", \"check my methods\", \"review my statistics\", \"review as a peer reviewer\", \"evaluate this manuscript\", \"review this PDF\", or mentions manuscript review, peer review, paper critique, or methodological review."
 license: "BSD-3-Clause"
-compatibility: "Dispatches the paper-review agent once (single mode) or several times in parallel (panel mode), so it needs a harness with subagents."
+compatibility: "Dispatches the paper-reviewer agent once (single mode) or several times in parallel (panel mode), so it needs a harness with subagents."
 metadata:
   version: "0.1.0"
   author: "Seyed (Yahya) Shirazi"
   source: "https://github.com/neuromechanist/research-skills"
-  agents: "paper-review"
+  agents: "paper-reviewer"
 ---
 
 # Academic Manuscript Review
@@ -29,12 +29,10 @@ Review validity depends on independence: a reviewer that shares the conversation
 
 ## Dispatch
 
-Pick the branch for the current tool. In every branch the reviewer follows `references/review-procedure.md`.
+Pass the reviewer only the framing: the manuscript path, the target journal or manuscript type, and the mode. In every branch the reviewer follows `references/review-procedure.md`.
 
-- **Claude Code:** `Task(subagent_type: "paper-review", ...)` passing the manuscript path, target journal/type, and mode. For panel mode, launch one `Task` per lens in parallel, then a final synthesis `Task`.
-- **Codex CLI:** plugin installation exposes this skill, not a Codex subagent. To use a fresh-context Codex reviewer, first copy `agents/templates/paper-review.toml` to `~/.codex/agents/` or `.codex/agents/`, then invoke that configured agent if the current Codex surface supports `/agent`. For panel mode, ensure `max_threads` covers the lens count. If no Codex subagent is configured or available, use the fallback branch.
-- **Copilot CLI:** plugin installation exposes this skill and, through `.github/plugin/plugin.json`, the `.agent.md` reviewer in `agents/templates/`. Invoke that configured agent when the current Copilot surface supports custom agents; use `/fleet` for panel mode when available. If running outside a plugin install, copy `agents/templates/paper-review.agent.md` to `.github/agents/` or `~/.copilot/agents/`. If no custom agent is available, use the fallback branch.
-- **Fallback** (no subagent support, or the user wants an interactive in-thread review): first locate the rubric (`$CLAUDE_PLUGIN_ROOT/skills/paper-review/references`, else `find . -type d -path '*/skills/paper-review/references' | head -1`); if it cannot be found, stop and tell the user to install the manuscript plugin rather than reviewing from memory. Then follow `references/review-procedure.md` directly in this context.
+- **Harness with subagents:** dispatch the `paper-reviewer` agent as a subagent. For panel mode, dispatch one per lens in parallel, each told its lens, then run one more for the synthesis.
+- **Fallback** (no subagents, or the user wants an interactive in-thread review): follow `references/review-procedure.md` from this skill's folder directly in this context. Never review from memory: if the references cannot be read, stop and say so.
 
 ## The brain (do not duplicate into dispatch or agent shells)
 
@@ -43,6 +41,4 @@ Pick the branch for the current tool. In every branch the reviewer follows `refe
 - `references/review-principles.md` -- review philosophy and severity calibration.
 - `references/review-output-template.md` -- the Synopsis / Critical / Major / Minor / References / Editor Note format.
 - `examples/sample-manuscript-review.md` -- worked review for calibration; `examples/sample-manuscript-excerpt.md` -- sample manuscript input for testing.
-- Sister skill `manuscript:humanizer` -- AI-writing patterns to flag in the prose-quality pass.
-
-This workflow also uses `paper-review`.
+- Sister skill `humanizer` -- AI-writing patterns to flag in the prose-quality pass.

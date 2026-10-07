@@ -1,5 +1,5 @@
 ---
-name: "paper-review"
+name: "paper-reviewer"
 description: "Independent fresh-context academic manuscript peer reviewer. Invoked by the paper-review skill (single or panel mode); not triggered directly by the user."
 version: "0.1.0"
 tags: ["research"]
@@ -22,18 +22,11 @@ This agent is a thin shell. The review procedure, methodology and statistical ch
 
 ## Procedure
 
-1. Locate the skill references:
+1. Locate the skill references. Load the `paper-review` skill with your skill tool: its folder holds `references/`. If you cannot tell where that folder is, find it in the project and in the user's harness folders:
    ```bash
-   REF="${CLAUDE_PLUGIN_ROOT}/skills/paper-review/references"
-   if [ -z "${CLAUDE_PLUGIN_ROOT:-}" ] || ! test -d "$REF"; then
-       matches="$(find . -type d -path '*/skills/paper-review/references' 2>/dev/null)"
-       n="$(printf '%s\n' "$matches" | grep -c .)"
-       [ "$n" -eq 0 ] && { echo "FATAL: paper-review/references not found; install the manuscript plugin so the rubric is on disk" >&2; exit 2; }
-       REF="$(printf '%s\n' "$matches" | head -1)"
-       [ "$n" -gt 1 ] && echo "warning: $n candidate references dirs found; using $REF" >&2
-       echo "warning: CLAUDE_PLUGIN_ROOT unset/invalid; using fallback rubric at $REF" >&2
-   fi
-   test -f "$REF/review-procedure.md" || { echo "FATAL: $REF has no review-procedure.md" >&2; exit 2; }
+   REF="$(find . ~/.claude ~/.agents ~/.codex ~/.cursor ~/.gemini ~/.copilot ~/.config/opencode ~/.osaurus -path '*/paper-review/references/review-procedure.md' 2>/dev/null | head -1)"
+   test -n "$REF" || { echo "FATAL: paper-review/references not found; install the paper-review workflow so the rubric is on disk" >&2; exit 2; }
+   REF="$(dirname "$REF")"
    echo "Using rubric at: $REF"; ls "$REF"
    ```
    If this step fails, STOP and report it. Never review from memory; a review built on a recalled checklist instead of the loaded one is invalid.

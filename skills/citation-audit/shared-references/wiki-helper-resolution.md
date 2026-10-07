@@ -74,7 +74,7 @@ Four locations correspond to four legitimate install / dev paths:
 | `.aris/tools/research_wiki.py` | After running `bash tools/install_aris.sh` in the user project (Phase 0 symlink, added in #174 / #192) |
 | `tools/research_wiki.py` | (a) Manual copy of the helper into the user project (a documented temporary workaround); (b) running a SKILL from inside the ARIS repo itself |
 | `$ARIS_REPO/tools/research_wiki.py` | Env var explicitly set, or auto-resolved from `.aris/installed-skills.txt`'s `repo_root` field |
-| `$ARIS_REPO/tools/research_wiki.py` via `~/.aris/repo` | Global pointer file written by `install_aris*.{sh,ps1}` / `smart_update*.{sh,ps1}` (#366); the only layer that resolves for a **global copy-install** (`~/.claude/skills/research-wiki`) where none of the first three apply — there is no project-local `.aris/`, no `tools/` copy, and no manifest to read `ARIS_REPO` from |
+| `$ARIS_REPO/tools/research_wiki.py` via `~/.aris/repo` | Global pointer file written by `install_aris*.{sh,ps1}` / `smart_update*.{sh,ps1}` (#366); the only layer that resolves for a **global copy-install** (`<research-wiki skill folder>`) where none of the first three apply — there is no project-local `.aris/`, no `tools/` copy, and no manifest to read `ARIS_REPO` from |
 
 Order matters: the symlinked install is preferred because the symlink
 auto-tracks upstream tool fixes; the manual copy is second because it
@@ -91,7 +91,7 @@ all miss.
 - ❌ A layer at `/usr/local/share/...` or another OS-specific system
   path — `~/.aris/repo` already covers the global-install gap with a
   single per-user file, no OS branching needed.
-- ❌ Adding `~/.codex/skills/research-wiki/research_wiki.py` — that's
+- ❌ Adding `<research-wiki skill folder>/research_wiki.py` — that's
   Codex-side global install, lives in the **Codex** mirror's chain
   (`skills/skills-codex/...`), not the CC chain.
 

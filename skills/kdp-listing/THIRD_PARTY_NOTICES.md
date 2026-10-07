@@ -5,7 +5,8 @@ Adapted from **claude-anvil**, https://github.com/queelius/claude-anvil, at comm
 Changes made here:
 
 - Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
-- The plugin's `docs/` folder is bundled inside the skill, and `${CLAUDE_PLUGIN_ROOT}/docs` paths point to it.
+- Plugin-scoped names (such as `manuscript:humanizer`) and fixed install paths (such as `~/.claude/skills/<name>`), wherever they occur in the Markdown files, are rewritten to the component names and folder placeholders used here, so the text works in every harness.
+- The plugin's `docs/` folder is bundled inside the skill, without the maintainers' planning notes in `docs/superpowers/`, and `${CLAUDE_PLUGIN_ROOT}/docs` paths point to it.
 
 License of the upstream project:
 

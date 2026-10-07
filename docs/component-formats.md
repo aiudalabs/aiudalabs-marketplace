@@ -72,8 +72,12 @@ A skill may include `evals/evals.json` with test prompts and expected outputs. T
 
 - Required and non-empty.
 - Keep it under 500 lines. The validator warns above that. Move detail into `references/`.
-- Link to bundled files with relative paths, such as `[palette guide](references/color-systems.md)`. The validator fails on links to files that do not exist.
+- Link to bundled files with relative paths, such as `[palette guide](references/color-systems.md)`. The validator fails on links to files that do not exist, in `SKILL.md` and in every other Markdown file of the skill except those under `assets/`, and on links that leave the skill folder.
 - Keep references one level deep: `SKILL.md` links to a reference file, and that file does not link onward to another.
+
+### Portable paths
+
+Each harness installs skills into its own folder, so no file in a skill may locate itself or another skill through a fixed path. The validator fails on `~/.claude/skills`, `$HOME/.codex/agents` and the like for every harness, and on `CLAUDE_PLUGIN_ROOT`, in every text file of the skill and in agent bodies. Write "this skill's folder", run scripts with paths relative to it, and refer to other skills by name. `THIRD_PARTY_NOTICES.md`, `NOTICE.md` and `LICENSE` files are kept verbatim and not checked.
 
 ### Writing a good description
 
@@ -93,7 +97,7 @@ An agent is one Markdown file at `agents/<category>/<name>.md`. It describes a p
 
 | Field | Required | Rule |
 | --- | --- | --- |
-| `name` | Yes | Same naming rule as skills. Must equal the file name without `.md`. Unique across all categories. |
+| `name` | Yes | Same naming rule as skills. Must equal the file name without `.md`. Unique across all categories, and not the name of any skill, workflow or external. |
 | `description` | Yes | 1 to 1024 characters. Who the agent is and when to delegate to it. |
 | `version` | Yes | Semver. |
 | `requires` | No | List of skill names from this repository that the agent uses. The installer copies them with the agent. |

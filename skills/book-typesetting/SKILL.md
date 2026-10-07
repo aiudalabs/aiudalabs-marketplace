@@ -23,6 +23,8 @@ machine with:
 <book-typesetting skill folder>/scripts/doctor.sh
 ```
 
+`<book-typesetting skill folder>` stands for the folder this file was loaded from. Replace it with that path before running a command.
+
 **Never produced a print book?** Read `reference/print-basics.md` and orient them
 before running anything. It explains trim, bleed, safe areas, spine width, CMYK
 and PDF/X in plain language. Most mistakes here come from not knowing what the
@@ -60,7 +62,7 @@ redoing the layout.
 then import:
 
 ```bash
-S=~/.claude/skills/book-typesetting
+S=<book-typesetting skill folder>
 $S/scripts/init-book.sh --title "Their Book" --author "Their Name" ./their-book
 $S/scripts/import-docx.py manuscript.docx --target ./their-book --dry-run
 ```
@@ -104,7 +106,7 @@ This is the habit worth instilling. Print uploaders reject *silently* or with
 misleading text, so check the file yourself:
 
 ```bash
-S=~/.claude/skills/book-typesetting
+S=<book-typesetting skill folder>
 $S/scripts/verify-pdfx.py interior.pdf --expect-size 8x10 --expect-pages 296
 ```
 
@@ -119,7 +121,7 @@ you already built is now wrong.
 ## The commands
 
 ```bash
-S=~/.claude/skills/book-typesetting
+S=<book-typesetting skill folder>
 
 # Interior: render, then make press-ready.
 quarto render book-print.qmd --to pdf

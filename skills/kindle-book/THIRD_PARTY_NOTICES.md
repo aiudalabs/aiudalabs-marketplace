@@ -5,6 +5,7 @@ Adapted from **kindle-book-skill**, https://github.com/nikmcfly/kindle-book-skil
 Changes made here:
 
 - Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
+- Plugin-scoped names (such as `manuscript:humanizer`) and fixed install paths (such as `~/.claude/skills/<name>`), wherever they occur in the Markdown files, are rewritten to the component names and folder placeholders used here, so the text works in every harness.
 
 License of the upstream project:
 

@@ -5,6 +5,7 @@ Adapted from **claude-anvil**, https://github.com/queelius/claude-anvil, at comm
 Changes made here:
 
 - Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
+- Plugin-scoped names (such as `manuscript:humanizer`) and fixed install paths (such as `~/.claude/skills/<name>`), wherever they occur in the Markdown files, are rewritten to the component names and folder placeholders used here, so the text works in every harness.
 - Converted from the `reviewer` agent of the bookwright plugin into a workflow, because it coordinates other agents through steps; references to plugin-scoped names such as `bookwright:reviewer` now name the marketplace components.
 
 License of the upstream project:

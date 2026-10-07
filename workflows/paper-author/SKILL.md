@@ -9,7 +9,7 @@ metadata:
   source: "https://github.com/aiudalabs/aimprenta"
   argument-hint: "[paper-dir-or-idea] [--depth preprint|venue]"
   requires: "citation-audit humanizer lit-review manuscript-drafting manuscript-revision paper-review sciwrite"
-  agents: "paper-crawler paper-review research-analyst"
+  agents: "paper-crawler research-analyst"
 ---
 
 # Paper Author — Idea to Review-Ready Manuscript

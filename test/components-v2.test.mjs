@@ -79,6 +79,39 @@ test('stacks: workflows are listed under "workflows"', (t) => {
   assert.match(errors(validateAll(components)), /list workflows under "workflows"/);
 });
 
+test('content: no harness-specific paths in any file a skill ships, nor in agents', (t) => {
+  const { components } = fixture(t, {
+    'skills/humanizer/SKILL.md': skillFile('humanizer', '', 'Run `~/.claude/skills/humanizer/scripts/run.sh`.'),
+    'skills/humanizer/references/setup.md': 'Plugins use ${CLAUDE_PLUGIN_ROOT}/scripts.\n',
+    'skills/humanizer/scripts/run.sh': 'cd "$HOME/.codex/skills/humanizer"\n',
+    'skills/humanizer/THIRD_PARTY_NOTICES.md': 'Upstream installed into ~/.claude/skills/, kept verbatim.\n',
+    'agents/writing/prose-polisher.md': '---\nname: prose-polisher\ndescription: x\nversion: 0.1.0\n---\n\nRead ~/.cursor/agents/notes.md first.\n',
+  });
+  const found = errors(validateAll(components));
+  assert.match(found, /SKILL\.md:8 uses the harness-specific path "~\/\.claude\/skills"/);
+  assert.match(found, /references\/setup\.md:1 uses the harness-specific path "CLAUDE_PLUGIN_ROOT"/);
+  assert.match(found, /scripts\/run\.sh:1 uses the harness-specific path "\$HOME\/\.codex\/skills"/);
+  assert.match(found, /body uses the harness-specific path "~\/\.cursor\/agents"/);
+  assert.doesNotMatch(found, /THIRD_PARTY_NOTICES/, 'notices are kept verbatim');
+});
+
+test('content: links in references must resolve inside the skill folder', (t) => {
+  const { components } = fixture(t, {
+    'skills/humanizer/SKILL.md': skillFile('humanizer', '', 'See [guide](references/guide.md).'),
+    'skills/humanizer/references/guide.md': 'See [sibling](../../other-skill/SKILL.md), [gone](missing.md), [ok](../SKILL.md) and `[text](url)`.\n',
+    'skills/humanizer/assets/chapter.md': '![figure](../images/fig.png) is the user\'s file.\n',
+  });
+  const found = errors(validateAll(components));
+  assert.match(found, /references\/guide\.md links outside the skill folder: \.\.\/\.\.\/other-skill\/SKILL\.md/);
+  assert.match(found, /references\/guide\.md links to a missing file: missing\.md/);
+  assert.doesNotMatch(found, /\.\.\/SKILL\.md|url|assets/);
+});
+
+test('agents and skills cannot share a name', (t) => {
+  const { components } = fixture(t, { 'agents/writing/humanizer.md': '---\nname: humanizer\ndescription: x\nversion: 0.1.0\n---\n\nYou humanize.\n' });
+  assert.match(errors(validateAll(components)), /agent name "humanizer" is also the name of a skill/);
+});
+
 test('expand: a stack brings its workflow, the workflow its skills, external and agents', (t) => {
   const { components } = fixture(t);
   const { agents, skills } = expand([resolveReference('stack/write-article', components)], components);

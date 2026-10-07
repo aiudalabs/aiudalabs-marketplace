@@ -103,10 +103,10 @@ After drafting, check:
 - [ ] All abbreviations defined on first use
 - [ ] References complete and consistently formatted
 - [ ] Word/page count within journal limits
-- [ ] Run `manuscript:humanizer` as a final natural-writing pass (strips AI tells like significance inflation, em-dashes, "evolving landscape" filler, rule-of-three padding) before review
+- [ ] Run `humanizer` as a final natural-writing pass (strips AI tells like significance inflation, em-dashes, "evolving landscape" filler, rule-of-three padding) before review
 
 ## Additional Resources
 
 - Reference: [references/section-templates.md](references/section-templates.md) - Templates for each manuscript section
 - Reference: [references/revision-response.md](references/revision-response.md) - How to write point-by-point responses to reviewers
-- Sister skill: `manuscript:humanizer` - Removes 29 categories of AI-writing tells while respecting academic conventions (e.g., passive voice in Methods, hedging in Discussion). Run after drafting and before peer review.
+- Sister skill: `humanizer` - Removes 29 categories of AI-writing tells while respecting academic conventions (e.g., passive voice in Methods, hedging in Discussion). Run after drafting and before peer review.

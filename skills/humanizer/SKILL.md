@@ -561,10 +561,10 @@ Provide:
 
 ## Cross-references in the research-skills marketplace
 
-- `manuscript:manuscript-writing` for paper drafting and section-level guidance. Run humanizer after drafting and before review.
-- `manuscript:paper-review` for peer-review feedback. Humanizer is often the right fix for a "writing quality" comment from a reviewer.
-- `manuscript:manuscript-formatting` for journal-specific formatting. Run humanizer first; formatting applies house style afterward (title case, citation style, etc.).
-- `manuscript:lit-review` for literature-review prose. The synthesized passages from lit-review are particularly prone to "evolving landscape" and "growing body of work" filler.
+- `manuscript-drafting` for paper drafting and section-level guidance. Run humanizer after drafting and before review.
+- `paper-review` for peer-review feedback. Humanizer is often the right fix for a "writing quality" comment from a reviewer.
+- `paper-publisher` for journal-specific formatting. Run humanizer first; formatting applies house style afterward (title case, citation style, etc.).
+- `lit-review` for literature-review prose. The synthesized passages from lit-review are particularly prone to "evolving landscape" and "growing body of work" filler.
 - `grant:grant-writing` for NIH/NSF proposals. Run humanizer on Specific Aims, Significance, Innovation, and Approach narrative. Pay extra attention to patterns 1 (significance inflation), 4 (promotional language), and 24 (excessive hedging); defer to the funding mechanism's formatting for patterns 17 (title case) and 19 (curly quotes).
 - `grant:grant-review` for proposal critique. Patterns most relevant to grant prose: 1 (significance inflation), 4 (promotional language), 7 (AI vocabulary), 8 (copula avoidance), 14 (em-dash overuse), 24 (excessive hedging), 25 (generic positive conclusions). These often surface as "writing quality" or "lack of specificity" reviewer comments.
 

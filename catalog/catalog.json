@@ -177,7 +177,7 @@
       "path": "agents/research/paper-crawler.md"
     },
     {
-      "name": "paper-review",
+      "name": "paper-reviewer",
       "description": "Independent fresh-context academic manuscript peer reviewer. Invoked by the paper-review skill (single or panel mode); not triggered directly by the user.",
       "version": "0.1.0",
       "category": "research",
@@ -187,7 +187,7 @@
       ],
       "license": "BSD-3-Clause",
       "source": "https://github.com/neuromechanist/research-skills",
-      "path": "agents/research/paper-review.md"
+      "path": "agents/research/paper-reviewer.md"
     },
     {
       "name": "research-analyst",
@@ -475,36 +475,17 @@
         "THIRD_PARTY_NOTICES.md",
         "shared-references/acceptance-gate.md",
         "shared-references/assurance-contract.md",
-        "shared-references/capture-antipatterns.md",
         "shared-references/citation-discipline.md",
-        "shared-references/compute-env-contract.md",
         "shared-references/effort-contract.md",
-        "shared-references/evidence-precheck.md",
         "shared-references/experiment-integrity.md",
         "shared-references/external-cadence.md",
         "shared-references/fan-out-pattern.md",
-        "shared-references/icra-keywords.md",
-        "shared-references/injection-hygiene.md",
         "shared-references/integration-contract.md",
-        "shared-references/output-composition.md",
-        "shared-references/output-language.md",
-        "shared-references/output-manifest.md",
-        "shared-references/output-versioning.md",
         "shared-references/page-shrink-heuristic.md",
         "shared-references/paper-preferences.md",
-        "shared-references/patent-format-cn.md",
-        "shared-references/patent-format-ep.md",
-        "shared-references/patent-format-us.md",
-        "shared-references/patent-writing-principles.md",
-        "shared-references/prior-art-databases.md",
-        "shared-references/resumable-runs.md",
-        "shared-references/review-scope-limits.md",
         "shared-references/review-tracing.md",
         "shared-references/reviewer-independence.md",
         "shared-references/reviewer-routing.md",
-        "shared-references/skill-governance.md",
-        "shared-references/taste-calibration.md",
-        "shared-references/venue-checklists.md",
         "shared-references/wiki-helper-resolution.md",
         "shared-references/writing-principles.md",
         "tools/refresh_audit_hashes.py",
@@ -641,8 +622,6 @@
         "docs/audit-report-template.md",
         "docs/kdp-exemplars.md",
         "docs/kdp-reference.md",
-        "docs/superpowers/plans/2026-03-18-kdp-cover-mcp-impl.md",
-        "docs/superpowers/specs/2026-03-18-kdp-cover-mcp-design.md",
         "docs/user-config-template.md"
       ]
     },
@@ -660,8 +639,6 @@
         "docs/audit-report-template.md",
         "docs/kdp-exemplars.md",
         "docs/kdp-reference.md",
-        "docs/superpowers/plans/2026-03-18-kdp-cover-mcp-impl.md",
-        "docs/superpowers/specs/2026-03-18-kdp-cover-mcp-design.md",
         "docs/user-config-template.md"
       ]
     },
@@ -694,7 +671,6 @@
       "tools": [],
       "path": "skills/line-and-copy-editor",
       "files": [
-        "README.md",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "references/ai-prose-patterns.md",
@@ -1059,7 +1035,6 @@
       ],
       "agents": [
         "paper-crawler",
-        "paper-review",
         "research-analyst"
       ]
     },
@@ -1104,7 +1079,7 @@
         "references/statistical-review-guide.md"
       ],
       "agents": [
-        "paper-review"
+        "paper-reviewer"
       ]
     },
     {
@@ -1154,7 +1129,6 @@
         "bibliography-auditor",
         "consistency-checker",
         "logic-reviewer",
-        "paper-review",
         "technical-reviewer",
         "writing-reviewer"
       ]

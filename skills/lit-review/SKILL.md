@@ -22,9 +22,9 @@ Orchestrate a rigorous, citation-grounded literature review across phases: angle
 
 ## When NOT to Use
 
-- Original research IMRAD writing. Use `manuscript:manuscript-writing`.
-- Peer review of a submitted manuscript. Use `manuscript:paper-review`.
-- Journal formatting. Use `manuscript:manuscript-formatting`.
+- Original research IMRAD writing. Use `manuscript-drafting`.
+- Peer review of a submitted manuscript. Use `paper-review`.
+- Journal formatting. Use `paper-publisher`.
 
 ## Two modes
 
@@ -61,7 +61,7 @@ Each brief defines:
 - Seed material (existing prior-work documents to import)
 - Acceptance criteria (count thresholds, breadth thresholds, completeness gates)
 - Out-of-scope items
-- Sister skills to use (`opencite:opencite`, `manuscript:manuscript-writing`)
+- Sister skills to use (`opencite:opencite`, `manuscript-drafting`)
 
 See [references/brief-template.md](references/brief-template.md) for the full structure.
 
@@ -101,23 +101,23 @@ Each direction paper:
 - Defends a thesis grounded in the corpus
 - Cites every claim back to a specific card path: `[<slug>](../research/collection/<strand>/<slug>/card.md)`
 - Closes with a flat references section keyed to BibTeX in the strand `.bib`
-- Follows review-paper IMRAD structure and prose discipline (delegate to `manuscript:manuscript-writing`): no em-dashes, abbreviations defined on first use, descriptive voice not exhortatory
+- Follows review-paper IMRAD structure and prose discipline (delegate to `manuscript-drafting`): no em-dashes, abbreviations defined on first use, descriptive voice not exhortatory
 
 The cite-card cross-link is the load-bearing convention. A claim that does not link to a card is a claim that has not yet been grounded; either ground it (add the card) or remove the claim.
 
 See [references/direction-paper-template.md](references/direction-paper-template.md).
 
-For LaTeX export of a direction paper to a journal review template, delegate to `manuscript:manuscript-formatting`. The base format is markdown.
+For LaTeX export of a direction paper to a journal review template, delegate to `paper-publisher`. The base format is markdown.
 
 ### Phase 4: Review loop
 
-Self-review the direction paper using `manuscript:paper-review`. Treat it as a peer review of one's own draft.
+Self-review the direction paper using `paper-review`. Treat it as a peer review of one's own draft.
 
 Common loop-back triggers:
 - Reviewer (self or other) names a claim as ungrounded -> Phase 1 (add cards) or Phase 3 (drop claim)
 - Reviewer flags a missing theme -> Phase 0 (new strand or expanded scope) -> Phase 1 (collect)
 - Reviewer flags a contradiction in synthesis -> Phase 2 (revise gap analysis or ontology)
-- Reviewer flags storyline incoherence -> Phase 3 (restructure with `manuscript:manuscript-writing`)
+- Reviewer flags storyline incoherence -> Phase 3 (restructure with `manuscript-drafting`)
 
 Apply [references/rigor-checklist.md](references/rigor-checklist.md) before declaring a direction paper done.
 
@@ -173,10 +173,10 @@ The cite-card cross-link convention from Phase 3 still applies regardless of whe
 | Skill | Used for |
 |---|---|
 | `opencite:opencite` | DOI lookup, PDF retrieval, PDF -> markdown, BibTeX export |
-| `manuscript:manuscript-writing` | IMRAD / review-paper structure plus prose discipline (abbreviations, voice, transitions) |
-| `manuscript:manuscript-formatting` | Journal formatting / LaTeX export |
-| `manuscript:paper-review` | Self-review loops on direction-paper drafts |
-| `manuscript:humanizer` | Final natural-writing pass on synthesized prose. Lit-review synthesis sections are particularly prone to "evolving landscape", "growing body of work", and significance-inflation patterns; run humanizer before declaring a direction paper or Phase 2 synthesis complete. |
+| `manuscript-drafting` | IMRAD / review-paper structure plus prose discipline (abbreviations, voice, transitions) |
+| `paper-publisher` | Journal formatting / LaTeX export |
+| `paper-review` | Self-review loops on direction-paper drafts |
+| `humanizer` | Final natural-writing pass on synthesized prose. Lit-review synthesis sections are particularly prone to "evolving landscape", "growing body of work", and significance-inflation patterns; run humanizer before declaring a direction paper or Phase 2 synthesis complete. |
 | `project:epic-dev` | Formalize the lit-review phases (epic + sub-issues + worktrees + state file); also an upstream source of research angles when reviewing one's own project |
 
 ## References

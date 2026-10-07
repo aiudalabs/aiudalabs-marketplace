@@ -15,6 +15,7 @@
 // `source` and `license`, which adapters append to the installed file.
 
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { listSkillFiles } from '../lib/components.mjs';
 import { dirname, join } from 'node:path';
 import { ROOT } from '../lib/components.mjs';
 import { parseFrontmatter, stringifyFrontmatter } from '../lib/frontmatter.mjs';
@@ -39,21 +40,41 @@ const UPSTREAM_LICENSES = {
 const LIVE_UPSTREAMS = new Set(['sciwrite']);
 
 const CONVERTED = 'Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).';
+const PORTABLE = 'Plugin-scoped names (such as `manuscript:humanizer`) and fixed install paths (such as `~/.claude/skills/<name>`), wherever they occur in the Markdown files, are rewritten to the component names and folder placeholders used here, so the text works in every harness.';
 const BOOKWRIGHT_ORCHESTRATORS = ['writer', 'reviewer', 'iterator', 'rewriter'];
 
 // Rewrites applied to every imported text: plugin-scoped names, plugin-root
-// paths and the absolute paths aimprenta's installer creates.
+// paths and the absolute paths aimprenta's installer creates. A skill is
+// installed into a different folder in every harness, so no text may locate
+// one through a fixed path such as ~/.claude/skills/<name>.
 function portable(text) {
   return text
     .replace(/`?bookwright:(writer|reviewer|iterator|rewriter)`?/g, '`bookwright-$1`')
     .replace(/bookwright:(init|integrate|revise|notebook)\b/g, 'bookwright `/$1` command (not included in this marketplace)')
     .replace(/bookwright:([a-z][a-z0-9-]*)/g, '$1')
+    // The research-skills manuscript plugin, under the names used here.
+    .replace(/manuscript:manuscript-writing\b/g, 'manuscript-drafting')
+    .replace(/manuscript:manuscript-formatting\b/g, 'paper-publisher')
+    .replace(/manuscript:(paper-review|humanizer|lit-review)\b/g, '$1')
     .replaceAll('${CLAUDE_PLUGIN_ROOT}/docs', 'docs')
     .replaceAll('~/.claude/scripts/aimprenta/', '<manuscript-checks skill folder>/scripts/')
-    .replaceAll('~/.claude/skills/book-typesetting/', '<book-typesetting skill folder>/')
-    .replaceAll('`~/.claude/agents/`', 'the installed agents folder')
     .replaceAll('Read `/Users/owl/.claude/principles/academic-writing.md` for the full principle set.', 'Load the `academic-writing-principles` skill for the full principle set.')
-    .replaceAll('/Users/owl/.claude/', '~/.claude/');
+    .replaceAll('/Users/owl/.claude/', '~/.claude/')
+    .replaceAll('`~/.claude/agents/`', 'the installed agents folder')
+    .replace(/~\/\.(?:claude|codex)\/skills\/([a-z0-9-]+)/g, '<$1 skill folder>')
+    .replace(/~\/\.(?:claude|codex)\/skills\b\/?/g, '<skills folder>');
+}
+
+// Applies `portable` to every Markdown file of an imported folder, not only
+// SKILL.md: references are read by the agent too. Notices stay verbatim.
+function portableTree(target, rewrite = (file, text) => text) {
+  for (const file of listSkillFiles(target)) {
+    if (!file.endsWith('.md') || /(^|\/)(THIRD_PARTY_NOTICES|NOTICE|LICENSE)\.md$/.test(file)) continue;
+    const path = join(target, file);
+    const before = readFileSync(path, 'utf8');
+    const after = rewrite(file, portable(before));
+    if (after !== before) writeFileSync(path, after);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -62,6 +83,16 @@ function portable(text) {
 
 const RS = 'vendor/research-skills/plugins/manuscript';
 const ANVIL = 'vendor/claude-anvil';
+
+// The upstream shared references citation-audit links to, directly or through
+// another reference.
+const CITATION_AUDIT_REFERENCES = [
+  'acceptance-gate.md', 'assurance-contract.md', 'citation-discipline.md', 'effort-contract.md', 'experiment-integrity.md',
+  'external-cadence.md', 'fan-out-pattern.md', 'integration-contract.md', 'page-shrink-heuristic.md', 'paper-preferences.md',
+  'review-tracing.md', 'reviewer-independence.md', 'reviewer-routing.md', 'wiki-helper-resolution.md', 'writing-principles.md',
+];
+
+const SKILL_FOLDER_NOTE = '`<book-typesetting skill folder>` stands for the folder this file was loaded from. Replace it with that path before running a command.';
 
 const SKILLS = [
   {
@@ -72,11 +103,16 @@ const SKILLS = [
   {
     name: 'citation-audit', upstream: 'academic-human-in-the-loop', from: 'vendor/academic-human-in-the-loop/skills/citation-audit',
     extra: [
-      ['vendor/academic-human-in-the-loop/skills/shared-references', 'shared-references'],
+      // Only the references this skill reaches; upstream's folder serves its whole suite.
+      ['vendor/academic-human-in-the-loop/skills/shared-references', 'shared-references', { only: CITATION_AUDIT_REFERENCES }],
       ['vendor/academic-human-in-the-loop/tools/verify_paper_audits.sh', 'tools/verify_paper_audits.sh'],
       ['vendor/academic-human-in-the-loop/tools/refresh_audit_hashes.py', 'tools/refresh_audit_hashes.py'],
     ],
     rewrite: (text) => text.replaceAll('(../shared-references/', '(shared-references/').replace('mcp__codex__codex, WebSearch', 'Agent, WebSearch'),
+    // Links to sibling skills of the upstream suite that are not bundled here.
+    treeRewrite: (file, text) => text
+      .replaceAll('](../citation-audit/SKILL.md)', '](../SKILL.md)')
+      .replace(/\[([^\]]+)\]\(\.\.\/(?:paper-claim-audit|skills-codex)\/[^)]*\)/g, '$1'),
     prefaceFile: 'patches/citation-audit-adaptation.md',
     preface: (note) => note
       .replace('LOCAL ADAPTATION (aimprenta install)', 'ADAPTATION (aiudalabs marketplace)')
@@ -85,10 +121,13 @@ const SKILLS = [
     compatibility: 'Runs reviewer calls as fresh subagents, so it needs a harness with subagents. The bundled tools need Python 3 and bash.',
     changes: [
       'Each reviewer call runs as a fresh subagent instead of the OpenAI Codex MCP; an adaptation note at the top of SKILL.md explains the substitution, and `allowed-tools` lists `Agent` instead of `mcp__codex__codex`.',
-      '`shared-references/` and the two scripts in `tools/` are bundled inside the skill folder (upstream keeps them at the repository root), and links to them are rewritten.',
+      '`shared-references/` and the two scripts in `tools/` are bundled inside the skill folder (upstream keeps them at the repository root), and links to them are rewritten. Only the shared references this skill links to, directly or through another reference, are bundled; links to upstream sibling skills that are not bundled become plain text.',
     ],
   },
-  { name: 'line-and-copy-editor', upstream: 'claude-skills', from: 'vendor/claude-skills/line-and-copy-editor' },
+  {
+    name: 'line-and-copy-editor', upstream: 'claude-skills', from: 'vendor/claude-skills/line-and-copy-editor', skip: ['README.md'],
+    changes: ['`README.md` is left out: it explains how to install from the upstream collection and links to files outside the skill.'],
+  },
   {
     name: 'sciwrite', upstream: 'sciwrite', live: true, skip: ['.git'],
     rewrite: (text) => text.replace(/^name: manuscript-writing-review$/m, 'name: sciwrite'),
@@ -113,16 +152,20 @@ const SKILLS = [
   {
     name: 'book-typesetting', upstream: 'book-typesetting-skill', from: 'vendor/book-typesetting-skill', skip: ['INSTALL.sh', '.gitignore', 'README.md', '.git'],
     metadata: { 'requires-tools': 'quarto pandoc xelatex gs python3' },
-    changes: ['Installed as a plain skill folder: `INSTALL.sh`, `README.md` and `.gitignore` are left out, as upstream\'s own installer does; `LICENSE` and `NOTICE.md` are kept.'],
+    rewrite: (text) => replaceOnce(text, '/scripts/doctor.sh\n```\n', `/scripts/doctor.sh\n\`\`\`\n\n${SKILL_FOLDER_NOTE}\n`),
+    changes: [
+      'Installed as a plain skill folder: `INSTALL.sh`, `README.md` and `.gitignore` are left out, as upstream\'s own installer does; `LICENSE` and `NOTICE.md` are kept.',
+      'Paths under `~/.claude/skills/book-typesetting` are written as `<book-typesetting skill folder>`, because each harness installs skills in its own folder.',
+    ],
   },
   { name: 'kindle-book', upstream: 'kindle-book-skill', from: 'vendor/kindle-book-skill', metadata: { 'requires-tools': 'python3' } },
   {
-    name: 'kdp-audit', upstream: 'claude-anvil', from: `${ANVIL}/kdp/skills/kdp-audit`, extra: [[`${ANVIL}/kdp/docs`, 'docs']],
-    changes: ['The plugin\'s `docs/` folder is bundled inside the skill, and `${CLAUDE_PLUGIN_ROOT}/docs` paths point to it.'],
+    name: 'kdp-audit', upstream: 'claude-anvil', from: `${ANVIL}/kdp/skills/kdp-audit`, extra: [[`${ANVIL}/kdp/docs`, 'docs', { skip: ['superpowers'] }]],
+    changes: ['The plugin\'s `docs/` folder is bundled inside the skill, without the maintainers\' planning notes in `docs/superpowers/`, and `${CLAUDE_PLUGIN_ROOT}/docs` paths point to it.'],
   },
   {
-    name: 'kdp-listing', upstream: 'claude-anvil', from: `${ANVIL}/kdp/skills/kdp-listing`, extra: [[`${ANVIL}/kdp/docs`, 'docs']],
-    changes: ['The plugin\'s `docs/` folder is bundled inside the skill, and `${CLAUDE_PLUGIN_ROOT}/docs` paths point to it.'],
+    name: 'kdp-listing', upstream: 'claude-anvil', from: `${ANVIL}/kdp/skills/kdp-listing`, extra: [[`${ANVIL}/kdp/docs`, 'docs', { skip: ['superpowers'] }]],
+    changes: ['The plugin\'s `docs/` folder is bundled inside the skill, without the maintainers\' planning notes in `docs/superpowers/`, and `${CLAUDE_PLUGIN_ROOT}/docs` paths point to it.'],
   },
   { name: 'ebook-publishing', upstream: 'ebook-publishing-skill', from: 'vendor/ebook-publishing-skill' },
 ];
@@ -176,9 +219,46 @@ const AGENTS = [
   ...['bibliography-auditor', 'paper-crawler', 'research-analyst'].map((name) => ({ name, upstream: 'academic-writing-agents', category: 'research' })),
   ...['logic-reviewer', 'consistency-checker', 'prose-polisher', 'writing-reviewer', 'technical-reviewer', 'section-drafter', 'brainstormer'].map((name) => ({ name, upstream: 'academic-writing-agents', category: 'writing' })),
   ...['latex-layout-auditor', 'latex-figure-specialist'].map((name) => ({ name, upstream: 'academic-writing-agents', category: 'latex' })),
-  { name: 'paper-review', upstream: 'research-skills', from: `${RS}/agents/paper-review.md`, category: 'research' },
+  {
+    // Renamed so `add paper-review` is not ambiguous with the workflow.
+    name: 'paper-reviewer', upstream: 'research-skills', from: `${RS}/agents/paper-review.md`, category: 'research',
+    rewrite: (text) => replaceOnce(text.replace(/^name: paper-review$/m, 'name: paper-reviewer'), PAPER_REVIEW_LOOKUP, PORTABLE_PAPER_REVIEW_LOOKUP),
+  },
   ...['source-reformulator', 'cross-ref-auditor', 'quality-auditor', 'notebook-author', 'section-writer', 'math-auditor', 'spec-auditor'].map((name) => ({ name, upstream: 'claude-anvil', from: `${ANVIL}/bookwright/agents/${name}.md`, category: 'book' })),
 ];
+
+// The upstream reviewer finds its rubric through the Claude Code plugin root,
+// which does not exist in other harnesses, and under skills/, where a workflow
+// is not installed in a plugin.
+const PAPER_REVIEW_LOOKUP = `1. Locate the skill references:
+   \`\`\`bash
+   REF="\${CLAUDE_PLUGIN_ROOT}/skills/paper-review/references"
+   if [ -z "\${CLAUDE_PLUGIN_ROOT:-}" ] || ! test -d "$REF"; then
+       matches="$(find . -type d -path '*/skills/paper-review/references' 2>/dev/null)"
+       n="$(printf '%s\\n' "$matches" | grep -c .)"
+       [ "$n" -eq 0 ] && { echo "FATAL: paper-review/references not found; install the manuscript plugin so the rubric is on disk" >&2; exit 2; }
+       REF="$(printf '%s\\n' "$matches" | head -1)"
+       [ "$n" -gt 1 ] && echo "warning: $n candidate references dirs found; using $REF" >&2
+       echo "warning: CLAUDE_PLUGIN_ROOT unset/invalid; using fallback rubric at $REF" >&2
+   fi
+   test -f "$REF/review-procedure.md" || { echo "FATAL: $REF has no review-procedure.md" >&2; exit 2; }
+   echo "Using rubric at: $REF"; ls "$REF"
+   \`\`\``;
+const PORTABLE_PAPER_REVIEW_LOOKUP = `1. Locate the skill references. Load the \`paper-review\` skill with your skill tool: its folder holds \`references/\`. If you cannot tell where that folder is, find it in the project and in the user's harness folders:
+   \`\`\`bash
+   REF="$(find . ~/.claude ~/.agents ~/.codex ~/.cursor ~/.gemini ~/.copilot ~/.config/opencode ~/.osaurus -path '*/paper-review/references/review-procedure.md' 2>/dev/null | head -1)"
+   test -n "$REF" || { echo "FATAL: paper-review/references not found; install the paper-review workflow so the rubric is on disk" >&2; exit 2; }
+   REF="$(dirname "$REF")"
+   echo "Using rubric at: $REF"; ls "$REF"
+   \`\`\``;
+const PORTABLE_PAPER_REVIEW_DISPATCH = `## Dispatch
+
+Pass the reviewer only the framing: the manuscript path, the target journal or manuscript type, and the mode. In every branch the reviewer follows \`references/review-procedure.md\`.
+
+- **Harness with subagents:** dispatch the \`paper-reviewer\` agent as a subagent. For panel mode, dispatch one per lens in parallel, each told its lens, then run one more for the synthesis.
+- **Fallback** (no subagents, or the user wants an interactive in-thread review): follow \`references/review-procedure.md\` from this skill's folder directly in this context. Never review from memory: if the references cannot be read, stop and say so.
+
+`;
 
 const BOOKWRIGHT_DESCRIPTIONS = {
   writer: 'Drafts textbook chapters section by section from a chapter plan: dispatches the right drafting agent per section (section-writer, notebook-author or source-reformulator), then has spec-auditor and quality-auditor check each one and re-dispatches fixes. Use when a planned chapter or section of a technical book needs to be written.',
@@ -199,9 +279,17 @@ const WORKFLOWS = [
   },
   { name: 'scientific-book-editor', from: 'skills/scientific-book-editor', requires: ['manuscript-checks'], notRequired: ['production-book-publisher'], compatibility: 'Runs a panel of review agents in parallel, so it needs a harness with subagents. The manuscript checks need Python 3.' },
   {
-    name: 'paper-review', upstream: 'research-skills', from: `${RS}/skills/paper-review`, agents: ['paper-review'],
-    compatibility: 'Dispatches the paper-review agent once (single mode) or several times in parallel (panel mode), so it needs a harness with subagents.',
-    changes: ['Imported as a workflow, because it dispatches the `paper-review` agent; the agent is imported alongside it.'],
+    name: 'paper-review', upstream: 'research-skills', from: `${RS}/skills/paper-review`, agents: ['paper-reviewer'],
+    rewrite: (text) => {
+      const dispatch = /## Dispatch\n[\s\S]*?\n(?=## The brain)/;
+      if (!dispatch.test(text)) fail('paper-review: the Dispatch section was not found upstream');
+      return text.replace(dispatch, () => PORTABLE_PAPER_REVIEW_DISPATCH);
+    },
+    compatibility: 'Dispatches the paper-reviewer agent once (single mode) or several times in parallel (panel mode), so it needs a harness with subagents.',
+    changes: [
+      'Imported as a workflow, because it dispatches a reviewer agent; the agent is imported alongside it as `paper-reviewer`, so the two names do not collide.',
+      'The Dispatch section is rewritten for any harness with subagents: upstream points at Claude Code, Codex and Copilot plugin templates that are not part of this marketplace.',
+    ],
   },
   {
     name: 'paper-author', from: 'skills/paper-author', notRequired: ['scientific-book-editor'], version: '0.2.0',
@@ -280,7 +368,7 @@ function writeNotice(dir, upstream, changes) {
     '',
     'Changes made here:',
     '',
-    ...[CONVERTED, ...changes].map((change) => `- ${change}`),
+    ...[CONVERTED, PORTABLE, ...changes].map((change) => `- ${change}`),
     '',
     'License of the upstream project:',
     '',
@@ -333,10 +421,16 @@ function importSkill(spec) {
     copyFolder(source, target, spec.skip);
     text = readFileSync(join(source, 'SKILL.md'), 'utf8');
   }
-  for (const [from, to] of spec.extra ?? []) {
+  for (const [from, to, { only, skip = [] } = {}] of spec.extra ?? []) {
     mkdirSync(dirname(join(target, to)), { recursive: true });
-    cpSync(join(aimprenta, from), join(target, to), { recursive: true });
+    const keep = (path) => {
+      const parts = path.split(/[\\/]/);
+      if (skip.some((part) => parts.includes(part))) return false;
+      return !only || path === join(aimprenta, from) || only.includes(parts.at(-1));
+    };
+    cpSync(join(aimprenta, from), join(target, to), { recursive: true, filter: keep });
   }
+  portableTree(target, spec.treeRewrite);
   if (spec.rewrite) text = spec.rewrite(text);
   let { data, body } = parseFrontmatter(portable(text));
   if (spec.prefaceFile) body = `${spec.preface(readFileSync(join(aimprenta, spec.prefaceFile), 'utf8')).trimEnd()}\n\n${body}`;
@@ -364,7 +458,8 @@ function importOwnSkill(spec) {
 function importAgent(spec) {
   const info = upstreamInfo(spec.upstream);
   const file = join(aimprenta, spec.from ?? join('vendor', spec.upstream, 'agents', `${spec.name}.md`));
-  const { data, body } = parseFrontmatter(portable(readFileSync(file, 'utf8')));
+  const text = readFileSync(file, 'utf8');
+  const { data, body } = parseFrontmatter(portable(spec.rewrite ? spec.rewrite(text) : text));
   const frontmatter = {
     name: spec.name,
     description: data.description,
@@ -406,6 +501,7 @@ function importWorkflow(spec) {
     text = readFileSync(join(aimprenta, spec.fromAgent), 'utf8');
   } else {
     copyFolder(join(aimprenta, spec.from), target);
+    portableTree(target);
     text = readFileSync(join(aimprenta, spec.from, 'SKILL.md'), 'utf8');
   }
   if (spec.rewrite) text = spec.rewrite(text);
