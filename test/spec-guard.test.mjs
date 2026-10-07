@@ -194,6 +194,22 @@ test('check runs before there is a backlog, on the documents that exist', (t) =>
   assert.equal(run([join(SCRIPTS, 'spec.mjs'), 'impact', 'D-01', '--root', dir]).status, 2, 'impact still needs a backlog');
 });
 
+test('check: the brief headings and the jobs the PRD traces', (t) => {
+  const dir = copyExample(t);
+  const headings = ['Tagline', 'Apps', 'Market', 'User groups', 'Core value loop', 'Personas and jobs', 'Adversarial analysis', 'Do-not-build list'];
+  const brief = headings.map((name, i) => `## ${i + 1}. ${name}\n\n${name === 'Personas and jobs' ? '| J-ANA-1 | Book a court |\n| J-ANA-2 | Cancel |\n' : 'Text.\n'}`).join('\n');
+  writeFileSync(join(dir, 'docs/PRODUCT_BRIEF.md'), `# Product Brief — Courts\n\n${brief}`);
+  edit(dir, 'PRD.md', '- Given a free slot', '- Traces J-ANA-1. Given a free slot');
+  edit(dir, 'PRD.md', '- Given a `requested` booking', '- Traces J-ANA-2 and J-BOB-1. Given a `requested` booking');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-job'], 'J-BOB-1 is not in the brief');
+  edit(dir, 'PRD.md', ' and J-BOB-1', '');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
+  edit(dir, 'PRD.md', 'Traces J-ANA-2. ', '');
+  assert.deepEqual(codes(checkProject(readProject(dir), { strict: true })), ['uncovered-job']);
+  writeFileSync(join(dir, 'docs/PRODUCT_BRIEF.md'), '# Brief\n\n## Tagline\n\nOld format.\n');
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['brief-format'], 'an old brief only warns');
+});
+
 test('install and hooks: commits and agent edits stay inside the active issue', { skip: !hasGit && 'git is not installed' }, (t) => {
   const dir = copyExample(t);
   const git = (...args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8' });

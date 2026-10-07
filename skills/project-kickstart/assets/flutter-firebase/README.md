@@ -1,6 +1,6 @@
 # {{project_title}}
 
-_To be filled in after Phase 1 (`product-discovery`)._
+_`product-discovery` replaces this line with the brief's tagline at the end of Phase 1._
 
 ## Quick start
 

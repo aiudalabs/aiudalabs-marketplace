@@ -107,7 +107,7 @@ Common contradictions: a screen needing a container the schema lacks; an executi
 
 If there are contradictions, list them numbered and stop. Ask which document is right. Never reconcile silently.
 
-Once the user decides, apply each fix through the phase that owns the document: re-run that phase's skill on that point only (`product-requirements` for an FR, `schema-design` for a container or a transition, `ui-screens-spec` for a screen), re-reading the current documents, and close it with that phase's gate. A one-line correction (a renamed reason code, a number, a version) may be edited in place instead; show each such edit, as a before and after, at the coherence gate. Then run `check` again and mark the architecture's section 15 items as applied. If `docs/UI_SCREENS.md` changed and mockups already exist, refresh the affected mockups with `navegable-mockups`.
+Once the user decides, apply each fix through the phase that owns the document: re-run that phase's skill on that point only (`product-requirements` for an FR, `schema-design` for a container or a transition, `ui-screens-spec` for a screen), re-reading the current documents, and close it with that phase's gate. A one-line correction (a renamed reason code, a number, a version) may be edited in place instead; show each such edit, as a before and after, at the coherence gate. Then run `check` again and mark the architecture's "Changes to earlier documents" items as applied. If `docs/UI_SCREENS.md` changed and mockups already exist, refresh the affected mockups with `navegable-mockups`.
 
 ## Step 4: Phase 6, governance
 
@@ -179,8 +179,8 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 
 ```
 {project-root}/
-├── AGENTS.md                    ← Phase 6 (constitution)
-├── CLAUDE.md                    ← Phase 6 (@AGENTS.md)
+├── AGENTS.md                    ← kickstart, rewritten in Phase 6 (constitution)
+├── CLAUDE.md                    ← kickstart (@AGENTS.md)
 ├── docs/
 │   ├── SESSION.md               ← rewritten by every phase skill
 │   ├── PRODUCT_BRIEF.md         ← Phase 1
@@ -194,7 +194,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 │   ├── ISSUES.md                ← Phase 6
 │   ├── WAVE_DAG.md              ← Phase 6 (computed)
 │   └── SPRINT_PROMPTS.md        ← Phase 6 (Sprints 0 and 1)
-├── tools/spec-guard/            ← Phase 6 (guardrails)
+├── tools/spec-guard/            ← kickstart, re-installed after updates (guardrails)
 └── mockups/
     └── {app-id}.html            ← Phase 7 (any time after Phase 4)
 ```

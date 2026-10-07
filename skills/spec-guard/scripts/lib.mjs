@@ -6,6 +6,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const DOCS = {
+  brief: 'docs/PRODUCT_BRIEF.md',
   decisions: 'docs/OPINIONATED_DEFAULTS.md',
   requirements: 'docs/PRD.md',
   roster: 'docs/AGENT_ROSTER.md',
@@ -68,9 +69,25 @@ export function parseRequirements(text) {
     // The decisions a requirement cites, in its section, so a dangling D-xx is caught before any backlog exists.
     const section = text.slice(match.index + match[0].length, matchesFound[index + 1]?.index ?? text.length).split(/^#{1,3}\s/m)[0];
     const cites = [...new Set([...section.matchAll(/\bD-(\d{2,})\b/g)].map((m) => `D-${m[1]}`))];
-    requirements.set(id, { id, title: title.trim(), line, cites, deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
+    const jobs = [...new Set([...section.matchAll(/\bJ-[A-Z]+-\d+\b/g)].map((m) => m[0]))];
+    requirements.set(id, { id, title: title.trim(), line, cites, jobs, deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
   });
   return { requirements, problems };
+}
+
+// ---------------------------------------------------------------- brief
+
+export const BRIEF_HEADINGS = ['Tagline', 'Apps', 'Market', 'User groups', 'Core value loop', 'Personas and jobs', 'Adversarial analysis', 'Do-not-build list'];
+
+// The brief's numbered headings and the job ids defined under "Personas and jobs".
+export function parseBrief(text) {
+  const headings = [...text.matchAll(/^##\s+(\d+)\.\s+(.+?)\s*$/gm)].map((m) => m[2]);
+  const start = text.search(/^##\s+\d+\.\s+Personas and jobs\s*$/m);
+  const rest = start === -1 ? '' : text.slice(start).replace(/^[^\n]*\n/, '');
+  const end = rest.search(/^##\s/m);
+  const section = end === -1 ? rest : rest.slice(0, end);
+  const jobs = new Set([...section.matchAll(/\bJ-[A-Z]+-\d+\b/g)].map((m) => m[0]));
+  return { headings, jobs };
 }
 
 // ---------------------------------------------------------------- roster
@@ -354,6 +371,22 @@ export function checkProject(project, { strict = false } = {}) {
   const gap = strict ? error : warning;
 
   if (decisions && !project.profile) found.push(warning('no-profile', DOCS.decisions, 'no `**Stack profile:**` line; the stack is not locked'));
+  if (decisions && project.profile && decisions.has('D-01') && !decisions.get('D-01').locksProfile && [...decisions.values()].some((d) => d.locksProfile)) {
+    found.push(warning('profile-not-d01', DOCS.decisions, 'the `**Stack profile:**` line belongs in the section of D-01'));
+  }
+  if (project.brief) {
+    const missing = BRIEF_HEADINGS.filter((name) => !project.brief.headings.includes(name));
+    if (project.brief.headings.length === 0) found.push(warning('brief-format', DOCS.brief, 'the brief does not use the numbered headings (## 1. Tagline … ## 8. Do-not-build list), so later phases cannot rely on its sections'));
+    // A warning, not an error: briefs written before these headings existed must keep passing CI.
+    else for (const name of missing) found.push(warning('brief-heading', DOCS.brief, `the brief has no "## N. ${name}" heading`));
+  }
+  if (project.brief?.jobs.size && requirements) {
+    const traced = new Set([...requirements.values()].flatMap((requirement) => requirement.jobs));
+    for (const requirement of requirements.values()) {
+      for (const job of requirement.jobs) if (!project.brief.jobs.has(job)) found.push(error('unknown-job', `${DOCS.requirements}:${requirement.line}`, `${requirement.id} traces ${job}, which is not a job in ${DOCS.brief}`));
+    }
+    for (const job of project.brief.jobs) if (!traced.has(job)) found.push(gap('uncovered-job', DOCS.brief, `${job} is served by no requirement in ${DOCS.requirements}`));
+  }
   if (decisions && requirements) {
     for (const requirement of requirements.values()) {
       for (const ref of requirement.cites) if (!decisions.has(ref)) found.push(error('unknown-decision', `${DOCS.requirements}:${requirement.line}`, `${requirement.id} cites ${ref}, which is not in ${DOCS.decisions}`));
@@ -501,6 +534,7 @@ export function readProject(root) {
   const requirementsText = read(root, DOCS.requirements);
   const rosterFile = existsSync(join(root, DOCS.roster)) ? DOCS.roster : existsSync(join(root, DOCS.legacyRoster)) ? DOCS.legacyRoster : null;
   const issuesText = read(root, DOCS.issues);
+  const briefText = read(root, DOCS.brief);
 
   const decisions = decisionsText ? parseDecisions(decisionsText) : null;
   const requirements = requirementsText ? parseRequirements(requirementsText) : null;
@@ -514,6 +548,7 @@ export function readProject(root) {
     problems,
     issuesText,
     rosterFile,
+    brief: briefText && briefText.trim() ? parseBrief(briefText) : null,
     // Before Phase 1 the scaffold's AGENTS.md is the only place the profile is written.
     profile: decisions?.profile ?? (parseDecisions(read(root, 'AGENTS.md') ?? '').profile),
     decisions: decisions && decisions.decisions.size ? decisions.decisions : null,

@@ -106,7 +106,7 @@ Rules:
 After the decisions, two closing sections that are not numbered decisions:
 
 - `## Performance budgets`: numeric targets (cold start, time to first action, notification latency, sync delay). Milliseconds and seconds, never adjectives.
-- `## Deferral list`: `### v1.1`, `### v2`, `### v∞` with every feature the user mentioned that is not in the MVP. A feature that is neither in the MVP nor in a bucket does not exist.
+- `## Deferral list`: `### v1.1`, `### v2`, `### v∞` with every feature the user mentioned that is not in the MVP. A feature that is neither in the MVP nor in a bucket does not exist. The brief's do-not-build list is different: it holds what the product will not do at all, and needs no bucket; a do-not-build item the user may want later goes to `v∞` instead.
 
 ## The method
 
@@ -214,7 +214,7 @@ When a check fails, show it and ask the user to change a decision, add a feature
 
 ### Step 9: Write the documents and stop at the gate
 
-Write `docs/PRODUCT_BRIEF.md` and `docs/OPINIONATED_DEFAULTS.md`.
+Write `docs/PRODUCT_BRIEF.md` and `docs/OPINIONATED_DEFAULTS.md`. If the root `AGENTS.md` and `README.md` still hold the kickstart's one-line placeholder for the product description, replace it with the brief's tagline; change nothing else in them.
 
 Run the `spec-guard` check from the project root: `node tools/spec-guard/spec.mjs check`, or the same `scripts/spec.mjs` from the `spec-guard` skill's folder when the project has no `tools/spec-guard/` yet. It works before a backlog exists: it checks the decisions, the PRD and the roster that are on disk, and ends with "No backlog yet". Fix every error it reports on the decisions file (ids, headings, stack profile line). If it stops with "no backlog at docs/ISSUES.md", the project's copy is older than the `spec-guard` skill: re-run its installer (`node <spec-guard skill folder>/scripts/install.mjs`, safe to repeat) and check again. If `spec-guard` is not installed at all, check the decisions against the format above by reading them, and say so.
 
@@ -252,7 +252,7 @@ Phase 2 — product-requirements.
 
 **Gate.** Close with:
 
-> Fase 1 cerrada. {N} decisiones locked (D-01 a D-{N}), {M} features diferidas, stack profile `{id}`. La siguiente fase es el PRD (`product-requirements`), que lee estos dos documentos como ground truth. Si quieres revisar una decisión, este es el momento más barato. ¿Avanzamos?
+> Fase 1 cerrada. {N} decisiones (D-01 a D-{N}), {K} de ellas diferidas, {M} features diferidas, stack profile `{id}`. La siguiente fase es el PRD (`product-requirements`), que lee estos dos documentos como ground truth. Si quieres revisar una decisión, este es el momento más barato. ¿Avanzamos?
 
 Under `product-spec-orchestrator`, its phase gate replaces this closing message: one gate that carries these counts plus its "Decisiones tomadas en Fase 1 que vale la pena verificar" bullets.
 

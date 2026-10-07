@@ -58,6 +58,7 @@ PROFILE        = "flutter-firebase" | "fastapi-react"
 STACK          = "aiuda-stack" (flutter-firebase) | "aiuda-stack-fastapi" (fastapi-react)
 HARNESS        = "claude-code" | ...
 AIUDA_LOOK     = yes | no
+AIUDA_LOOK_TEXT = "yes (docs/DESIGN_SYSTEM.md)" | "no (ui-screens-spec asks for the visual identity)"
 APPS           = list, or TBD
 TRACKER        = "github" | "bitbucket" | "none"
 PROJECT_DIR    = absolute path, e.g. "$(pwd)/marketplace-pa"
@@ -91,6 +92,15 @@ The templates are in this skill's folder, under `assets/flutter-firebase/`. Copy
 mkdir -p "$PROJECT_DIR"
 cp -R "<this skill's folder>/assets/flutter-firebase/." "$PROJECT_DIR/"
 mkdir -p "$PROJECT_DIR/docs" && mv "$PROJECT_DIR/SESSION.md" "$PROJECT_DIR/docs/SESSION.md"
+if [ "$AIUDA_LOOK" = yes ]; then mv "$PROJECT_DIR/DESIGN_SYSTEM.md" "$PROJECT_DIR/docs/"; else rm "$PROJECT_DIR/DESIGN_SYSTEM.md"; fi
+
+# Substitutions (GNU sed; on macOS write `sed -i ''`). Values with a `/` need another delimiter.
+grep -rlI '{{' "$PROJECT_DIR" --exclude-dir=node_modules | while read -r file; do
+  sed -i -e "s/{{project_name}}/$PROJECT_NAME/g" -e "s/{{package_name}}/$PACKAGE_NAME/g" \
+    -e "s/{{project_title}}/$PROJECT_TITLE/g" -e "s/{{apps_included}}/$APPS/g" \
+    -e "s/{{profile}}/$PROFILE/g" -e "s/{{harness}}/$HARNESS/g" -e "s|{{aiuda_look}}|$AIUDA_LOOK_TEXT|g" \
+    -e "s/{{year}}/$(date +%Y)/g" -e "s/{{node_version}}/22/g" -e "s/{{flutter_version}}/3.27.0/g" "$file"
+done
 ```
 
 What lands where:
@@ -119,7 +129,7 @@ App folders follow the app names:
 
 - A mobile app (`customer-app`, `reader-app`, `mobile-app`): `apps/<name without -app>` (`apps/reader`).
 - A tablet app (`supervisor-tablet`): `apps/<name>_tablet` (`apps/supervisor_tablet`).
-- A web admin (`*-dashboard`, `*-web`, `*-admin`): one `admin/` folder, whatever the name. Scaffold it with `cd "$PROJECT_DIR" && pnpm create vite admin --template react-ts`. That template gives `dev`, `build` (`tsc -b && vite build`), `lint` (whatever linter the current template ships) and `preview`, and nothing else: no Tailwind, no shadcn/ui, no test runner, no `typecheck` (the `build` type-checks). They come from an issue once `docs/ARCHITECTURE.md` chooses them, and that issue adds the command to `AGENTS.md` and `admin.yml`.
+- A web admin (`*-dashboard`, `*-web`, `*-admin`): one `admin/` folder, whatever the name. Scaffold it with `cd "$PROJECT_DIR" && pnpm create vite admin --template react-ts`, then name it like the other packages: `cd "$PROJECT_DIR/admin" && npm pkg set name="@$PROJECT_NAME/admin"`. Keep the TypeScript version the template ships; the admin builds on its own. That template gives `dev`, `build` (`tsc -b && vite build`), `lint` (whatever linter the current template ships) and `preview`, and nothing else: no Tailwind, no shadcn/ui, no test runner, no `typecheck` (the `build` type-checks). They come from an issue once `docs/ARCHITECTURE.md` chooses them, and that issue adds the command to `AGENTS.md` and `admin.yml`.
 - **Without a web admin**: remove `admin` from `pnpm-workspace.yaml`, the `hosting` block from `firebase.json`, `.github/workflows/admin.yml`, and the admin lines from `AGENTS.md` (the stack line, the `pnpm --dir admin` commands, the `react-dev` roster line and the `admin/` folder line).
 - **TBD**: no app folders. `docs/SESSION.md` already says Phase 1 names the apps; the first sprint creates them. `flutter.yml` skips its checks while no `pubspec.yaml` exists under `apps/` or `packages/`.
 
@@ -156,6 +166,8 @@ for s in lint build; do pnpm --dir admin run "$s" || echo "admin $s: FAILED"; do
 
 Every script in the functions template passes on the empty scaffold (`vitest` runs with `--passWithNoTests`). Use `pnpm --dir <folder> run <script>`: it fails on a missing script, where `pnpm --filter` exits 0 without running anything. A failure here is a defect to report, not to hide: fix it in the scaffold or list it in the report.
 
+pnpm 10 does not run dependencies' install scripts unless approved, and lists the ones it skipped ("Ignored build scripts: esbuild, protobufjs, …"). None of them is needed by this scaffold: every check above passes without them. If a dependency added later needs its script, approve it with `pnpm approve-builds`, which records it in `package.json`.
+
 fastapi-react: the install and test commands from the profile's `references/kickstart.md`; `python -m pytest -q` must be green.
 
 A missing tool goes in the final report; it never stops the kickstart.
@@ -175,8 +187,8 @@ Then install the `spec-guard` guardrails with **the copy just installed in the p
 
 ```bash
 SPEC_GUARD="$PROJECT_DIR/<folder printed for skill/spec-guard>"
-node "$SPEC_GUARD/scripts/install.mjs" --root "$PROJECT_DIR" --ci            # every harness
-node "$SPEC_GUARD/scripts/install.mjs" --root "$PROJECT_DIR" --ci --claude   # HARNESS is claude-code
+# One command: --claude only when HARNESS is claude-code.
+node "$SPEC_GUARD/scripts/install.mjs" --root "$PROJECT_DIR" --ci $([ "$HARNESS" = claude-code ] && echo --claude)
 ```
 
 It copies the tools into `tools/spec-guard/`, sets the pre-commit and commit-msg hooks, adds `.github/workflows/spec-guard.yml` (owned by the lane the profile roster gives it; `firebase-dev` for flutter-firebase) and, with `--claude`, a hook in `.claude/settings.json` that blocks edits outside the lane. The installer is safe to run again: after every `spec-guard` update, run it again to refresh `tools/spec-guard/`; it keeps hooks and settings.
@@ -222,8 +234,8 @@ Count the scaffold without `.git` and `node_modules`:
 
 ```bash
 cd "$PROJECT_DIR"
-find . \( -name .git -o -name node_modules \) -prune -o -type d -print | wc -l   # folders (N)
-find . \( -name .git -o -name node_modules \) -prune -o -type f -print | wc -l   # files (M)
+git ls-files | xargs -n1 dirname | sort -u | wc -l   # folders in the commit (N)
+git ls-files | wc -l                                # files in the commit (M); build output is ignored, so not counted
 ```
 
 In Spanish:

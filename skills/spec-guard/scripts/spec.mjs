@@ -79,7 +79,7 @@ function check() {
   } else {
     const errors = print(problems);
     const warnings = problems.length - errors;
-    const checked = [project.decisions && `${project.decisions.size} decisions`, project.requirements && `${project.requirements.size} requirements`, project.roster && `${project.roster.agents.size} agents`, project.issues && `${project.issues.length} issues`].filter(Boolean);
+    const checked = [project.brief && 'the brief', project.decisions && `${project.decisions.size} decisions`, project.requirements && `${project.requirements.size} requirements`, project.roster && `${project.roster.agents.size} agents`, project.issues && `${project.issues.length} issues`].filter(Boolean);
     const scope = checked.length ? checked.join(', ') : 'no spec documents yet';
     const verdict = errors ? '' : project.issues ? ' The backlog is consistent.' : ' No backlog yet: multi-agent-governance writes it in Phase 6.';
     console.log(`\nChecked ${scope}: ${errors} error(s), ${warnings} warning(s).${verdict}`);

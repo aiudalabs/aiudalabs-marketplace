@@ -4,6 +4,15 @@ The exact shapes `scripts/spec.mjs` reads. Every skill that writes these
 documents follows this page; anything outside it is reported, never guessed.
 All paths are relative to the project root.
 
+## Brief: `docs/PRODUCT_BRIEF.md`
+
+Eight numbered headings, in this order: `## 1. Tagline`, `## 2. Apps`,
+`## 3. Market`, `## 4. User groups`, `## 5. Core value loop`,
+`## 6. Personas and jobs`, `## 7. Adversarial analysis`,
+`## 8. Do-not-build list`. Under "Personas and jobs", every job has an id
+`J-<PERSONA>-<n>` (`J-CARLOS-1`). The PRD traces requirements to those ids;
+a job no requirement serves is a coverage gap, like an uncovered decision.
+
 ## Decisions: `docs/OPINIONATED_DEFAULTS.md`
 
 One heading per decision, numbered `D-01`, `D-02`, ... in order:
