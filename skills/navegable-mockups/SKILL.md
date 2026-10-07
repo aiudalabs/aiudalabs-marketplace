@@ -40,9 +40,9 @@ If the product has its own design system or token file (for example a `tokens.js
 
 ## Output
 
-One HTML file per app: `mockups/<app-id>.html`, where `<app-id>` is the app id exactly as the brief and `UI_SCREENS.md` name it (`player-app` → `mockups/player-app.html`, `admin-dashboard` → `mockups/admin-dashboard.html`). Nothing is added to or removed from the id. Each screen is a `<div class="screen" id="s-<screen-id>">`, and the file opens the screen named in the URL hash, so `mockups/player-app.html#s-1.3.1` lands on screen 1.3.1. That is the link `UI_SCREENS.md` and the backlog issues cite for key screens.
+One HTML file per app: `mockups/<app-id>.html`, where `<app-id>` is the app id exactly as the brief and `UI_SCREENS.md` name it (`player-app` → `mockups/player-app.html`, `admin-dashboard` → `mockups/admin-dashboard.html`). Nothing is added to or removed from the id. Each screen is a `<div class="screen" id="s-<screen-id>">`, and the file opens the screen named in the URL hash, so `mockups/player-app.html#s-1.3.1` lands on screen 1.3.1. That is the link `UI_SCREENS.md` and the backlog issues cite for key screens. When more than one app is mocked, `mockups/STORY.md` holds the story they share (Step 7).
 
-Each file holds all the key screens of its app and works offline except for the web fonts. Start every file from [references/skeleton.md](references/skeleton.md): the shared head and toolbar, a phone frame and a web frame, and the one script that handles the hash, the tab bar, inner scrolling, in-screen tabs and links to screens outside the key set.
+Each file holds all the key screens of its app and works offline except for the web fonts. Start every file from [references/skeleton.md](references/skeleton.md): the shared head and toolbar, a phone frame and a web frame, and the one script that handles the hash, the tab bar, inner scrolling, in-screen tabs and choices, overflow menus and links to screens outside the key set.
 
 ## Method
 
@@ -50,7 +50,7 @@ Each file holds all the key screens of its app and works offline except for the 
 
 From `UI_SCREENS.md`, list the apps with their ids, the key screens of each with id, title and the reason it was picked, the tokens, the components those screens use, and the formats the spec locks for money, dates, times and phone numbers. Decide the frame per app: phone for a mobile app, web for a web app. Confirm the count with the user: key screens × apps. The selection is the contract; do not add screens.
 
-When several apps are built in parallel (one agent per app), each builds its own file, and one of them, or the caller, writes `docs/SESSION.md` once at the end (Step 13).
+When several apps are mocked, sequentially or in parallel (one agent per app), they share one story in `mockups/STORY.md` (Step 7): the caller writes it before starting the agents; when it does not exist, the first agent writes it and the others read it. Each agent builds its own file, and one of them, or the caller, writes `docs/SESSION.md` once at the end (Step 13).
 
 ### 2. Write the token block
 
@@ -58,7 +58,7 @@ Copy the product's tokens into `:root` as CSS variables: color roles, font famil
 
 Three kinds of variable are allowed besides the tokens, each with a comment saying where it comes from:
 
-- **Per-app adjustments the spec gives.** When `UI_SCREENS.md` says one app renders text larger or uses a larger tap target (an owner app used at arm's length: type ×1.125, 56 dp taps), express it as variables derived from the tokens, such as `--type-scale` multiplying the base sizes and `--tap-target`. These are not new tokens; they are the spec's own numbers.
+- **Per-app adjustments the spec gives.** When `UI_SCREENS.md` says one app renders text larger or uses a larger tap target (an owner app used at arm's length), express it the way the spec gives it: a multiplier (`--type-scale: 1.125` applied to the base sizes) when it gives a factor, or the overridden type tokens themselves (`--type-body: 400 18px/24px …`) when it gives per-token values, plus `--tap-target`. These are not new tokens; they are the spec's own numbers.
 - **Literals the spec names.** When the spec itself gives a hex value instead of a role (a QR code "on `#FFFFFF`"), hold it in a variable named after its use (`--qr-background`), never a generic name like `--white`.
 - **Review meta-UI.** The toolbar and page greys as `--review-*` variables. They are not product tokens and never appear inside the frame.
 
@@ -82,7 +82,7 @@ The page around the frame is a neutral grey too, so the app's own background rea
 
 ### 5. Build the frame
 
-- **Phone** (mobile apps): 375 × 812 px, 1 px subtle border, 32 px outer radius, centered under the toolbar, background equal to the app's surface token, a decorative status bar (`9:41 · LTE · 100%`). The frame does not grow: each screen scrolls inside it, and sticky bars stay inside the screen.
+- **Phone** (mobile apps): 375 × 812 px, 1 px subtle border, 32 px outer radius, centered under the toolbar, background equal to the app's surface token, a decorative status bar (`9:41 · LTE · 100%`; use the story's time instead when the story happens at a stated hour, such as `7:20`). The frame does not grow: each screen scrolls inside it, and sticky bars stay inside the screen.
 - **Web** (web apps such as an admin dashboard): a 1280 px canvas with the app's sidebar and top bar from the spec. The sidebar stays put; the main area scrolls.
 
 Both are in [references/skeleton.md](references/skeleton.md). Use the class names given there, so the script and the checks work unchanged.
@@ -96,17 +96,47 @@ One `<div class="screen" id="s-{id}">` per key screen, following its spec: heade
 - The state the key-screen reason in `UI_SCREENS.md` names, when it names one ("picked for its offline banner" → mock the offline banner).
 - Otherwise the happy path with data. Empty, loading and error states are validated during implementation, not here; an empty state that is the signature of a screen (a first-launch inbox) counts as its happy path.
 
-If the reason names more than one state, mock the first and list the others in the handoff as not mocked.
+If the reason names more than one state, check whether they can be on screen at the same moment:
 
-**In-screen tabs and segmented controls** of a key screen work: each panel is a `.tab-panel`, switched with the script's `tab()`.
+- **Alternatives** (waiting for payment or declined; more or less than 24 h ahead): mock the first and list the others in the handoff as not mocked.
+- **Things that coexist** (the slot states of one calendar, a multi-selection, a "pending to send" mark): combine them in one view, with story data that makes them plausible together, and say so in the handoff.
+
+**Controls that act within a screen** work, without leaving it:
+
+- **In-screen tabs and segmented controls that switch content**: each panel is a `.tab-panel`, switched with the script's `tab()`. The tab and panel shown first carry the class `on` in the HTML. A screen may have several tab groups; the panels of each group share a parent element.
+- **Choices that only change what is selected** (chips, filters, a payment method, slot cells): `choose()` moves `aria-pressed` within the parent element, or toggles one control with `choose(this, true)` for a multi-selection. The story's selection is pressed in the HTML. Nothing recomputes: totals and summaries stay as the story says.
+- **Overflow menus**: a native `<details class="menu">`, whose items follow Step 10 like any other control.
+
+Dialogs, bottom sheets and other overlays the spec defines inside a key screen are not mocked unless the key-screen reason names them, in which case the dialog open over the screen is the state mocked. The controls that open them follow Step 10.
 
 ### 7. Use realistic data that tells one story
 
 Names, prices, dates, addresses and phone numbers must look real for the product's market and language, taken from `OPINIONATED_DEFAULTS.md` and the personas. Never Lorem ipsum, never "John Doe": placeholder text makes viewers judge the mockup as fake instead of imagining themselves using it.
 
 - **Formats come from the spec.** Render money, dates, times and phone numbers exactly as `UI_SCREENS.md` locks them (for example `$45.50` and 24 h `19:00` when it says so), and the market's conventions only where the spec is silent.
-- **One story per app, and across apps when they share entities.** Pick one persona, one venue or provider, one order or booking, and keep them consistent on every screen: the same code, the same amount, the same date, totals that add up. When the navigation graph reaches a screen from different entities (a queue row for a pending item, a detail link for an approved one), mock the entity of the story and list the state that is therefore not shown in the handoff.
+- **One story per app, and across apps when they share entities.** Pick one persona, one venue or provider, one order or booking, and keep them consistent on every screen: the same code, the same amount, the same date, totals that add up. When the navigation graph reaches a screen from different entities (a queue row for a pending item, a detail link for an approved one), mock the entity of the story and list the state that is therefore not shown in the handoff. Rows of other entities (other bookings in a list, other disputes in a queue) are shown but do not open the story's detail: they carry `data-off` (Step 10).
+- **One story file when there is more than one app.** Read `mockups/STORY.md` before choosing any data; when it does not exist, write it first. Every app uses its names, codes, dates and amounts exactly; an app that needs something it lacks adds it to the file without changing what is there. When the spec's example data contradicts the story (one example code used for different states in different apps), the story wins and the change goes in the handoff.
 - **Real calendar.** Weekday names match the dates for the year shown, and recurring dates follow the spec's rules (a payout week that starts Monday starts on a Monday).
+
+`mockups/STORY.md` is short, in the product's language for names and in the spec's formats:
+
+```markdown
+# Story — {product}
+
+Now: {weekday date, time} ({timezone if it matters})
+
+## People
+- {persona}: {full name}, {role}, {phone or email if shown}
+
+## Entities
+- {venue/provider}: {name}, {area}, {what it has: courts, prices, hours}
+- {booking/order} {code}: {who}, {where}, {date and time}, {amount}, {method}, {state now}
+
+## Per app
+- {app-id}: {which records it shows and in which state: "K7P2QX confirmed, tonight"; "a past booking D4M8TR, no-show in dispute"}
+```
+
+Each record has one state at the "Now" of the story. When an app needs the same kind of record in another state (a disputed past booking), it is a different record with its own code.
 
 ### 8. Copy
 
@@ -116,13 +146,13 @@ Structural labels the spec leaves without a `[COPY]` (field labels in a summary,
 
 ### 9. Avatars and images
 
-No photos and no image services: photos make viewers judge the photo instead of the design. Avatars are gradient circles with initials, built from the product's palette, one distinct gradient per person shown:
+No photos and no image services: photos make viewers judge the photo instead of the design. Avatars are gradient circles with initials, built only from color tokens the spec defines (no tonal steps it does not list), one distinct pair of roles per person shown:
 
 ```html
-<div class="avatar" style="background: linear-gradient(135deg, var(--primary-300), var(--primary-600));">MG</div>
+<div class="avatar" style="background: linear-gradient(135deg, var(--primary), var(--tertiary)); color: var(--on-primary);">MG</div>
 ```
 
-Illustrations, photos and maps are gradient rectangles with a label such as `[FOTO: cancha 1]` or `[MAPA]`. Charts are static inline SVG. A QR code is a static decorative SVG.
+Illustrations, photos and maps are gradient rectangles with a label such as `[FOTO: cancha 1]` or `[MAPA]`. Charts are static inline SVG. A QR code is a static decorative SVG. SVG presentation attributes do not resolve `var()` (`fill="var(--primary)"` renders black): use `style="fill: var(--primary)"`, or `fill="currentColor"` with the color set in CSS.
 
 ### 10. Wire navigation
 
@@ -132,11 +162,15 @@ Follow the navigation graph of the spec, edge by edge:
 
 - **Target is a key screen**: the control calls `show('{id}')`.
 - **Target is not a key screen** (a tab, a sidebar entry, a breadcrumb, a row action, a CTA, a back button): the control keeps its designed look and gets `data-off="{id} {title}"`. It does nothing, its tooltip names the screen, and tapping it names the screen in the toolbar label. Do not invent the screen and do not hide the control.
-- **The spec's path to a key screen passes through a non-key screen** (Pay → card form → Confirmed): the control may jump to the key screen it leads to when that is the path's outcome; list the shortcut in the handoff.
+- **The spec's path to a key screen passes through a non-key screen or a dialog** (Pay → card form → Confirmed; Save decision → confirm dialog → queue; Close → "¿Cancelar apartado?" → venue detail): the control jumps to the key screen that is the path's outcome when the user confirms; list each shortcut in the handoff.
+- **The control does something that is not navigation to a key screen** (copy, share, open a dialog whose outcome stays on this screen or leads to a non-key screen, open in a new tab, call or message): `data-off="{label} (acción)"`, for example `data-off="Copiar código (acción)"`.
+- **The target is outside the product** (a maps app, WhatsApp, a bank site): `data-off="{label} (externo)"`.
+- **The row or card is another entity than the story's** (another venue's card, another dispute in the queue): `data-off="{code or name} (otro {entity})"`, for example `data-off="M3Q8ZD (otra disputa)"`, even when the spec would open a key screen from it.
+- **The control changes state within the screen**: `tab()` or `choose()` (Step 6); no `data-off`.
 
 ### 11. Tab bar and sidebar
 
-**Phone.** If the app has bottom navigation, it sits once inside the frame, below the screens. Each screen that shows it in the spec carries `data-tabs="{tab}"`, naming the tab shown as current; screens without it hide the bar. Tabs whose root screen is not a key screen carry `data-off`, so they look disabled and name their target. A bar where every tab but the current one is off is fine; it is honest about the selection.
+**Phone.** If the app has bottom navigation, it sits once inside the frame, below the screens. Each screen that shows it in the spec carries `data-tabs="{tab}"`, naming the tab shown as current; screens without it hide the bar. Tabs whose root screen is not a key screen carry `data-off`, so they look disabled and name their target; the current tab stays at full opacity even when it carries `data-off` (the skeleton's CSS does this). A bar where every tab but the current one is off is fine; it is honest about the selection.
 
 **Web.** The sidebar is always shown. Each entry carries `data-nav="{id}"`; an entry whose screen is not a key screen also carries `data-off`. A key screen that belongs to a section whose root is not a key screen marks that entry with `data-nav` on the screen div.
 
@@ -146,10 +180,10 @@ Open each file in a browser, or headless (for example Playwright with Chromium),
 
 - No console errors on a cold open.
 - Every key screen is reachable from the select, and from in-app navigation where the spec has an edge between key screens.
-- Opening `mockups/<app-id>.html#s-<id>` shows screen `<id>` for every key screen, and choosing a screen updates the hash.
+- Opening `mockups/<app-id>.html#s-<id>` shows screen `<id>` for every key screen, and choosing a screen updates the hash. Screen ids contain dots, so a check selects a screen with `[id="s-1.2.3"]` or `getElementById('s-1.2.3')`, never `#s-1.2.3`.
 - The frame renders at its size: 375 × 812 for a phone, 1280 px wide for a web app. A screen taller than the frame scrolls inside it, and showing another screen starts it at the top.
-- The tab bar appears exactly on the screens that declare `data-tabs`; the sidebar marks the right entry.
-- Every `data-off` control has a tooltip and does nothing else.
+- The tab bar appears exactly on the screens that declare `data-tabs`; the sidebar marks the right entry, at full opacity.
+- Every `data-off` control has a tooltip and does nothing else; every `tab()` and `choose()` control changes only its own screen.
 - Every locked font face is loaded: after `document.fonts.ready`, each entry of `fonts` has a face in `document.fonts` with `status === 'loaded'` (not `document.fonts.check`, which answers true when the stylesheet never arrived). No text renders in a fallback font on a cold open.
 - No hex value outside `:root`; every color and font in the frame comes from the product's tokens.
 - Realistic data, in the spec's formats, telling one consistent story; no Lorem ipsum.
@@ -164,7 +198,7 @@ Save the files and close in Spanish, briefly, with the counts and the decisions 
 > Mockups listos: {N} pantallas en `mockups/{app-id}.html`, {M} en `mockups/{app-id}.html`. Ábrelos en el navegador y navega con el selector de arriba o tocando dentro del teléfono; cada pantalla tiene su enlace (`#s-{id}`).
 >
 > Decisiones que vale la pena verificar:
-> - {the story chosen, and states not shown because of it}
+> - {the story chosen (and `mockups/STORY.md` when there are several apps), and states not shown because of it}
 > - {shortcuts through non-key screens}
 > - {drafted labels, placeholder tokens, font source when the spec bundles fonts}
 >

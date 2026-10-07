@@ -85,7 +85,7 @@ If the user says "es como X pero para Y", ask which decisions transfer and which
 
 ## Step 2: Phases 1 to 5
 
-Run each phase skill in order, passing it every document produced so far (in Phase 1, the intake answers), and close each with the phase gate below before starting the next. Each phase skill writes `docs/SESSION.md` and runs `spec.mjs check` itself.
+Run each phase skill in order, passing it every document produced so far (in Phase 1, the intake answers), and close each with the phase gate below before starting the next. Each phase skill writes `docs/SESSION.md` and runs `spec.mjs check` itself, except agents running in parallel (Step 5).
 
 1. **Discovery.** Follow `product-discovery`. It writes the brief (with user groups and job ids) and the numbered defaults, with `**Stack profile:** <id>` inside D-01.
 2. **Requirements.** Follow `product-requirements`. It is conversational and may ask before writing. This is where scope gets pinned before any data modeling.
@@ -117,7 +117,15 @@ Follow `multi-agent-governance`. It writes the constitution, roster, orchestrato
 
 Phase 7 needs only `docs/UI_SCREENS.md`. Offer it after the Phase 4 gate ("¿Quieres ver mockups HTML navegables de las pantallas clave antes de la arquitectura, o seguimos?") and, if not done by then, after Phase 6: **"¿Quieres mockups HTML navegables antes del build, o vamos directo a construir?"**
 
-If yes, follow `navegable-mockups`, then gate it like any phase, and return to the next pending phase. The mockup of each app is `mockups/<app-id>.html` with one `#s-<screen-id>` anchor per key screen; UI issues cite that anchor for key screens, so the mockups stop being orphans. If `docs/UI_SCREENS.md` changes after the mockups were built (an iteration, a coherence fix), refresh the affected mockups before the handoff. If no, go to the handoff.
+If yes, follow `navegable-mockups`, then gate it like any phase, and return to the next pending phase.
+
+**Shared story first.** Before launching one mockup agent per app, write `mockups/STORY.md` yourself (or have the caller write it): one story every app tells. It names the personas, the venues or other entities, the codes (booking codes, invoice numbers), the dates and the amounts, and which past and future records each app needs to show (the player's upcoming booking K7P2QX is the owner's booking for that same slot). Every app's mockup uses those values and invents none; an app that needs a record the story lacks gets it added to `STORY.md` first. With a single app, the story still goes in `STORY.md`.
+
+**Phase 5 in parallel with Phase 7.** When the architecture and the mockups run at the same time (separate agents):
+
+- The parallel agents do not write `docs/SESSION.md`; tell each one so in its prompt. Each returns its closing counts and the decisions worth checking.
+- After both finish, rebuild `docs/SESSION.md` yourself in the shared shape, with each phase's State taken from `node tools/spec-guard/spec.mjs status`, Last phase naming both (`5 and 7 — system-architecture, navegable-mockups`) and Open questions merged.
+- Show one combined gate: both phases' counts and one "Decisiones tomadas en Fases 5 y 7 que vale la pena verificar" list. Never two gates open at once. The mockup of each app is `mockups/<app-id>.html` with one `#s-<screen-id>` anchor per key screen; UI issues cite that anchor for key screens, so the mockups stop being orphans. If `docs/UI_SCREENS.md` changes after the mockups were built (an iteration, a coherence fix), refresh the affected mockups before the handoff. If no, go to the handoff.
 
 ## Step 6: Handoff
 
@@ -148,6 +156,14 @@ List 5-10 things the skill decided that the user did not ask for. Implicit choic
 
 "Vale la pena verificar" matters: not imperious, not dismissible. The goal is that the user actually reads them.
 
+At the Phase 2 gate, after the bullets, add the decisions no FR serves, so the gap is visible rather than silent:
+
+> **Decisiones sin FR (no son comportamiento):** D-01 (perfil de stack){, D-xx técnicas, una por línea con su motivo}
+
+D-01, the stack profile decision, is always on this line: it is exempt from FR coverage and never counts as a gap. Any other decision on it needs its reason; a decision that changes what a user or operator can do or see does not belong here.
+
+A decision the phase proposes to amend appears in the bullets as "Enmienda propuesta a D-xx: {cambio}"; it is applied only after the user approves it (see "Amend a locked decision").
+
 ### 2. Wait for explicit approval
 
 Never advance on silence.
@@ -166,6 +182,8 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 
 **Iterate within a phase.** "La decisión 4 de la Fase 1 no me gusta": do not advance. Re-run the phase skill with the feedback, re-reading every current document (never a stale memory of them), and gate again. After three iterations on one phase, ask whether something upstream is misframed: "estamos iterando mucho en la Fase 1, ¿hay algo del producto que no está claro?".
 
+**Amend a locked decision.** Any phase after 1 may change a decision in `docs/OPINIONATED_DEFAULTS.md` only with the user's explicit approval at that phase's gate: put the proposed change in the gate's bullets, and once approved, the phase skill edits the decision in place (same `D-xx` id, never renumbered) and adds under its `**Lock:**` line `**Amended (Phase {N}, {skill}):** {what changed and why}.` Never silently, and never from a coherence fix without showing it at the gate.
+
 **Exit early.** Accept "me quedo aquí" after any phase, and say which phases ran and which did not. Not every project needs all seven:
 
 - Phase 3 only: a schema for an existing app
@@ -182,7 +200,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 ├── AGENTS.md                    ← kickstart, rewritten in Phase 6 (constitution)
 ├── CLAUDE.md                    ← kickstart (@AGENTS.md)
 ├── docs/
-│   ├── SESSION.md               ← rewritten by every phase skill
+│   ├── SESSION.md               ← rewritten by every phase skill (by the orchestrator after a parallel 5 and 7)
 │   ├── PRODUCT_BRIEF.md         ← Phase 1
 │   ├── OPINIONATED_DEFAULTS.md  ← Phase 1
 │   ├── PRD.md                   ← Phase 2
@@ -196,6 +214,7 @@ The phase's file exists on disk (`spec.mjs status` shows it). If it does not, th
 │   └── SPRINT_PROMPTS.md        ← Phase 6 (Sprints 0 and 1)
 ├── tools/spec-guard/            ← kickstart, re-installed after updates (guardrails)
 └── mockups/
+    ├── STORY.md                 ← Phase 7, written before the per-app mockups
     └── {app-id}.html            ← Phase 7 (any time after Phase 4)
 ```
 

@@ -12,7 +12,7 @@ metadata:
 
 Produce one HTML file that an engineer or a stakeholder double-clicks to navigate the spec of a project: what the product is and what was decided, what it must do, which screens it has, and how the system is built. No server, no build step. The content comes only from the spec documents.
 
-The page uses the Aiuda Labs house style, defined in [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md). Read that file before writing any HTML; it is the canonical source of every token, font, component class, the nav and the logo. Where this skill and the design system seem to disagree on a style, the design system wins.
+The page uses the Aiuda Labs house style, defined in [references/DESIGN_SYSTEM.md](references/DESIGN_SYSTEM.md). Read that file before writing any HTML; it is the canonical source of every token, font, component class, the nav and the logo. Where this skill and the design system seem to disagree on a style, the design system wins. A project's `docs/AIUDA_HOUSE_STYLE.md` (written by `project-kickstart` when the user chose the Aiuda Labs look) is a copy of the same file; this skill's reference is canonical. The house style styles this page only; the product's own tokens (docs/UI_SCREENS.md) never replace it, and it never becomes the product's identity.
 
 ## When to use it
 

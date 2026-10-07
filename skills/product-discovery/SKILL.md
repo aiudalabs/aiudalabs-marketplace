@@ -209,6 +209,7 @@ Before writing the documents, verify:
 2. Every persona can complete the loop under the locked decisions (a persona without a card cannot pay if card-only is locked).
 3. Every failure mode has a mitigation in a decision or the deferral list.
 4. The budgets are achievable with what the decisions imply ("search < 100 ms" implies a cache that may not be in scope).
+5. Every money outcome names who keeps the money. Each refund, partial refund or no-refund case in the decisions (late cancellation, no-show, provider rejection, payment declined) says where the funds end up: back to the customer, kept by the provider, kept by the platform, or split, and who absorbs the gateway fee. "No refund" alone is not a decision.
 
 When a check fails, show it and ask the user to change a decision, add a feature to the MVP, or accept the risk explicitly.
 

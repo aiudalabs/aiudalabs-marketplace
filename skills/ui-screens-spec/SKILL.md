@@ -31,13 +31,14 @@ Do not use it when:
 - `docs/OPINIONATED_DEFAULTS.md`: platforms, languages, market context, the stack profile (`**Stack profile:**` line).
 - `docs/PRD.md` when it exists: user stories (`US-<n>`) and FR ids. Every user story is realized by at least one screen.
 - The schema document (`docs/FIREBASE_SCHEMA.md` or `docs/DATA_SCHEMA.md`, per the profile): state machines, shapes, the data available, and the table of server-side units that write.
-- Any palette, token file or design-system document already in the project (a `DESIGN_SYSTEM.md`, a tokens file, the output of `visual-directions` or `design-tokens`).
+- Any palette, token file or design-system document **for this product** already in the project (a tokens file, the output of `visual-directions` or `design-tokens`, if installed). Not `docs/AIUDA_HOUSE_STYLE.md` or any other copy of the Aiuda Labs house style: it styles the generated spec page only (`html-spec-generator`), never the product.
+- `mockups/STORY.md` when it exists: the example story (people, places, codes, dates, amounts) the mockups use.
 
 If the brief, the decisions or the schema is missing, ask and stop.
 
 ## What it produces: `docs/UI_SCREENS.md`
 
-In English; the conversation stays in Spanish. Typically 500-900 lines for two or three apps, and it grows with the screen count (each screen takes 10-25 lines). The size is guidance: completeness wins over the budget. To keep it readable, a block may be one bullet (`- **Data:** reads ..., writes ...`), but no screen loses a block or a state to fit.
+In English; the conversation stays in Spanish. Typically 35-45 lines per screen plus 300-400 lines of tokens, components and navigation graphs: about 2,000 lines for three apps with 50 screens. The size is guidance: completeness wins over the budget. To keep it readable, a block may be one bullet (`- **Data:** reads ..., writes ...`), but no screen loses a block or a state to fit.
 
 The headings are fixed:
 
@@ -61,10 +62,10 @@ The headings are fixed:
 ## Open questions
 ```
 
-1. **Apps inventory**: each app with platform, primary user and tap-target convention.
+1. **Apps inventory**: each app with platform, primary user and tap-target convention, then the example story (Step 8).
 2. **Design tokens**: color seed and roles (status roles included), the status-to-color map, neutrals, type system, spacing, radius, elevation, tap targets per app (Step 2).
 3. **Component vocabulary**: reusable components with variants.
-4. **One `## App X — {app-id}` section per app**: its navigation graph, then its screen specs in numbered order. `X` is the app's number in the screen ids, and `{app-id}` is the app id exactly as the brief writes it.
+4. **One `## App X — {app-id}` section per app**: its navigation graph (with its global navigation), then its screen specs in numbered order. `X` is the app's number in the screen ids, and `{app-id}` is the app id exactly as the brief writes it.
 5. **Key screens**: five per app, picked for the mockups, with a reason and a mockup back-link each.
 6. **Cross-check**: the Step 10 tables, including user story → screens.
 7. **Open questions**: `[SUPUESTO]` items, and writes or data that need a unit from Phase 5.
@@ -86,7 +87,9 @@ Tap targets are **non-negotiable per context**. Gloved kitchen staff cannot hit 
 
 ### Step 2: Design tokens, locked once
 
-Every screen references tokens, never raw values. If the project already has a palette, token file or design-system document, take its values.
+Every screen references tokens, never raw values. If the project already has a palette, token file or design-system document for this product, take its values.
+
+The Aiuda Labs house style is not the product's identity. `docs/AIUDA_HOUSE_STYLE.md` (the kickstart's "Aiuda Labs look") and any other copy of it style the generated spec page only: ignore them here, and use them for the product only when the user names the Aiuda Labs brand as the product's identity in answer to the question below.
 
 **When none exists, ask; never invent the identity silently.** It is the user's product. In one message, offer:
 
@@ -98,7 +101,7 @@ Wait for the answer, then lock the tokens below and list the identity first in t
 
 - **Color seed and roles**: one hex value that generates the role palette (Material 3 `fromSeed` for Flutter apps; the same roles mapped to CSS variables for web). Document the seed and every role the screens use: primary, on-primary, secondary, surface, surface variants, on-surface, outline, and the status roles **success, warning, error and info**, each with its `on-` pair. Say which roles come from the seed and which are set by hand as overrides.
 - **Status-to-color map**: a table from every status of every state machine in the schema (`held`, `confirmed`, `cancelled`, `refunded`...) to a role and a label. Badges and banners use it; no screen picks a status color on its own.
-- **Type system**: three fonts at most, by role. For example Display and Headline: Fraunces 400-700; Body and Label: DM Sans 400, 500; Mono (timers, codes): DM Mono 400. The scale is shared; only the rendering size shifts per app (the kitchen display renders larger).
+- **Type system**: three fonts at most, by role. For example Display and Headline: Fraunces 400-700; Body and Label: DM Sans 400, 500; Mono (timers, codes): DM Mono 400. The scale is shared; only the rendering size shifts per app (the kitchen display renders larger). **One token per role**: each kind of content (the countdown, booking codes, prices in tables) names exactly one type token and one color role, in the type table and in every component; never "display or mono".
 - **Spacing**: 4-point grid, `xs=4, sm=8, md=16, lg=24, xl=32, 2xl=48`. No off-grid values.
 - **Radius**: `small=8, medium=12, large=16, full=999`. Nothing in between.
 - **Elevation**: a named scale (`e0` flat, `e1` cards, `e2` sheets and menus, `e3` dialogs) with the shadow or Material elevation value of each. Screens name the level, never a shadow.
@@ -106,7 +109,7 @@ Wait for the answer, then lock the tokens below and list the identity first in t
 
 ### Step 3: Component vocabulary
 
-For each reusable component: **name** in PascalCase (matching the eventual widget or component), **purpose** in one sentence, **variants**, and the **tokens** it consumes.
+For each reusable component: **name** in PascalCase (matching the eventual widget or component), **purpose** in one sentence, **variants**, and the **tokens** it consumes, one per role (a variant that needs another token is its own variant, named).
 
 ```
 ResultsCard
@@ -156,7 +159,7 @@ Primary CTA
 
 Navigation
   - Back: 1.2.2
-  - Bottom tab bar: visible, active = "Buscar"
+  - Bottom tab bar (global, see the navigation graph): visible, active = "Buscar"
 
 Data
   - Reads: providers (filtered by zone and category), denormalized rating fields
@@ -170,7 +173,7 @@ Permissions
   - Role: customer
 ```
 
-Every screen has the six blocks. When one is empty, say so; never drop the heading. Data names containers and fields exactly as the schema document does, and lists the FR ids the screen serves. Every write names the server-side unit that performs it, from the schema's server-writes table (`Writes: checkouts.method via startPayment`); a client never writes a status directly.
+Every screen has the six blocks. When one is empty, say so; never drop the heading. Data names containers and fields exactly as the schema document does, and lists the FR ids the screen serves. Every write names the server-side unit that performs it, from the schema's server-writes table (`Writes: checkouts.method via startPayment`); a client never writes a status directly. A write the schema lets the client make itself names that table instead: `Writes: users.fcmTokens direct (schema: Direct client writes)`. Nothing else is written `direct`.
 
 **Anchors.** Every screen heading is preceded by `<a id="s-<screen-id>"></a>`, as in the example. Markdown renderers slug `### 1.2.3 — Search results` into something like `#123--search-results`, so without the explicit anchor every link from the backlog is dead. With it, `docs/UI_SCREENS.md#s-1.2.3` works on GitHub, and the id matches the mockup's `#s-1.2.3`.
 
@@ -188,6 +191,15 @@ Results (1.2.3)
   → Filters (1.2.4) — filter icon
 ```
 
+**Global navigation, once per app.** A tab bar, sidebar or top nav that persists across screens is specified once, at the top of the app's graph: each entry's label, target screen and the screens that show it. Its edges are part of the graph (they count as inbound edges for the check below); a screen's Navigation block only says whether it shows the bar and which entry is active.
+
+```
+Tab bar — shown on 1.2.1, 1.5.1, 1.6.1
+  Buscar   → Home (1.2.1)
+  Reservas → Bookings (1.5.1)
+  Perfil   → Profile (1.6.1)
+```
+
 Every screen except the app's entry points has an inbound edge; every screen except terminal ones (a post-booking "thank you") has an outbound edge. Entry points are listed at the top of the graph: the splash of a mobile app; for a web app, the sign-in page and any page reached by a link from outside (an email, a notification).
 
 ### Step 7: Empty, loading and error states
@@ -202,7 +214,9 @@ A missing state is a Phase 4 bug: the UI agents will invent it, differently on e
 
 ### Step 8: Microcopy placeholders
 
-Mark all user-facing text `[COPY: "draft"]`. Final copy depends on tone, voice and tests that have not happened; drafts are enough for mockups and development.
+Mark all user-facing text `[COPY: "draft"]`. Final copy depends on tone, voice and tests that have not happened; drafts are enough for mockups and development. Each draft reads right in every state the screen shows it in (a payment label shown during the match does not say "not played yet").
+
+**Example data is one story.** Every example value in a screen (people, places, codes, dates, amounts) comes from one story shared by all apps, written as a short table at the end of section 1: the same booking has the same code, venue, date and amount in the customer, provider and admin screens, and its amounts add up (price, commission, net). Distinct records get distinct values: a cancelled booking, a refund adjustment and tonight's booking each have their own code, never one code reused across states. When `mockups/STORY.md` exists, take its values; `navegable-mockups` builds every app from the same story.
 
 ### Step 9: Five key screens per app
 
@@ -221,10 +235,11 @@ List the picks with one sentence of rationale each, and give each its **mockup b
 - Every state machine in the schema has a screen that drives or displays each transition (system-only transitions are displayed, not driven).
 - Every container in the schema is read by at least one screen, or is server-internal.
 - Every PRD user story is realized by at least one screen: a table `US-<n>` → screen ids, with no story left without one.
-- **Every write a screen makes has an owner**: a unit in the schema's server-writes table. A write with no owner (starting a payment, emailing a statement) is marked `[SUPUESTO] needs a server unit (Phase 5)`, listed under Open questions and raised at the gate; never invent the unit's contract here.
+- **Every write a screen makes has an owner**: a unit in the schema's server-writes table, or a row of its Direct client writes table (`direct (schema: Direct client writes)`). A write with no owner (starting a payment, emailing a statement) is marked `[SUPUESTO] needs a server unit (Phase 5)`, listed under Open questions and raised at the gate; never invent the unit's contract here.
 - Every screen has all six blocks and its `<a id="s-<screen-id>">` anchor; every screen with data has empty, loading and error.
 - Every app has exactly five key screens, each with a mockup back-link.
-- The navigation graph is connected.
+- The navigation graph is connected, and each app's global navigation (tab bar, sidebar) is specified once in its graph.
+- The example data follows the one story: the same record has the same values in every app, and distinct records have distinct codes.
 - All copy is marked `[COPY: ...]`; no hex value or raw size appears in a screen spec.
 
 Write the tables in the Cross-check section. When a check fails, show it and ask.

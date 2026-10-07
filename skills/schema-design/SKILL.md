@@ -45,9 +45,9 @@ If the brief or the decisions are missing, ask and stop.
 One document in `./docs/`, named by the profile (`FIREBASE_SCHEMA.md` for `flutter-firebase`, `DATA_SCHEMA.md` for `fastapi-react`), in English, typically 400-700 lines. That size is guidance: completeness wins over the budget, and no required section, shape or query is dropped to fit it. The profile's data-layer file refines the section names:
 
 1. **Stack confirmation**: profile, services and stores in use, versions.
-2. **Stores and top-level containers**: collections or tables, one-line purpose each.
+2. **Stores and containers**: every collection, subcollection or table, one heading each with a one-line purpose.
 3. **Shapes**: every entity in the profile's contract idiom (TypeScript types; SQLAlchemy models plus Pydantic schemas).
-4. **State machines and server writes**: for every lifecycle entity, states, transitions and the server-side owner of each transition; then the table of every server-side unit that writes (Step 4).
+4. **State machines and server writes**: for every lifecycle entity, states, transitions and the server-side owner of each transition, one owner per cause; then the table of every server-side unit that writes, and the table of direct client writes (Step 4).
 5. **Placement decisions**: which data lives in which store, and why.
 6. **Permissions philosophy**: tenancy, ownership, roles. Philosophy, not literal rules or middleware.
 7. **Query-cost anticipation**: composite indexes, DB indexes, N+1 risks, each tied to the query that needs it.
@@ -55,7 +55,7 @@ One document in `./docs/`, named by the profile (`FIREBASE_SCHEMA.md` for `flutt
 9. **Denormalization decisions**: every duplicated field, with rationale and consistency owner.
 10. **Migration story**: how the schema evolves, with the profile's mechanism.
 
-Cite the decisions (`D-04`) and requirements (`FR-ORDER-1`) each section serves, using their exact ids. Issues later point at sections of this document with anchors (`docs/FIREBASE_SCHEMA.md#bookings`), so give each container its own heading, once, in section 2. Other sections that go container by container use different heading text (`### Booking shape`, `### Booking lifecycle`): two headings with the same text get the anchors `#bookings` and `#bookings-1`, and the issues would link to the wrong one.
+Cite the decisions (`D-04`) and requirements (`FR-ORDER-1`) each section serves, using their exact ids. Issues later point at sections of this document with anchors (`docs/FIREBASE_SCHEMA.md#bookings`), so give each container its own heading, once, in section 2, subcollections included (`### bookings`, `### bookings/{id}/messages`). Other sections that go container by container use different heading text (`### Booking shape`, `### Booking lifecycle`): two headings with the same text get the anchors `#bookings` and `#bookings-1`, and the issues would link to the wrong one.
 
 ## The method
 
@@ -79,16 +79,17 @@ Write every container's shape with the profile's conventions (where types live i
 - The shape is the contract. A schema in prose only is not a schema.
 - Every field typed; no untyped blobs without a written reason.
 - Enum-like fields are closed sets, never free strings.
+- A long closed list (more than about six values, or one shared by several fields or containers: sports, reason codes, amenities) is enumerated once, as a named constant in the profile's idiom (`export const SPORTS = [...] as const` with `type Sport = typeof SPORTS[number]`; a Python `Enum` plus its CHECK constraint), and every other shape and section cites it by name. When the PRD already enumerates it in a table, the constant matches that table value for value.
 - No PII in identifiers: ids end up in logs and URLs.
 - Server-only data is structurally separated from client-readable data.
 
-### Step 4: State machines
+### Step 4: State machines and server writes
 
 For every entity with a status, write the machine: states, allowed transitions (who triggers each one and the **server-side unit that owns it**: a named unit of the kind the trigger needs, per the profile: a client-invoked function or endpoint, a trigger on a write, a scheduled job, an HTTPS webhook, a worker task), forbidden transitions, terminal states. Expiry and no-show are scheduled jobs and payment confirmations are webhooks; not every owner is client-invoked.
 
 The invariant on every stack: **clients never write the status field directly; every transition goes through a server-authoritative unit**, and the schema names it. An undocumented status field is a bug factory.
 
-One owner per trigger: a transition caused in one way has exactly one unit. When the same from → to has several causes (the customer releases a hold; a scheduled job expires it), list one unit per cause and write in one line why they cannot race, usually that each runs in a transaction that re-reads the status and moves it only from the expected state. Phase 5 pins the same units and keeps the proof.
+One owner per cause: a transition caused in one way has exactly one unit. When the same from → to has several causes (the customer releases a hold; a scheduled job expires it), list one unit per cause and write in one line why they cannot race, usually that each runs in a transaction that re-reads the status and moves it only from the expected state. Phase 5 pins the same units and keeps the proof.
 
 ```
 Booking
@@ -98,13 +99,23 @@ Booking
 Forbidden: completed → anything (terminal); any client write to status
 ```
 
-After the machines, list **every server-side unit that writes**, not only the ones that change a status: starting a payment, sending a statement by email, recording a device token, writing a counter. Screens in Phase 4 name their writes against this table, and Phase 5 writes one block per row.
+After the machines, list **every server-side unit that writes**, not only the ones that change a status: starting a payment, sending a statement by email, sending a push notification, writing a counter. Screens in Phase 4 name their writes against this table, and Phase 5 writes one block per row.
 
 | Unit | Kind | Writes (containers and fields) | Serves |
 |---|---|---|---|
 | `confirmBooking` | callable | `bookings.status`, `bookings.confirmedAt` | FR-BOOKING-2 |
 | `startPayment` | callable | `checkouts.method`, `checkouts.gatewayPaymentId` | FR-PAYMENT-1 |
 | `paymentWebhook` | HTTPS | `checkouts.status`, `payments/*` | FR-PAYMENT-3 |
+
+Then list **every write a client makes directly**, without a server unit: a device token, a `readAt` on its own notification, its own listing's description. Each row names who may write and the rule that bounds it; status, totals and denormalized copies are never here. They go in section 4 under their own heading, `### Direct client writes`:
+
+| Container and field | Who | Rule |
+|---|---|---|
+| `users/{uid}/devices/{token}` | the signed-in user | own uid only; create and delete |
+| `notifications.readAt` | the recipient | only `readAt`, only from null to server time |
+| `venues.description`, `venues.photos` | the venue owner | own venue only; no other field |
+
+Screens in Phase 4 cite these writes as `direct (schema: Direct client writes)`, for example `Writes: notifications.readAt direct (schema: Direct client writes)`. A write in neither table is a gap. When the profile allows no direct client writes (every write is an endpoint, as in `fastapi-react`), keep the heading with "None: every write goes through a unit in the server-writes table".
 
 ### Step 5: Permissions philosophy
 
@@ -146,14 +157,16 @@ With the profile's mechanism (a `schemaVersion` field plus backfill jobs; Alembi
 - Every non-deferred decision with data implications has a schema counterpart.
 - Every FR's state is representable.
 - Every transition has a named server-side owner, one per cause, with a no-race line when there are several.
-- Every write the PRD implies (by a client through a unit, or by the server on its own) has a row in the server-writes table.
+- Every write the PRD implies has a row: in the server-writes table (a client through a unit, or the server on its own) or in Direct client writes.
 - Every query-cost entry names its query.
 - Every denormalized field has a consistency owner.
 - The document uses the profile's idiom throughout, with no artifacts from another stack.
 
 When a check fails, show the gap and ask.
 
-This phase never edits `PRD.md` or `OPINIONATED_DEFAULTS.md`. When the cross-check finds a contradiction inside the PRD (one FR frees a slot on a declined payment, another lets the customer retry while the hold lasts) or between the PRD and a decision, write the schema on the reading you propose, mark it `[SUPUESTO]`, and raise it at the gate and in `SESSION.md` under Open questions. The owning skill (`product-requirements` or `product-discovery`) fixes its own document once the user decides, and the schema follows.
+This phase never edits `PRD.md`. When the cross-check finds a contradiction inside the PRD (one FR frees a slot on a declined payment, another lets the customer retry while the hold lasts) or between the PRD and a decision, write the schema on the reading you propose, mark it `[SUPUESTO]`, and raise it at the gate and in `SESSION.md` under Open questions. `product-requirements` fixes the PRD once the user decides, and the schema follows.
+
+A decision in `OPINIONATED_DEFAULTS.md` follows the rule every later phase shares: it is amended only with the user's explicit approval at this phase's gate, by editing the decision in place (same `D-xx` id, never renumbered) and adding under its `**Lock:**` line `**Amended (Phase 3, schema-design):** {what changed and why}.` Never silently: until the user approves, the schema follows the proposed reading marked `[SUPUESTO]`.
 
 ## Anti-patterns
 
@@ -222,6 +235,6 @@ Wait for explicit approval. `ui-screens-spec` then consumes the state machines (
 
 - Write security rules or middleware (sprints).
 - Specify server-side units beyond naming them and what they write (Phase 5, `system-architecture`).
-- Edit the PRD or the decisions; it raises contradictions at the gate.
+- Edit the PRD; it raises contradictions at the gate. It amends a decision only with the user's approval at the gate, in place and noted (Step 10).
 - Write migration scripts; only the migration story.
 - Predict scale beyond an order of magnitude.

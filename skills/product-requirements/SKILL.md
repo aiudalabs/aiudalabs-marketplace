@@ -101,9 +101,13 @@ If the brief predates job ids, or the decisions give work to a group the brief d
 
 Forbid vague verbs ("manage", "handle", "support") without an observable outcome. If the Then cannot be checked, the requirement is underspecified: split it, or mark the gap `[SUPUESTO]`.
 
+A long closed list that several requirements depend on (sports, cancellation reasons, document types, amenities) is enumerated once, in one table in the FR that introduces it or under In scope, and every other FR cites it by name ("one of the cancellation reasons in FR-BOOKING-4"). Never re-list the values in several places: copies drift. `schema-design` turns that table into one closed set.
+
 ### Step 4: Trace every requirement
 
-Each FR cites the job id it serves and any decision it depends on. A requirement with no traceable purpose is scope creep: drop it or move it to Out of scope. A requirement that contradicts a locked decision is a **blocker**: show it to the user, do not override the decision. Changing a decision means editing it in `OPINIONATED_DEFAULTS.md` with the user's approval.
+Each FR cites the job id it serves and any decision it depends on. A requirement with no traceable purpose is scope creep: drop it or move it to Out of scope. A requirement that contradicts a locked decision is a **blocker**: show it to the user, do not override the decision.
+
+Amending a decision follows the rule every later phase shares: only with the user's explicit approval at this phase's gate, by editing the decision in place in `OPINIONATED_DEFAULTS.md` (same `D-xx` id, never renumbered) and adding under its `**Lock:**` line `**Amended (Phase 2, product-requirements):** {what changed and why}.` Never silently: an amendment the user did not approve at the gate is not made.
 
 ### Step 5: Make non-functional requirements numeric
 
@@ -120,7 +124,7 @@ Check that:
 - Every job id in the brief has at least one FR, and every FR traces to a job id that exists.
 - Every FR has acceptance criteria and a `**Traces:**` line.
 - Every D-xx cited exists and is not contradicted.
-- Every non-deferred decision that changes what a user or operator can do or see is served by at least one FR. The stack-profile decision (D-01) and purely technical decisions need none; list them in the gate as "sin FR, no es comportamiento" so the gap is visible rather than silent.
+- Every non-deferred decision that changes what a user or operator can do or see is served by at least one FR. The stack-profile decision (D-01) and purely technical decisions need none; list them in the gate on one line, `Decisiones sin FR (no son comportamiento): D-01 (perfil de stack), ...`, so the gap is visible rather than silent. D-01 is always on it.
 - Every user story has a `US-<n>` id and lists the FRs it covers.
 - Out of scope is explicit.
 
@@ -178,7 +182,7 @@ Wait for explicit approval.
 - Requirements or user stories without ids: later phases cannot reference them.
 - An FR id in a heading where it is not defined (a user story or section heading): it counts as a second definition.
 - Inventing personas or features not traceable to the brief.
-- Silently disagreeing with a locked decision.
+- Silently disagreeing with a locked decision, or silently editing one.
 - Non-functional "requirements" made of adjectives.
 - Designing tables or screens here.
 
@@ -190,4 +194,4 @@ Wait for explicit approval.
 
 - Pick data stores, tables or screens.
 - Write code, the backlog or agent lanes.
-- Reopen the vision or the decisions locked in Phase 1. It builds on them and flags conflicts.
+- Reopen the vision, or change a decision locked in Phase 1 on its own. It builds on them and flags conflicts; a decision changes only by an amendment the user approves at the gate (Step 4).

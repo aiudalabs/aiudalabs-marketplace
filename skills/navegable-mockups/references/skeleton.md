@@ -25,6 +25,8 @@ the `titles` and `fonts` lists. SKILL.md says when each part applies.
 
       /* Per-app adjustments given by the spec, derived from the tokens */
       --type-scale: 1;          /* e.g. 1.125 when the spec says this app's text is 12.5% larger */
+      /* or, when the spec gives per-token values for this app, override those tokens here:
+         --type-body: 400 18px/24px var(--font-body); */
       --tap-target: 48px;       /* the tap target the spec gives this app */
 
       /* Literals the spec itself names, as a variable named after their use */
@@ -38,14 +40,21 @@ the `titles` and `fonts` lists. SKILL.md says when each part applies.
       --review-border: #D4D4D8;
     }
     * { box-sizing: border-box; }
+    button, input, select, textarea { font: inherit; }   /* form controls use the product's fonts, not the UA's */
     body { margin: 0; background: var(--review-page); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
     .review-toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
       padding: 10px 20px; background: var(--review-bar); color: var(--review-text); border-bottom: 1px solid var(--review-border); font-size: 14px; }
     .review-toolbar #screen-label { margin-left: auto; color: var(--review-muted); }
     [data-off] { cursor: not-allowed; }               /* links to screens outside the key set */
     .bottom-tabs [data-off], .sidebar [data-off] { opacity: .5; }   /* tabs and menu entries look disabled */
-    .tab-panel { display: none; }                    /* in-screen tabs */
+    .bottom-tabs [data-off].current, .sidebar [data-off].current { opacity: 1; }   /* ...except the current one */
+    .tab-panel { display: none; }                    /* in-screen tabs; the first tab and panel carry class="on" */
     .tab-panel.on { display: block; }
+    /* choose(): style the selected look with [aria-pressed="true"] in the product's tokens */
+    .menu { position: relative; }                    /* overflow menu: <details class="menu"> */
+    .menu > summary { list-style: none; cursor: pointer; }
+    .menu > summary::-webkit-details-marker { display: none; }
+    .menu-items { position: absolute; right: 0; z-index: 5; }
     /* ... frame CSS from one of the two sections below ... */
   </style>
 </head>
@@ -69,7 +78,10 @@ the `titles` and `fonts` lists. SKILL.md says when each part applies.
 Screens scroll inside the frame, not the page: the frame has a fixed height, the
 `.screens` box takes what the status bar and tab bar leave, and each screen is
 its own scroll container. A sticky bottom bar inside a screen (a "Reservar"
-button) uses `position: sticky; bottom: 0` within that screen.
+button) uses `position: sticky; bottom: 0` within that screen. The children of a
+screen keep their content height (`flex: none`), so a long list never shrinks
+to zero inside the flex column; a body that should fill the space left above a
+bottom bar gets class `grow`.
 
 ```css
 .phone-frame { width: 375px; height: 812px; margin: 24px auto 40px; border: 1px solid var(--review-border);
@@ -79,6 +91,8 @@ button) uses `position: sticky; bottom: 0` within that screen.
 .screens { flex: 1; min-height: 0; position: relative; }
 .screen { display: none; height: 100%; overflow-y: auto; }
 .screen.active { display: flex; flex-direction: column; }
+.screen > * { flex: none; }
+.screen > .grow { flex: 1 0 auto; }   /* fills the space, never shrinks below its content */
 .bottom-tabs { flex: none; display: flex; border-top: 1px solid var(--outline-variant); }
 .bottom-tabs[hidden] { display: none; }
 .bottom-tabs [data-tab].current { color: var(--primary); }
@@ -86,7 +100,7 @@ button) uses `position: sticky; bottom: 0` within that screen.
 
 ```html
 <div class="phone-frame">
-  <div class="status-bar"><span>9:41</span><span>LTE · 100%</span></div>
+  <div class="status-bar"><span>9:41</span><span>LTE · 100%</span></div>  <!-- the story's time when it has one -->
   <div class="screens">
     <!-- data-tabs names the tab shown as current; leave it out where the spec hides the bar -->
     <div id="s-1.2.3" class="screen" data-tabs="buscar">…</div>
@@ -97,6 +111,25 @@ button) uses `position: sticky; bottom: 0` within that screen.
     <button data-tab="reservas" data-off="1.5.1 Mis reservas">Reservas</button>
   </nav>
 </div>
+```
+
+Inside a screen, the controls that are not navigation to a key screen:
+
+```html
+<div class="chips"><!-- choose(): one selected per parent; choose(this, true) toggles for a multi-selection -->
+  <button aria-pressed="true" onclick="choose(this)">Yappy</button>
+  <button aria-pressed="false" onclick="choose(this)">Tarjeta</button>
+</div>
+<details class="menu">
+  <summary aria-label="Más opciones">⋮</summary>
+  <div class="menu-items">
+    <button onclick="show('2.2.5')">Cancelar por lluvia</button>
+    <button data-off="2.2.3 Bloquear horario">Bloquear</button>
+  </div>
+</details>
+<button data-off="Copiar código (acción)">Copiar</button>
+<a data-off="Google Maps (externo)">Cómo llegar</a>
+<div class="card" data-off="Cancha La Bombonera (otro local)">…</div>
 ```
 
 ## Web frame
@@ -159,12 +192,14 @@ function show(id) {
   if (tabs) tabs.hidden = !target.dataset.tabs;
   document.querySelectorAll('[data-tab]').forEach((t) => t.classList.toggle('current', t.dataset.tab === target.dataset.tabs));
   document.querySelectorAll('[data-nav]:not(.screen)').forEach((n) => n.classList.toggle('current', n.dataset.nav === (target.dataset.nav || id)));
+  document.querySelectorAll('details.menu[open]').forEach((d) => { d.open = false; });   // close overflow menus
   if (location.hash !== '#s-' + id) history.replaceState(null, '', '#s-' + id);
 }
 
-// Links to screens outside the key set keep their look, do nothing, and name their target.
+// Controls not mocked (other screens, actions, external targets, other entities)
+// keep their look, do nothing, and name their target.
 document.querySelectorAll('[data-off]').forEach((el) => {
-  el.title = el.dataset.off + ' (no está en los mockups)';
+  el.title = el.dataset.off + ' — no está en los mockups';
   el.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -173,9 +208,18 @@ document.querySelectorAll('[data-off]').forEach((el) => {
 });
 
 // In-screen tabs: <button class="tab" onclick="tab(this, 'panel-id')">, panels with class="tab-panel".
+// One group = the tabs sharing a parent and the panels sharing a parent, so a screen may have several.
 function tab(button, panelId) {
-  button.parentElement.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t === button));
-  button.closest('.screen').querySelectorAll('.tab-panel').forEach((p) => p.classList.toggle('on', p.id === panelId));
+  button.parentElement.querySelectorAll(':scope > .tab').forEach((t) => t.classList.toggle('on', t === button));
+  const panel = document.getElementById(panelId);
+  panel.parentElement.querySelectorAll(':scope > .tab-panel').forEach((p) => p.classList.toggle('on', p === panel));
+}
+
+// In-screen choices (chips, a payment method, slot cells): aria-pressed, nothing else changes.
+// choose(this) keeps one pressed among its siblings; choose(this, true) toggles it alone.
+function choose(button, multi) {
+  if (multi) return button.setAttribute('aria-pressed', String(button.getAttribute('aria-pressed') !== 'true'));
+  button.parentElement.querySelectorAll(':scope > [aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
 }
 
 // Open the screen named in the URL (#s-1.3.1): the anchor UI_SCREENS.md and the issues cite.
@@ -185,7 +229,11 @@ show(titles[fromHash()] ? fromHash() : Object.keys(titles)[0]);
 ```
 
 Call `show()` from the toolbar select, the tabs or sidebar, and the in-app
-controls whose target is a key screen. Give every control whose target is not
-a key screen `data-off="{id} {title}"` and no `onclick`. A key screen with its
-own tabs or segmented control uses `tab()`. Nothing else goes in the script:
-no timers, no state machines, no fetching.
+controls whose target is a key screen. Give every control that is not mocked a
+`data-off` and no `onclick`: `"{id} {title}"` for a non-key screen,
+`"{label} (acción)"` for an action, `"{label} (externo)"` for a target outside
+the product, `"{code or name} (otro {entity})"` for another entity's row. A key
+screen with its own tabs or segmented control uses `tab()`; a choice that only
+changes the selection uses `choose()`; an overflow menu is a `<details
+class="menu">`. Nothing else goes in the script: no timers, no state machines,
+no fetching.
