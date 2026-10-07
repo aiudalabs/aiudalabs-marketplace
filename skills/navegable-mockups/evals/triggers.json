@@ -1,10 +1,11 @@
 [
-  { "query": "Ya aprobamos UI_SCREENS.md de la app de reservas de canchas. Hagamos los mockups navegables de las 5 pantallas clave de la app de jugadores para mandárselos al inversor.", "should_trigger": true },
-  { "query": "I need a clickable HTML prototype of our restaurant ordering app's key screens, phone frame, no server, so the pilot restaurants can click through it on their laptops.", "should_trigger": true },
-  { "query": "Dame un mockup en HTML con marco de teléfono de las pantallas del customer-app y del provider-app, con datos realistas de Panamá, para enseñárselo al equipo el lunes.", "should_trigger": true },
-  { "query": "Phase 6 is approved and yes, I want the mockups phase: build the navigable screens for the admin dashboard too, desktop layout.", "should_trigger": true },
-  { "query": "quiero validar las pantallas con 5 usuarios piloto antes de escribir código, arma los HTML navegables a partir del spec de pantallas", "should_trigger": true },
-  { "query": "Necesitamos especificar todas las pantallas de la app de delivery: header, estados vacíos, errores, navegación y tokens de diseño.", "should_trigger": false, "use_instead": "ui-screens-spec" },
-  { "query": "Show me two or three different looks for our booking app's home page so I can pick the visual style before we lock the colors.", "should_trigger": false, "use_instead": "visual-directions" },
-  { "query": "Genera la página HTML de arquitectura con los diagramas Mermaid del sistema y el modelo de datos.", "should_trigger": false, "use_instead": "html-spec-generator" }
+  {"query": "Ya aprobamos UI_SCREENS.md de la app de reservas de canchas. Hagamos los mockups navegables de las 5 pantallas clave de la app de jugadores para mandárselos al inversor.", "should_trigger": true},
+  {"query": "I need a clickable HTML prototype of our restaurant ordering app's key screens, phone frame, no server, so the pilot restaurants can click through it on their laptops.", "should_trigger": true},
+  {"query": "Dame un mockup en HTML con marco de teléfono de las pantallas del customer-app y del provider-app, con datos realistas de Panamá, para enseñárselo al equipo el lunes.", "should_trigger": true},
+  {"query": "Phase 6 is approved and yes, I want the mockups phase: build the navigable screens for the admin dashboard too, desktop layout.", "should_trigger": true},
+  {"query": "quiero validar las pantallas con 5 usuarios piloto antes de escribir código, arma los HTML navegables a partir del spec de pantallas", "should_trigger": true},
+  {"query": "Acabamos de cerrar la fase 4 de pantallas; antes de la arquitectura quiero ver el admin-dashboard en HTML clicable, en escritorio con su menú lateral.", "should_trigger": true},
+  {"query": "Necesitamos especificar todas las pantallas de la app de delivery: header, estados vacíos, errores, navegación y tokens de diseño.", "should_trigger": false, "use_instead": "ui-screens-spec"},
+  {"query": "Show me two or three different looks for our booking app's home page so I can pick the visual style before we lock the colors.", "should_trigger": false, "use_instead": "visual-directions"},
+  {"query": "Genera la página HTML de arquitectura con los diagramas Mermaid del sistema y el modelo de datos.", "should_trigger": false, "use_instead": "html-spec-generator"}
 ]
