@@ -3,12 +3,14 @@
 name: flutter
 
 on:
+  # Called by the deploy workflows, so they run these checks instead of copying the jobs.
+  workflow_call:
   pull_request:
     branches: [main, develop]
-    paths: ['apps/**', 'packages/**', 'melos.yaml', 'pubspec.yaml', '.github/workflows/flutter.yml']
+    paths: ['apps/**', 'packages/**', 'melos.yaml', 'pubspec.yaml', 'pubspec.lock', 'tools/deps-check.mjs', '.github/workflows/flutter.yml']
   push:
     branches: [develop]
-    paths: ['apps/**', 'packages/**', 'melos.yaml', 'pubspec.yaml', '.github/workflows/flutter.yml']
+    paths: ['apps/**', 'packages/**', 'melos.yaml', 'pubspec.yaml', 'pubspec.lock', 'tools/deps-check.mjs', '.github/workflows/flutter.yml']
 
 jobs:
   flutter:
@@ -30,13 +32,18 @@ jobs:
           flutter-version: '{{flutter_version}}'
           cache: true
       # melos.yaml is the Melos 6 format; Melos 7+ reads its config from pubspec.yaml instead.
+      # GitHub sets CI=true, which keeps Melos from prompting (it crashes without a TTY).
       - if: steps.detect.outputs.present == 'true'
         run: dart pub global activate melos '>=6.3.0 <7.0.0'
       - if: steps.detect.outputs.present == 'true'
         run: melos bootstrap
       - if: steps.detect.outputs.present == 'true'
+        run: melos run deps-check
+      - if: steps.detect.outputs.present == 'true'
         run: melos run analyze
       - if: steps.detect.outputs.present == 'true'
         run: melos run format-check
+      - if: steps.detect.outputs.present == 'true'
+        run: melos run tests-present
       - if: steps.detect.outputs.present == 'true'
         run: melos run test

@@ -3,12 +3,14 @@
 name: firebase
 
 on:
+  # Called by the deploy workflows, so they run these checks instead of copying the jobs.
+  workflow_call:
   pull_request:
     branches: [main, develop]
-    paths: ['functions/**', 'packages-ts/**', '*.rules', 'firestore.indexes.json', 'database.rules.json', 'firebase.json', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/firebase.yml']
+    paths: ['functions/**', 'packages-ts/**', '*.rules', 'firestore.indexes.json', 'firebase.json', 'links/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/firebase.yml']
   push:
     branches: [develop]
-    paths: ['functions/**', 'packages-ts/**', '*.rules', 'firestore.indexes.json', 'database.rules.json', 'firebase.json', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/firebase.yml']
+    paths: ['functions/**', 'packages-ts/**', '*.rules', 'firestore.indexes.json', 'firebase.json', 'links/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/firebase.yml']
 
 jobs:
   functions:
@@ -25,7 +27,13 @@ jobs:
       - run: pnpm --dir functions run typecheck
       - run: pnpm --dir functions run lint
       - run: pnpm --dir functions run test
-      - run: pnpm --dir functions run build
+      # build, then stage functions/.deploy: fails on a `workspace:` runtime dependency
+      # or a function without a region, as the deploy would.
+      - run: pnpm run functions:stage
+      - name: Check the staged manifest installs from the registry
+        run: |
+          d="$(mktemp -d)" && cp functions/.deploy/package.json "$d/"
+          npm install --dry-run --ignore-scripts --prefix "$d"
       # Each shared types package that exists must have a typecheck script:
       # `--dir ... run` fails when it is missing, where `--filter` passes checking nothing.
       - name: Type-check shared TypeScript packages

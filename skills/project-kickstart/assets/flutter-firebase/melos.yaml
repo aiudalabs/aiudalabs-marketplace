@@ -18,21 +18,32 @@ scripts:
     description: Run static analysis on all packages
     run: melos exec -- "dart analyze ."
 
+  deps-check:
+    description: Check path dependencies against the package graph (docs/ARCHITECTURE.md)
+    run: node tools/deps-check.mjs
+
   format:
     description: Format Dart code in all packages
     run: melos exec -- "dart format ."
 
   format-check:
     description: Verify Dart code is formatted
-    run: melos exec -- "dart format --set-exit-if-changed ."
+    run: melos exec -- "dart format --output=none --set-exit-if-changed ."
+
+  # `test` runs one package at a time (-c 1: parallel `flutter test` runs contend
+  # for the startup lock) and only where test/ exists; `tests-present` fails on a
+  # package without one, so no package is skipped silently. The gate runs both.
+  tests-present:
+    description: Fail when a package has no test/ folder
+    run: melos exec -c 1 -- "test -d test || { echo \"\$MELOS_PACKAGE_NAME has no test/ folder\"; exit 1; }"
 
   test:
     description: Run unit + widget tests in all packages with tests
-    run: melos exec --dir-exists="test" -- "flutter test"
+    run: melos exec -c 1 --dir-exists="test" -- "flutter test"
 
   test-coverage:
     description: Run tests with coverage in all packages
-    run: melos exec --dir-exists="test" -- "flutter test --coverage"
+    run: melos exec -c 1 --dir-exists="test" -- "flutter test --coverage"
 
   generate:
     description: Run code generation (build_runner) where applicable

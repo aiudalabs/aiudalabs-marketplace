@@ -8,14 +8,14 @@
   },
   "scripts": {
     "gen:index": "node scripts/gen-index.mjs",
-    "build": "node scripts/gen-index.mjs && tsc",
-    "build:watch": "node scripts/gen-index.mjs && tsc --watch",
-    "lint": "node scripts/gen-index.mjs && eslint src",
+    "build": "node scripts/gen-index.mjs && tsc --noEmit && node scripts/bundle.mjs",
+    "build:watch": "node scripts/gen-index.mjs && node scripts/stage-deploy.mjs --watch --bundle",
+    "lint": "node scripts/gen-index.mjs && eslint src test --no-error-on-unmatched-pattern",
     "typecheck": "node scripts/gen-index.mjs && tsc --noEmit",
-    "test": "node scripts/gen-index.mjs && vitest run --passWithNoTests",
+    "test": "node scripts/gen-index.mjs && node scripts/vitest-suite.mjs unit",
     "test:watch": "vitest",
-    "test:rules": "vitest run --config vitest.rules.config.ts --passWithNoTests",
-    "test:integration": "vitest run --config vitest.integration.config.ts --passWithNoTests",
+    "test:rules": "node scripts/vitest-suite.mjs rules",
+    "test:integration": "node scripts/vitest-suite.mjs integration",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
@@ -25,9 +25,11 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@{{project_name}}/types": "workspace:*",
     "@eslint/js": "^9.39.0",
     "@firebase/rules-unit-testing": "^5.0.0",
     "@types/node": "^22.0.0",
+    "esbuild": "^0.28.0",
     "eslint": "^9.39.0",
     "firebase": "^12.0.0",
     "typescript": "~5.9.0",

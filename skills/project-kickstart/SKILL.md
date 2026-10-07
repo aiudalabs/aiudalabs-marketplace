@@ -4,7 +4,7 @@ description: "Scaffolds a NEW, empty repository for the product-spec method, fro
 license: MIT
 compatibility: Needs git, Node.js 22 or later and network access for npx. flutter-firebase also uses Dart with Melos, pnpm and firebase-tools; fastapi-react uses Python 3.11+, pnpm and Docker. Missing tools are reported, not installed. macOS or Linux (WSL2 on Windows).
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: aiudalabs
   requires: stack-profile-flutter-firebase stack-profile-fastapi-react spec-guard
 ---
@@ -39,6 +39,7 @@ Ask in one message:
 4. **Issue tracker**: `github`, `bitbucket` or `none`.
 5. **Harness**: the coding agent the team works in, which receives the agents and skills in Step 6. `claude-code` (default), or another id that `npx github:aiudalabs/aiudalabs-marketplace harnesses` lists (`cursor`, `codex`, `gemini-cli`, `opencode`, ...).
 6. **Aiuda Labs look**: should the generated spec page (`html-spec-generator`) carry the Aiuda Labs house style? `yes` copies it to `docs/AIUDA_HOUSE_STYLE.md`; `no` (default) copies nothing. Either way it never styles the product or its mockups: `ui-screens-spec` asks for the product's visual identity in Phase 4.
+7. **Functions region** (flutter-firebase only): where Cloud Functions run, the same region as Firestore. Take it from `docs/ARCHITECTURE.md` when it exists and do not ask; default `us-central1`. It is set once, in `functions/src/init.ts`.
 
 Wait for all answers; ask follow-ups for anything ambiguous.
 
@@ -62,7 +63,19 @@ AIUDA_LOOK_TEXT = "yes, spec page only (docs/AIUDA_HOUSE_STYLE.md); the product 
 APPS           = list, or TBD
 TRACKER        = "github" | "bitbucket" | "none"
 PROJECT_DIR    = absolute path, e.g. "$(pwd)/marketplace-pa"
+FUNCTIONS_REGION = "us-central1" | the architecture's region
+FLUTTER_VERSION  = the current Flutter stable, read now (below); never a remembered number
 ```
+
+Read the current Flutter stable at scaffold time; it is pinned in `.tool-versions`, CI and the root `pubspec.yaml`:
+
+```bash
+FLUTTER_VERSION=$(curl -fsS https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);console.log(j.releases.find(r=>r.hash===j.current_release.stable).version)})')
+flutter --version --machine 2>/dev/null | grep '"frameworkVersion"'   # the installed one
+```
+
+Without network, use the installed version. When the installed Flutter is older than the pin, say so and ask: `flutter upgrade` (default) or pin the installed version. The root `pubspec.yaml` requires `flutter >= FLUTTER_VERSION`, so an older SDK fails `melos bootstrap`.
 
 Every path below uses the absolute `PROJECT_DIR`, so a `cd` in an earlier step never changes where a command writes.
 
@@ -78,7 +91,8 @@ Substitutions in every template:
 | `{{aiuda_look}}` | `AIUDA_LOOK_TEXT` |
 | `{{year}}` | current year |
 | `{{node_version}}` | `22` |
-| `{{flutter_version}}` | `3.27.0` |
+| `{{flutter_version}}` | `FLUTTER_VERSION` |
+| `{{functions_region}}` | `FUNCTIONS_REGION` |
 
 Right after Step 4, `grep -rnI '{{' "$PROJECT_DIR" --exclude-dir=node_modules` must print nothing.
 
@@ -86,7 +100,7 @@ Right after Step 4, `grep -rnI '{{' "$PROJECT_DIR" --exclude-dir=node_modules` m
 
 ### flutter-firebase
 
-The templates are in this skill's folder, under `assets/flutter-firebase/`. Copy **every** file, including the dotfiles (`.gitignore`, `.env.example`, `.firebaserc`, `.tool-versions`, `.github/workflows/*.yml`, `functions/eslint.config.mjs`), into `PROJECT_DIR`, keeping the relative paths, and apply the substitutions:
+The templates are in this skill's folder, under `assets/flutter-firebase/`. Copy **every** file, including the dotfiles (`.gitignore`, `.env.example`, `.firebaserc`, `.tool-versions`, `.github/workflows/*.yml`, `functions/.gitignore`, `functions/.env.local.example`), into `PROJECT_DIR`, keeping the relative paths, and apply the substitutions:
 
 ```bash
 mkdir -p "$PROJECT_DIR"
@@ -99,7 +113,8 @@ grep -rlI '{{' "$PROJECT_DIR" --exclude-dir=node_modules | while read -r file; d
   sed -i -e "s/{{project_name}}/$PROJECT_NAME/g" -e "s/{{package_name}}/$PACKAGE_NAME/g" \
     -e "s/{{project_title}}/$PROJECT_TITLE/g" -e "s/{{apps_included}}/$APPS/g" \
     -e "s/{{profile}}/$PROFILE/g" -e "s/{{harness}}/$HARNESS/g" -e "s|{{aiuda_look}}|$AIUDA_LOOK_TEXT|g" \
-    -e "s/{{year}}/$(date +%Y)/g" -e "s/{{node_version}}/22/g" -e "s/{{flutter_version}}/3.27.0/g" "$file"
+    -e "s/{{year}}/$(date +%Y)/g" -e "s/{{node_version}}/22/g" -e "s/{{flutter_version}}/$FLUTTER_VERSION/g" \
+    -e "s/{{functions_region}}/$FUNCTIONS_REGION/g" "$file"
 done
 ```
 
@@ -112,16 +127,19 @@ What lands where:
 | `README.md`, `STATUS.md` | root. `STATUS.md` holds sprint outcomes (written by `sprint-runner`); phase progress comes from `spec.mjs status` |
 | `SESSION.md` | `docs/SESSION.md`, every phase pending, the kickstart answers under "Last phase: 0" |
 | `AIUDA_HOUSE_STYLE.md` | `docs/AIUDA_HOUSE_STYLE.md` when `AIUDA_LOOK` is yes, otherwise delete it. It styles the spec page only, never the product; the name keeps `ui-screens-spec` from reading it as the product's design system |
-| `melos.yaml`, `pubspec.yaml`, `package.json`, `pnpm-workspace.yaml` | root: Melos 6 for Dart, pnpm for TypeScript (`packageManager` pins the pnpm version CI uses) |
-| `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`, `database.rules.json`, `storage.rules` | root |
-| `functions/` (`package.json`, `tsconfig.json`, `eslint.config.mjs`, three `vitest*.config.ts`, `.gitignore`, `scripts/gen-index.mjs`, `src/init.ts`) | `functions/`. `gen-index.mjs` generates `src/index.ts` before every build, typecheck, lint and test, so no issue edits the barrel; git ignores it |
+| `melos.yaml`, `pubspec.yaml`, `package.json`, `pnpm-workspace.yaml` | root: Melos 6 for Dart (`melos` is a dev dependency of the root `pubspec.yaml`, which Melos requires), pnpm for TypeScript (`packageManager` pins the pnpm version CI uses; `pnpm.onlyBuiltDependencies` lets esbuild, protobufjs and @firebase/util run their install scripts) |
+| `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`, `storage.rules` | root. Every emulator, the hub and the UI bind `127.0.0.1`. Two Hosting targets, `admin` and `links`, mapped per project in `.firebaserc`. No Realtime Database: the issue that adopts it, when `docs/ARCHITECTURE.md` chooses it, adds `database.rules.json`, the `database` block and emulator, and the CI path |
+| `functions/` (`package.json`, `tsconfig.json`, `eslint.config.mjs`, three `vitest*.config.ts`, `.gitignore`, `.env.local.example`, `scripts/`, `src/init.ts`) | `functions/`. `scripts/gen-index.mjs` generates `src/index.ts` (importing `./init` first) before every build, typecheck, lint and test, so no issue edits the barrel. `build` typechecks and bundles with esbuild into `lib/` (`scripts/bundle.mjs`, inlining `@<project>/types`); `scripts/stage-deploy.mjs` writes `.deploy/`, the `functions.source` of `firebase.json`, with a registry-only manifest, and fails on a function without a region. `scripts/vitest-suite.mjs` runs each test suite: `NOT RUN` until its first test file, strict after. `src/init.ts` sets the region with `setGlobalOptions` |
+| `packages-ts/types/` | the shared types package `@<project>/types`, empty, with a `typecheck` script; functions list it as a `workspace:*` devDependency |
+| `links/` | Hosting site for App Links and Universal Links: `env/<alias>/.well-known/` per environment, copied into `public/.well-known/` by `scripts/stage-links.mjs` (the Hosting predeploy, keyed on `$GCLOUD_PROJECT`); `/r/**` rewrites to `public/open.html`, never to `404.html` (Hosting answers that rewrite with 404) |
+| `tools/deps-check.mjs`, `tools/emulator-config.mjs` | `tools/`: `melos run deps-check` checks path dependencies against the package graph; `emulator-config.mjs <offset>` writes an offset emulator config for parallel worktrees |
 | `.github/workflows/flutter.yml`, `firebase.yml`, `admin.yml` | `.github/workflows/`: one workflow per lane, each naming its owner in a comment |
 
 Then create the folders:
 
 ```bash
 mkdir -p "$PROJECT_DIR"/{mockups,emulator-data}
-mkdir -p "$PROJECT_DIR"/packages/{core,data,ui} "$PROJECT_DIR"/packages-ts/types
+mkdir -p "$PROJECT_DIR"/packages/{core,data,ui}
 mkdir -p "$PROJECT_DIR"/functions/src/{callable,triggers,scheduled,https}
 ```
 
@@ -129,8 +147,9 @@ App folders follow the app names:
 
 - A mobile app (`customer-app`, `reader-app`, `mobile-app`): `apps/<name without -app>` (`apps/reader`).
 - A tablet app (`supervisor-tablet`): `apps/<name>_tablet` (`apps/supervisor_tablet`).
-- A web admin (`*-dashboard`, `*-web`, `*-admin`): one `admin/` folder, whatever the name. Scaffold it with `cd "$PROJECT_DIR" && pnpm create vite admin --template react-ts`, then name it like the other packages and add the two scripts every lane validates with: `cd "$PROJECT_DIR/admin" && npm pkg set name="@$PROJECT_NAME/admin" scripts.typecheck="tsc -b" scripts.test="vitest run --passWithNoTests" devDependencies.vitest="^3.2.0"`. Keep the TypeScript version the template ships; the admin builds on its own. The template gives `dev`, `build` (`tsc -b && vite build`), `lint` (whatever linter the current template ships) and `preview`; with the two above, the admin has every command `AGENTS.md` and `admin.yml` run. No Tailwind, no shadcn/ui: they come from an issue once `docs/ARCHITECTURE.md` chooses them, and that issue adds any new command to `AGENTS.md` and `admin.yml`.
-- **Without a web admin**: remove `admin` from `pnpm-workspace.yaml`, the admin site from the `hosting` block in `firebase.json` (keep a Hosting site when the apps need App Links or Universal Links: it serves `.well-known/`; see the profile's `architecture.md`), `.github/workflows/admin.yml`, and the admin lines from `AGENTS.md` (the stack line, the `pnpm --dir admin` commands, the `react-dev` roster line and the `admin/` folder line).
+- A web admin (`*-dashboard`, `*-web`, `*-admin`): one `admin/` folder, whatever the name. Scaffold it with `cd "$PROJECT_DIR" && pnpm create vite admin --template react-ts`, then name it like the other packages and add the two scripts every lane validates with: `cd "$PROJECT_DIR/admin" && npm pkg set name="@$PROJECT_NAME/admin" scripts.typecheck="tsc -b" scripts.test="vitest run --passWithNoTests" devDependencies.vitest="^3.2.0"`. Make the linter fail on warnings and print its counts: when the template's `lint` is `oxlint`, `npm pkg set scripts.lint="oxlint --deny-warnings -f default"` (plain `oxlint` prints nothing on success and exits 0 on warnings); for `eslint .`, `eslint . --max-warnings 0`. Keep the TypeScript version the template ships; the admin builds on its own. The template gives `dev`, `build` (`tsc -b && vite build`), `lint` and `preview`; with the two above, the admin has every command `AGENTS.md` and `admin.yml` run. No Tailwind, no shadcn/ui: they come from an issue once `docs/ARCHITECTURE.md` chooses them, and that issue adds any new command to `AGENTS.md` and `admin.yml`.
+- **Without a web admin**: remove `admin` from `pnpm-workspace.yaml`, the `admin` target from the `hosting` block in `firebase.json` and from `.firebaserc`, `.github/workflows/admin.yml`, and the admin lines from `AGENTS.md` (the stack line, the `pnpm --dir admin` commands, the `react-dev` roster line and the `admin/` folder line).
+- **Without web links** (no app opens an App Link, a Universal Link or a payment return URL): remove `links/`, the `links` target from `firebase.json` and `.firebaserc`, and the `links` lines from `AGENTS.md`. When unsure, keep it.
 - **TBD**: no app folders. `docs/SESSION.md` already says Phase 1 names the apps; the first sprint creates them. `flutter.yml` skips its checks while no `pubspec.yaml` exists under `apps/` or `packages/`.
 
 Git does not track empty folders, so give each one a `.gitkeep`; a clone then has the whole layout:
@@ -151,22 +170,28 @@ Do **not** create placeholder spec documents (`PRODUCT_BRIEF.md`, `PRD.md`, ...)
 
 ## Step 5: Install dependencies and check the scaffold (best effort)
 
-The lockfile must exist before the first commit, because CI installs with `--frozen-lockfile`.
+The lockfiles (`pnpm-lock.yaml`, the root `pubspec.lock`) must exist before the first commit, because CI installs with `--frozen-lockfile`.
 
 flutter-firebase:
 
 ```bash
 cd "$PROJECT_DIR"
 dart pub global activate melos '>=6.3.0 <7.0.0' || echo "Melos: skipped (Dart missing)"
-melos bootstrap || echo "melos bootstrap: skipped"
+# CI=true: without a TTY, Melos 6 crashes on its first-run analytics prompt.
+CI=true melos bootstrap || echo "melos bootstrap: FAILED"   # writes the root pubspec.lock
+for s in deps-check analyze format-check tests-present test; do CI=true melos run "$s" || echo "melos $s: FAILED"; done
 pnpm install                                     # writes pnpm-lock.yaml
 for s in typecheck lint test build test:rules; do pnpm --dir functions run "$s" || echo "functions $s: FAILED"; done
+pnpm --dir packages-ts/types run typecheck || echo "types typecheck: FAILED"
+pnpm run functions:stage || echo "functions:stage: FAILED"   # build, then stage functions/.deploy
+d=$(mktemp -d) && cp functions/.deploy/package.json "$d/" && npm install --dry-run --ignore-scripts --prefix "$d" \
+  || echo "deploy manifest: FAILED"             # what Cloud Build installs: registry versions only
 for s in lint typecheck test build; do pnpm --dir admin run "$s" || echo "admin $s: FAILED"; done   # only with an admin
 ```
 
-Every script passes on the empty scaffold because `vitest` runs with `--passWithNoTests`. That flag is for the scaffold only: "No test files found" verifies nothing, and the Sprint 0 issue that adds a package's first test removes it. Unit tests live where `functions/vitest.config.ts` looks (`src/**/*.test.ts`, `test/unit/**`); rules and integration tests have their own configs (`test/rules/**`, `test/integration/**`). Use `pnpm --dir <folder> run <script>`: it fails on a missing script, where `pnpm --filter` exits 0 without running anything. A failure here is a defect to report, not to hide: fix it in the scaffold or list it in the report.
+On the empty scaffold the melos scripts run over 0 packages and each functions test suite prints `NOT RUN (0 test files)`: report them as not run, not as passes. `functions/scripts/vitest-suite.mjs` drops that leniency by itself once a suite has its first test file, so no issue has to remember to remove a `--passWithNoTests`. Unit tests live where `functions/vitest.config.ts` looks (`src/**/*.test.ts`, `test/unit/**`); rules and integration tests have their own configs (`test/rules/**`, `test/integration/**`). Use `pnpm --dir <folder> run <script>`: it fails on a missing script, where `pnpm --filter` exits 0 without running anything. A failure here is a defect to report, not to hide: fix it in the scaffold or list it in the report.
 
-pnpm 10 does not run dependencies' install scripts unless approved, and lists the ones it skipped ("Ignored build scripts: esbuild, protobufjs, …"). None of them is needed by this scaffold: every check above passes without them. If a dependency added later needs its script, approve it with `pnpm approve-builds`, which records it in `package.json`.
+pnpm 10 runs a dependency's install script only when the root `package.json` lists it in `pnpm.onlyBuiltDependencies` (the scaffold lists esbuild, protobufjs and @firebase/util); `pnpm install` names any other it skipped ("Ignored build scripts"). Approve one a later dependency needs with `pnpm approve-builds`, which records it there.
 
 fastapi-react: the install and test commands from the profile's `references/kickstart.md`; `python -m pytest -q` must be green.
 
@@ -202,7 +227,7 @@ One commit, after everything above is generated, so the first push has the lockf
 ```bash
 cd "$PROJECT_DIR"
 git add -A
-git status --short     # check: pnpm-lock.yaml, the harness folders, .aiudalabs-marketplace.json, tools/spec-guard/, .githooks/, .github/workflows/spec-guard.yml
+git status --short     # check: pnpm-lock.yaml, pubspec.lock, the harness folders, .aiudalabs-marketplace.json, tools/spec-guard/, .githooks/, .github/workflows/spec-guard.yml
 git commit -m "chore: kickstart {PROJECT_NAME} ({PROFILE})"
 git checkout -b develop
 ```
