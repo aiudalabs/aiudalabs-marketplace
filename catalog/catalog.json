@@ -455,7 +455,7 @@
     {
       "name": "aiuda-brand",
       "description": "Produces Aiuda Labs branded business documents (proposals, training proposals, quotes, SOWs, one-pagers, reports, case studies) as print-ready PDF from branded HTML, or HTML or Word on request, in the exact visual identity of aiudalabs.com: Satoshi, Instrument Serif and JetBrains Mono, warm cream background, orange accent, eyebrow labels, dark footer and the <ai/>labs logo. Use for 'propuesta comercial', 'propuesta de capacitación', 'cotización', 'one-pager con la marca de Aiuda Labs', 'dame esto branded'. Applies only the Aiuda Labs brand. Not for writing a brand's guidelines (use `brand-guidelines`), checking a piece against a brand (use `brand-review`), or technical architecture pages (use `html-spec-generator`).",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "license": "MIT",
       "requires": [],
       "tools": [],
