@@ -40,21 +40,26 @@ export function parseDecisions(text) {
   const decisions = new Map();
   const problems = [];
   const pattern = new RegExp(`^#{1,6}\\s+(?:D-(\\d+)|Decision\\s+(\\d+))${DASH}(.+)$`, 'gim');
-  for (const match of text.matchAll(pattern)) {
+  const found = [...text.matchAll(pattern)];
+  const profileAt = /\*\*Stack profile:\*\*/i.exec(text)?.index ?? -1;
+  found.forEach((match, index) => {
     const id = `D-${String(match[1] ?? match[2]).padStart(2, '0')}`;
     const title = match[3].trim();
     if (decisions.has(id)) problems.push(error('duplicate-decision', `${DOCS.decisions}:${lineOf(text, match.index)}`, `${id} is defined twice`));
-    decisions.set(id, { id, title, deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
-  }
+    // The decision that locks the stack profile is implemented by the scaffold, not by an issue.
+    const end = found[index + 1]?.index ?? text.length;
+    const locksProfile = profileAt > match.index && profileAt < end;
+    decisions.set(id, { id, title, locksProfile, deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
+  });
   const profile = /\*\*Stack profile:\*\*\s*`?([a-z0-9-]+)`?/i.exec(text)?.[1]?.toLowerCase();
   return { decisions, profile: profile ? (PROFILE_ALIASES[profile] ?? profile) : null, problems };
 }
 
-// `### FR-ORDER-1 — Title` (or `FR-12`).
+// `### FR-ORDER-1 — Title`, `### FR-CHECK-IN-2 — Title` or the older `FR-12`.
 export function parseRequirements(text) {
   const requirements = new Map();
   const problems = [];
-  const pattern = new RegExp(`^#{1,6}\\s+(FR-[A-Z0-9]+(?:-\\d+)?)${DASH}(.+)$`, 'gm');
+  const pattern = new RegExp(`^#{1,6}\\s+(FR-(?:[A-Z][A-Z0-9]*-)*\\d+)${DASH}(.+)$`, 'gm');
   const matchesFound = [...text.matchAll(pattern)];
   matchesFound.forEach((match, index) => {
     const [, id, title] = match;
@@ -435,7 +440,7 @@ export function checkProject(project, { strict = false } = {}) {
   if (decisions) {
     const used = cited('decision_refs');
     for (const decision of decisions.values()) {
-      if (!decision.deferred && !decision.existing && !used.has(decision.id)) found.push(gap('uncovered-decision', DOCS.decisions, `${decision.id} (${decision.title}) is implemented by no issue: scope dropped silently, or mark it (deferred) or, if the code already does it, (existing)`));
+      if (!decision.deferred && !decision.existing && !decision.locksProfile && !used.has(decision.id)) found.push(gap('uncovered-decision', DOCS.decisions, `${decision.id} (${decision.title}) is implemented by no issue: scope dropped silently, or mark it (deferred) or, if the code already does it, (existing)`));
     }
   }
   if (requirements) {

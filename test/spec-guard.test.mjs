@@ -56,12 +56,15 @@ test('decisions: D-xx headings, the older "Decision N:" form, deferred and the p
   assert.equal(decisions.get('D-02').title, 'Free cancellation');
   assert.ok(decisions.get('D-11').deferred);
   assert.equal(profile, 'flutter-firebase');
+  const withProfile = parseDecisions('## D-01 — Stack\n\n**Stack profile:** fastapi-react\n\n## D-02 — Other\n');
+  assert.ok(withProfile.decisions.get('D-01').locksProfile, 'the profile decision is implemented by the scaffold');
+  assert.ok(!withProfile.decisions.get('D-02').locksProfile);
   assert.deepEqual(parseDecisions('## D-01 — a\n## D-01 — b\n').problems.map((p) => p.code), ['duplicate-decision']);
 });
 
 test('requirements and roster', () => {
-  const { requirements } = parseRequirements('### FR-ORDER-1 — Place an order\n### FR-12 — Legacy id\n#### FR-PAY-2 — Refunds (deferred)\n');
-  assert.deepEqual([...requirements.keys()], ['FR-ORDER-1', 'FR-12', 'FR-PAY-2']);
+  const { requirements } = parseRequirements('### FR-ORDER-1 — Place an order\n### FR-12 — Legacy id\n#### FR-PAY-2 — Refunds (deferred)\n### FR-CHECK-IN-3 — Check in\n');
+  assert.deepEqual([...requirements.keys()], ['FR-ORDER-1', 'FR-12', 'FR-PAY-2', 'FR-CHECK-IN-3']);
   assert.ok(requirements.get('FR-PAY-2').deferred);
 
   const { agents, problems } = parseRoster('## flutter-dev\n\n**Owns:** `apps/**`, `packages/ui/**`\n\n## qa-tester\n\n**Owns:** none\n\n## react-dev — admin\n\nNo lane line.\n');

@@ -22,9 +22,10 @@ One heading per decision, numbered `D-01`, `D-02`, ... in order:
 - A decision the code already implements, recorded when an existing repository
   is adopted, carries `(existing)`: `## D-05 — Money is integer cents (existing)`.
   It needs no issue either, and an issue may still cite it when it applies it.
-- The stack profile is locked by a line anywhere in the file:
+- The stack profile is locked by a line inside one decision's section:
   `**Stack profile:** flutter-firebase` (or `fastapi-react`). The older ids
-  `aiuda-flutter-firebase` and `python-fastapi-react` are accepted.
+  `aiuda-flutter-firebase` and `python-fastapi-react` are accepted. That
+  decision is implemented by the scaffold, so it needs no issue.
 
 ## Requirements: `docs/PRD.md`
 
@@ -38,8 +39,10 @@ One heading per functional requirement:
 - Then the order is created with status `placed` within 3 s
 ```
 
-- The id is `FR-`, an uppercase area, `-`, a number: `FR-ORDER-1`. `FR-12`
-  (no area) is also accepted.
+- The id is `FR-`, an uppercase area, `-`, a number: `FR-ORDER-1`. The area
+  may have hyphens (`FR-CHECK-IN-2`). `FR-12` (no area) is also accepted.
+- Only headings define requirements. Mention ids anywhere else in plain text,
+  never in another heading, or they count as definitions.
 - `(deferred)` in the heading takes the requirement out of this release;
   `(existing)` marks one the code already meets.
 
