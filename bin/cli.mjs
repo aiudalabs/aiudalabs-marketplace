@@ -316,12 +316,32 @@ function showOutdated(options) {
   const manifest = readManifest(baseDir);
   const harnessIds = options.harness ? [options.harness] : manifestHarnesses(manifest);
   if (harnessIds.length === 0) return console.log(`Nothing installed here with \`add\` (no ${MANIFEST_FILE}).`);
+  const scope = options.global ? 'global' : 'project';
 
   let any = false;
   for (const harnessId of harnessIds) {
-    for (const row of outdated(manifest, harnessId, components)) {
+    const adapter = getAdapter(harnessId);
+    const installed = manifest.harnesses[harnessId]?.installed ?? {};
+    // Components that left the catalog.
+    for (const row of outdated(manifest, harnessId, components).filter((r) => r.available === null)) {
       any = true;
-      console.log(`${harnessId.padEnd(12)} ${row.key.padEnd(40)} ${row.installed ?? '?'} -> ${row.available ?? 'removed from the catalog'}`);
+      console.log(`${harnessId.padEnd(12)} ${row.key.padEnd(40)} removed from the catalog`);
+    }
+    if (!adapter) continue;
+    const roots = (manifest.harnesses[harnessId]?.requested ?? []).flatMap((key) => {
+      try {
+        return [resolveReference(key, components)];
+      } catch {
+        return [];
+      }
+    });
+    const { operations } = planInstall(expand(roots, components), adapter, { scope, baseDir });
+    for (const { operation, state } of classifyUpdate(manifest, harnessId, operations, { baseDir })) {
+      if (state !== 'upgrade' && state !== 'modified') continue;
+      any = true;
+      const entry = installed[`${operation.kind}/${operation.id}`];
+      const change = entry?.version !== operation.version ? `${entry?.version ?? '?'} -> ${operation.version}` : `${operation.version}, content changed`;
+      console.log(`${harnessId.padEnd(12)} ${`${operation.kind}/${operation.id}`.padEnd(40)} ${change}${state === 'modified' ? '  (edited locally)' : ''}`);
     }
   }
   if (!any) console.log('Everything is up to date.');

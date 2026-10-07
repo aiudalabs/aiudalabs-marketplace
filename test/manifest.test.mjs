@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { appendFileSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { getAdapter } from '../adapters/index.mjs';
-import { loadAll } from '../lib/components.mjs';
+import { ROOT, loadAll } from '../lib/components.mjs';
 import { InstallError, applyInstall, expand, planInstall, resolveReference } from '../lib/install.mjs';
 import {
   MANIFEST_FILE, classifyUpdate, outdated, planRemoval, readManifest, recordInstall, recordRemoval, resolveTarget, writeManifest,
@@ -102,4 +102,24 @@ test('manifest: a corrupt file is a user error, not a crash', (t) => {
   t.after(() => rmSync(baseDir, { recursive: true, force: true }));
   writeFileSync(join(baseDir, MANIFEST_FILE), '{ nope');
   assert.throws(() => readManifest(baseDir), InstallError);
+});
+
+test('update: a fix shipped without a version bump is still an upgrade', (t) => {
+  // A marketplace of one skill and one agent, installed, then changed upstream.
+  const market = mkdtempSync(join(tmpdir(), 'aiuda-market-'));
+  t.after(() => rmSync(market, { recursive: true, force: true }));
+  cpSync(join(ROOT, 'skills/color-system'), join(market, 'skills/color-system'), { recursive: true });
+  cpSync(join(ROOT, 'agents/design/brand-guardian.md'), join(market, 'agents/design/brand-guardian.md'));
+  const plan = (catalog, baseDir) => planInstall(expand([resolveReference('color-system', catalog)], catalog), adapter, { scope: 'project', baseDir });
+
+  const before = loadAll(market);
+  const baseDir = mkdtempSync(join(tmpdir(), 'aiuda-manifest-'));
+  t.after(() => rmSync(baseDir, { recursive: true, force: true }));
+  const { operations } = plan(before, baseDir);
+  const manifest = recordInstall(readManifest(baseDir), adapter.id, [resolveReference('color-system', before)], applyInstall(operations), baseDir);
+  assert.equal(classifyUpdate(manifest, adapter.id, plan(before, baseDir).operations, { baseDir })[0].state, 'current');
+
+  appendFileSync(join(market, 'skills/color-system/SKILL.md'), '\nA fix with no version bump.\n');
+  const after = loadAll(market);
+  assert.equal(classifyUpdate(manifest, adapter.id, plan(after, baseDir).operations, { baseDir })[0].state, 'upgrade');
 });

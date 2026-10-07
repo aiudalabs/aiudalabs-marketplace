@@ -514,7 +514,8 @@ export function readProject(root) {
     problems,
     issuesText,
     rosterFile,
-    profile: decisions?.profile ?? null,
+    // Before Phase 1 the scaffold's AGENTS.md is the only place the profile is written.
+    profile: decisions?.profile ?? (parseDecisions(read(root, 'AGENTS.md') ?? '').profile),
     decisions: decisions && decisions.decisions.size ? decisions.decisions : null,
     requirements: requirements && requirements.requirements.size ? requirements.requirements : null,
     roster,

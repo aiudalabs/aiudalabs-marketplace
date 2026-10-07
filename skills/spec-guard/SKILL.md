@@ -4,7 +4,7 @@ description: "Checks a product spec and its sprint backlog with code instead of 
 license: MIT
 compatibility: Node.js 18 or later and git. No dependencies and no network access; the GitHub export writes a script for the gh CLI that a person runs.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires-tools: "node git"
 ---
@@ -48,6 +48,8 @@ On a branch whose name carries an issue id (`wt/S3-07`, `S3-07-create-booking`):
 - **CI** (`--ci`) runs `check --strict` on every push and `verify` on pull requests from issue branches.
 
 On any branch, a commit that changes `docs/ISSUES.md` must pass `check`. Existing hook or workflow files that spec-guard did not write are left alone; the installer says so.
+
+After the `spec-guard` skill is updated (`npx github:aiudalabs/aiudalabs-marketplace update`), run the installer again: it replaces `tools/spec-guard/` with the new scripts and keeps the hooks, the CI workflow and `.claude/settings.json` as they are. Until then the project keeps checking with the old copy.
 
 `git commit --no-verify` skips the local hooks. That is deliberate, for emergencies; CI runs the same checks, so nothing skipped locally reaches the base branch unseen.
 
