@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Make me a favicon from this SVG logo for my bakery's website.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need all the icons for our installable web app, including the maskable ones, plus the Apple touch icon.",
+    "should_trigger": true
+  },
+  {
+    "query": "Create the image that shows up when someone shares our link on LinkedIn or Slack.",
+    "should_trigger": true
+  },
+  {
+    "query": "Export our logo as PNGs at every size the App Store and Google Play ask for, and check that each file is right.",
+    "should_trigger": true
+  },
+  {
+    "query": "Design a logo for my plant nursery that would also work as an app icon.",
+    "should_trigger": false,
+    "use_instead": "logo-direction"
+  },
+  {
+    "query": "Check whether the social images our agency delivered use the right brand colors and logo version.",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  },
+  {
+    "query": "Build a whole brand identity for my startup from scratch, from finding the look to the guidelines.",
+    "should_trigger": false,
+    "use_instead": "visual-identity"
+  }
+]

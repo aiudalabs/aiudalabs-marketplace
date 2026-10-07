@@ -48,7 +48,7 @@ node bin/cli.mjs new stack <name>
 node bin/cli.mjs new external <name>
 ```
 
-It refuses a name that breaks the naming rule or is already in use. Every part you have to write is marked `TODO`, and `npm run validate` fails until the description is written. The sections below say what goes in each one.
+It refuses a name that breaks the naming rule or is already in use. Every part you have to write is marked `TODO`, and `npm run validate` fails until the description and, for a skill or workflow, the trigger evals in `evals/triggers.json` are written. The sections below say what goes in each one.
 
 ## Add a skill
 
@@ -58,6 +58,8 @@ It refuses a name that breaks the naming rule or is already in use. Every part y
 4. Keep `SKILL.md` under 500 lines. Put long material in `references/`, templates in `assets/` and runnable code in `scripts/`, and link to them with relative paths.
 5. If the skill hands work to another skill, list it in `metadata.requires` and refer to it by name in the instructions. Never link to a file inside another skill's folder: each skill is installed as its own folder.
 6. Scripts run with the Node.js or Python standard library alone. If one needs a program on the machine, list it in `metadata.requires-tools` and explain versions in `compatibility`.
+7. Never locate a skill through a harness folder such as `~/.claude/skills/<name>`: each harness installs skills somewhere else. Say "this skill's folder", and the validator enforces it.
+8. Write `evals/triggers.json`: at least three requests that should load the skill and two near misses that a neighboring skill owns, with `use_instead` naming it. If a near miss would load your skill, sharpen the description to say where it stops. The format is in [docs/component-formats.md](docs/component-formats.md#evals).
 
 ```markdown
 ---
@@ -230,6 +232,13 @@ npm test           # must pass
 
 Commit the regenerated files along with your change. Never edit `catalog/catalog.json` or `.claude-plugin/marketplace.json` by hand.
 
+If you added a skill or changed a description, check routing against its neighbors. This calls the Claude API, one request per case, so it needs `ANTHROPIC_API_KEY`:
+
+```bash
+node scripts/eval-triggers.mjs <name> --dry-run   # how many requests it would make
+node scripts/eval-triggers.mjs <name>             # the cases of one component, routed among the whole catalog
+```
+
 Install the component in at least one harness and use it once. Say which harness in the pull request.
 
 Every change reaches `main` through a pull request. Nobody pushes to `main` directly, the `validate` check has to pass, and a maintainer approves before it merges.
@@ -242,7 +251,7 @@ Components use semver.
 - Minor: new capability, backward compatible
 - Major: a change that alters what the component does or requires
 
-Bump the version of every component you change, including a stack whose list changed. The repository version in `package.json` is bumped by maintainers at release time.
+Bump the version of every component you change, including a stack whose list changed. `update` compares installed versions with the catalog, so a change without a bump never reaches people who already installed the component. The repository version in `package.json` is bumped by maintainers at release time.
 
 ## Quality bar
 

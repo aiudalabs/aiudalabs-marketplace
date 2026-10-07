@@ -1,9 +1,9 @@
 ---
 name: "manuscript-drafting"
-description: "Use this skill for \"write a paper\", \"draft manuscript\", \"write introduction\", \"write methods section\", \"write results\", \"write discussion\", \"write abstract\", \"structure a paper\", \"academic writing\", \"write for journal\", or when the user wants to draft or revise sections of an academic manuscript."
+description: "Drafts or restructures individual sections of an academic manuscript: introduction, methods, results, discussion and abstract, following IMRaD conventions for a journal. Use for \"write the introduction\", \"draft the methods section\", \"write the abstract\" or \"structure this paper\". For taking a whole paper from idea to a review-ready draft use paper-author; for revising existing text use manuscript-revision."
 license: "BSD-3-Clause"
 metadata:
-  version: "0.2.1"
+  version: "0.3.0"
   author: "Seyed (Yahya) Shirazi"
   source: "https://github.com/neuromechanist/research-skills"
 ---
@@ -103,10 +103,10 @@ After drafting, check:
 - [ ] All abbreviations defined on first use
 - [ ] References complete and consistently formatted
 - [ ] Word/page count within journal limits
-- [ ] Run `manuscript:humanizer` as a final natural-writing pass (strips AI tells like significance inflation, em-dashes, "evolving landscape" filler, rule-of-three padding) before review
+- [ ] Run `humanizer` as a final natural-writing pass (strips AI tells like significance inflation, em-dashes, "evolving landscape" filler, rule-of-three padding) before review
 
 ## Additional Resources
 
 - Reference: [references/section-templates.md](references/section-templates.md) - Templates for each manuscript section
 - Reference: [references/revision-response.md](references/revision-response.md) - How to write point-by-point responses to reviewers
-- Sister skill: `manuscript:humanizer` - Removes 29 categories of AI-writing tells while respecting academic conventions (e.g., passive voice in Methods, hedging in Discussion). Run after drafting and before peer review.
+- Sister skill: `humanizer` - Removes 29 categories of AI-writing tells while respecting academic conventions (e.g., passive voice in Methods, hedging in Discussion). Run after drafting and before peer review.

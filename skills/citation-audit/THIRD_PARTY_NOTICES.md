@@ -5,8 +5,9 @@ Adapted from **academic-human-in-the-loop**, https://github.com/OpenGHz/academic
 Changes made here:
 
 - Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
+- Plugin-scoped names (such as `manuscript:humanizer`) and fixed install paths (such as `~/.claude/skills/<name>`), wherever they occur in the Markdown files, are rewritten to the component names and folder placeholders used here, so the text works in every harness.
 - Each reviewer call runs as a fresh subagent instead of the OpenAI Codex MCP; an adaptation note at the top of SKILL.md explains the substitution, and `allowed-tools` lists `Agent` instead of `mcp__codex__codex`.
-- `shared-references/` and the two scripts in `tools/` are bundled inside the skill folder (upstream keeps them at the repository root), and links to them are rewritten.
+- `shared-references/` and the two scripts in `tools/` are bundled inside the skill folder (upstream keeps them at the repository root), and links to them are rewritten. Only the shared references this skill links to, directly or through another reference, are bundled; links to upstream sibling skills that are not bundled become plain text.
 
 License of the upstream project:
 

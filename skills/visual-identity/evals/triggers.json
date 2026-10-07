@@ -1,0 +1,37 @@
+[
+  {
+    "query": "I'm launching a meal-kit startup for night-shift nurses called ShiftPlate and we have zero branding. Can you take me through the whole thing: the look, colors, fonts, logo, icons and a brand guide at the end?",
+    "should_trigger": true
+  },
+  {
+    "query": "We're a 12-person accounting firm in Porto and our identity hasn't been touched since 2011. I want a complete rebrand, start to finish, not just a new logo.",
+    "should_trigger": true
+  },
+  {
+    "query": "Need a full visual identity for my dog-walking app Leashly, basically everything a branding agency would hand over at the end of a project.",
+    "should_trigger": true
+  },
+  {
+    "query": "Give our open-source time-series database a brand refresh end to end. Figure out the new look first, then build the palette, type, tokens, favicon set and guidelines from it.",
+    "should_trigger": true
+  },
+  {
+    "query": "starting a small ceramics studio, need branding from scratch. the works.",
+    "should_trigger": true
+  },
+  {
+    "query": "I only need a color palette for my bakery's website, warm and a bit retro, starting from a terracotta #c8553d.",
+    "should_trigger": false,
+    "use_instead": "color-system"
+  },
+  {
+    "query": "Can you suggest a font pairing for a family law firm's site? Serif headings, very readable body text.",
+    "should_trigger": false,
+    "use_instead": "typography-system"
+  },
+  {
+    "query": "I already have the Leashly logo as an SVG. Just generate the favicon and the app icons from it.",
+    "should_trigger": false,
+    "use_instead": "brand-asset-kit"
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "query": "The plan for chapter 6 of my probability textbook is in docs/superpowers/plans. Please draft all its sections and have each one audited.",
+    "should_trigger": true
+  },
+  {
+    "query": "Draft section 3.4 on the Wald confidence interval per the chapter plan, including the paired notebook, and run the spec and quality audits on it.",
+    "should_trigger": true
+  },
+  {
+    "query": "Chapter 9's plan is approved. Write it section by section, reformulating the two source papers it cites into fresh prose.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need the planned sections of chapter 12 of my Bernoulli-types book written now, with the auditors checking each draft against the checklist.",
+    "should_trigger": true
+  },
+  {
+    "query": "Chapter 6 is already drafted. Review it and give me a report of the problems, but don't change anything yet.",
+    "should_trigger": false,
+    "use_instead": "bookwright-reviewer"
+  },
+  {
+    "query": "Here's yesterday's review report for chapter 4. Apply its fixes and write me the revision report.",
+    "should_trigger": false,
+    "use_instead": "bookwright-rewriter"
+  },
+  {
+    "query": "I only have a vague idea for a textbook on causal inference, no outline, no plan. Take it from scratch to a full manuscript.",
+    "should_trigger": false,
+    "use_instead": "book-author"
+  }
+]

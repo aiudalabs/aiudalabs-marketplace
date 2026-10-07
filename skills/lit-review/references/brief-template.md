@@ -50,7 +50,7 @@ Imported entries must set `imported_from: <relative path>` in card.md.
 ## Skills to use
 
 - `opencite:opencite` for paper retrieval, DOI lookup, BibTeX export
-- `manuscript:manuscript-writing` for prose discipline (no em-dashes, abbreviations on first use)
+- `manuscript-drafting` for prose discipline (no em-dashes, abbreviations on first use)
 
 ## Acceptance criteria
 

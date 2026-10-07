@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Review chapter 5 of my technical book and give me one dated report of findings. Don't fix anything, I just want to see what's wrong.",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you audit section sec:bloom-filter-fpr? Check it against the plan, recompute the math, check the cross-refs and the prose clarity.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run a full editorial review of the whole book under book/ and merge everything the auditors find into a single report.",
+    "should_trigger": true
+  },
+  {
+    "query": "I just finished drafting chapter 11. Before I touch it again I want the four auditors run on it in parallel and their findings ranked by severity.",
+    "should_trigger": true
+  },
+  {
+    "query": "Keep reviewing and fixing chapter 5 until it comes back clean; I'm going to bed, don't wait for me.",
+    "should_trigger": false,
+    "use_instead": "bookwright-iterator"
+  },
+  {
+    "query": "The review report from this morning lists 14 substantive findings in chapter 5. Go fix them.",
+    "should_trigger": false,
+    "use_instead": "bookwright-rewriter"
+  },
+  {
+    "query": "My book manuscript on economic history is complete. Give me a publish / major-revision / don't-publish verdict with peer review and a citation audit.",
+    "should_trigger": false,
+    "use_instead": "scientific-book-editor"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  { "query": "Make it a Kindle book: here's my cookbook as a single markdown file with YAML frontmatter.", "should_trigger": true },
+  { "query": "I wrote a short self-help book in plain text. Can you turn it into an EPUB I can upload to Amazon and also a simple 6x9 paperback PDF?", "should_trigger": true },
+  { "query": "quick one: convert novella.md into an epub3 and a 5x8 pdf for kdp. no need for anything elaborate", "should_trigger": true },
+  { "query": "I've got my poetry collection in a few .md files and just want ebook and paperback files I can upload to KDP this weekend, using the cover.jpg I already have.", "should_trigger": true },
+  { "query": "KDP rejected my paperback interior because the fonts aren't embedded and the PDF has no TrimBox. Can you make it press-ready?", "should_trigger": false, "use_instead": "book-typesetting" },
+  { "query": "I need the full-wrap paperback cover PDF for KDP with the spine sized for my 236 pages.", "should_trigger": false, "use_instead": "kindle-cover" },
+  { "query": "What price should I set my Kindle ebook at to get the 70% royalty, and should I enroll in KDP Select?", "should_trigger": false, "use_instead": "ebook-publishing" }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Can you review the writing in my materials science paper before I send it to Acta Materialia? Just tell me what's cluttered, passive or inconsistent, ranked by priority.",
+    "should_trigger": true
+  },
+  {
+    "query": "I keep switching between 'catalyst loading' and 'catalyst content' in my manuscript. Do a pass on terminology consistency and number formatting.",
+    "should_trigger": true
+  },
+  {
+    "query": "Give me a report on the prose quality of my Discussion section: wordiness, weak verbs, sentences that are too long. Don't rewrite it, I want to fix it myself.",
+    "should_trigger": true
+  },
+  {
+    "query": "review my writing in this hydrology paper, journal says it needs language editing",
+    "should_trigger": true
+  },
+  {
+    "query": "Please just rewrite this abstract so it's tighter and more precise, I'll paste the result straight into the submission system.",
+    "should_trigger": false,
+    "use_instead": "manuscript-revision"
+  },
+  {
+    "query": "Here's my 280-page popular science book. Do a line and copy edit with tracked changes in Word and a style sheet.",
+    "should_trigger": false,
+    "use_instead": "line-and-copy-editor"
+  },
+  {
+    "query": "Are the statistical tests in my clinical trial paper appropriate? Check the methods and whether the results support the conclusions.",
+    "should_trigger": false,
+    "use_instead": "paper-review"
+  }
+]

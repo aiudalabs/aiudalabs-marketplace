@@ -28,7 +28,7 @@
         "./skills/manuscript-checks"
       ],
       "agents": [
-        "./agents/research/paper-review.md",
+        "./agents/research/paper-reviewer.md",
         "./agents/research/paper-crawler.md",
         "./agents/research/research-analyst.md"
       ]
@@ -72,7 +72,7 @@
         "./skills/academic-writing-principles"
       ],
       "agents": [
-        "./agents/research/paper-review.md",
+        "./agents/research/paper-reviewer.md",
         "./agents/research/bibliography-auditor.md",
         "./agents/writing/consistency-checker.md",
         "./agents/writing/logic-reviewer.md",

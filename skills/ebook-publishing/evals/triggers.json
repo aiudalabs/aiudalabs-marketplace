@@ -1,0 +1,10 @@
+[
+  { "query": "Should I go exclusive with KDP Select for my first cozy mystery or publish wide on Kobo, Apple Books and Google Play through Draft2Digital?", "should_trigger": true },
+  { "query": "I have a three-book fantasy series. Does it make sense to make book one permafree, and how would I price books two and three?", "should_trigger": true },
+  { "query": "I want an audiobook version of my productivity book but can't afford a narrator. What are my options with AI narration, and how do ACX and KDP Virtual Voice compare?", "should_trigger": true },
+  { "query": "Plan a launch for my nonfiction book on remote team management: ARC readers, a BookBub push, and what to do in the first 30 days.", "should_trigger": true },
+  { "query": "Is it worth buying ISBNs from Bowker or should I just take the free one from Amazon?", "should_trigger": true },
+  { "query": "Write me the Amazon book description, seven keyword phrases and two BISAC categories for my sci-fi thriller.", "should_trigger": false, "use_instead": "kdp-listing" },
+  { "query": "Turn my markdown manuscript into an EPUB and a 6x9 paperback PDF I can upload to KDP.", "should_trigger": false, "use_instead": "kindle-book" },
+  { "query": "Check my LaTeX manuscript against KDP's margin, trim and font rules and tell me what will get rejected.", "should_trigger": false, "use_instead": "kdp-audit" }
+]

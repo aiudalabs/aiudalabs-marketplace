@@ -1,0 +1,9 @@
+[
+  { "query": "Write the blurb for my Amazon KDP listing, with HTML formatting, for my thriller about a hacker in Lisbon.", "should_trigger": true },
+  { "query": "I need the seven keyword slots and the BISAC categories for my beginner's guide to sourdough baking on Amazon.", "should_trigger": true },
+  { "query": "My book page on Amazon isn't converting. Can you rewrite the product description and give me a couple of options for the opening hook?", "should_trigger": true },
+  { "query": "Draft a short third-person author bio for my KDP page. I'm a retired marine biologist and this is my first novel.", "should_trigger": true },
+  { "query": "Should I price my romance ebook at 2.99 or 4.99, and is a Kindle Countdown Deal worth it at launch?", "should_trigger": false, "use_instead": "ebook-publishing" },
+  { "query": "Check whether my manuscript's metadata, trim size and cover dimensions meet KDP's requirements.", "should_trigger": false, "use_instead": "kdp-audit" },
+  { "query": "Write a LinkedIn article announcing the launch of my new book on product management.", "should_trigger": false, "use_instead": "article-author" }
+]

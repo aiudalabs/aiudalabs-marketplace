@@ -66,14 +66,37 @@ When a skill includes content adapted from another project, add a `THIRD_PARTY_N
 
 ### Evals
 
-A skill may include `evals/evals.json` with test prompts and expected outputs. The folder is optional and the validator does not check its contents yet.
+Every skill and workflow has `evals/triggers.json`: requests that should load it, and near misses that should not. A harness picks a skill by its description alone, so two skills with overlapping descriptions compete for the same requests. These cases are how that shows up.
+
+```json
+[
+  { "query": "Review the writing in my hydrology paper; the journal asked for language editing", "should_trigger": true },
+  { "query": "Rewrite this abstract so it is tighter, I will paste it straight in", "should_trigger": false, "use_instead": "manuscript-revision" }
+]
+```
+
+| Field | Rule |
+| --- | --- |
+| `query` | A request in a user's own words, with concrete details. Paraphrase; do not copy the description. |
+| `should_trigger` | `true` when this component should be loaded, `false` for a near miss |
+| `use_instead` | Optional, only on a near miss: the skill, workflow or external that owns the request |
+
+The validator requires at least 3 cases that should trigger and 2 near misses, and checks every field. Write near misses from the neighbors a user could confuse with this component, and say in the description where this one stops and which neighbor to use instead.
+
+`node scripts/eval-triggers.mjs` runs the cases: it shows a model the name and description of everything in the catalog, as a harness does at discovery time, and reports each case it routes wrongly and the pairs it confuses. Pass component names to run only theirs, `--stack <name>` to route among what one stack installs, and `--dry-run` to see the size of the run first. It needs `ANTHROPIC_API_KEY`, and every case is one paid request.
+
+A skill may also include `evals/evals.json` with test prompts and expected outputs, in the format of Anthropic's skill-creator. It is optional and the validator does not check it.
 
 ### Body
 
 - Required and non-empty.
 - Keep it under 500 lines. The validator warns above that. Move detail into `references/`.
-- Link to bundled files with relative paths, such as `[palette guide](references/color-systems.md)`. The validator fails on links to files that do not exist.
+- Link to bundled files with relative paths, such as `[palette guide](references/color-systems.md)`. The validator fails on links to files that do not exist, in `SKILL.md` and in every other Markdown file of the skill except those under `assets/`, and on links that leave the skill folder.
 - Keep references one level deep: `SKILL.md` links to a reference file, and that file does not link onward to another.
+
+### Portable paths
+
+Each harness installs skills into its own folder, so no file in a skill may locate itself or another skill through a fixed path. The validator fails on `~/.claude/skills`, `$HOME/.codex/agents` and the like for every harness, and on `CLAUDE_PLUGIN_ROOT`, in every text file of the skill and in agent bodies. Write "this skill's folder", run scripts with paths relative to it, and refer to other skills by name. `THIRD_PARTY_NOTICES.md`, `NOTICE.md` and `LICENSE` files are kept verbatim and not checked.
 
 ### Writing a good description
 
@@ -93,7 +116,7 @@ An agent is one Markdown file at `agents/<category>/<name>.md`. It describes a p
 
 | Field | Required | Rule |
 | --- | --- | --- |
-| `name` | Yes | Same naming rule as skills. Must equal the file name without `.md`. Unique across all categories. |
+| `name` | Yes | Same naming rule as skills. Must equal the file name without `.md`. Unique across all categories, and not the name of any skill, workflow or external. |
 | `description` | Yes | 1 to 1024 characters. Who the agent is and when to delegate to it. |
 | `version` | Yes | Semver. |
 | `requires` | No | List of skill names from this repository that the agent uses. The installer copies them with the agent. |

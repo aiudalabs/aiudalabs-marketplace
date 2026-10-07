@@ -1,0 +1,9 @@
+[
+  { "query": "The editorial pass on my book is done and the revised manuscript is approved. Take it from here and build all the publishing files: paperback and hardcover interiors, EPUB, covers, KDP audit and listing.", "should_trigger": true },
+  { "query": "Publish my book. It's a 22-chapter Quarto project on climate economics in book/, and I want everything ready to upload to KDP and IngramSpark in dist/.", "should_trigger": true },
+  { "query": "scientific-book-editor just produced revised-book/. Run production on it end to end.", "should_trigger": true },
+  { "query": "My manuscript is final. I need print-ready files for both a paperback and a hardcover, a Kindle ebook, full-wrap covers with the right spine widths and a validation report, all in one go.", "should_trigger": true },
+  { "query": "Just generate the full-wrap paperback cover for KDP; the interior is already done and it's 198 pages.", "should_trigger": false, "use_instead": "kindle-cover" },
+  { "query": "My book draft is finished but hasn't been reviewed. I need a publishability verdict, scientific review, a citation audit and a copy edit before anything else.", "should_trigger": false, "use_instead": "scientific-book-editor" },
+  { "query": "Make a quick EPUB from this single markdown file so I can read my draft on my Kindle.", "should_trigger": false, "use_instead": "kindle-book" }
+]

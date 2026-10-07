@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Before we touch any visuals for our payroll tool for independent restaurants, I want a written brand brief: who we're for, how we're positioned, and three brand attributes.",
+    "should_trigger": true
+  },
+  {
+    "query": "What should my brand personality be? I run a climbing gym for total beginners in Leeds and every gym around here looks aggressive and neon.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want colors and a logo for my math tutoring service, but honestly I haven't figured out who it's really for or how it should feel. Where do I even start?",
+    "should_trigger": true
+  },
+  {
+    "query": "Write me a brand strategy doc for a regenerative coffee importer, including a look at how our competitors present themselves visually and what direction that suggests for us.",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's our finished brand brief. Now show me two or three genuinely different looks for the homepage so I can pick one.",
+    "should_trigger": false,
+    "use_instead": "visual-directions"
+  },
+  {
+    "query": "Who are the competitors for my AI contract review tool for mid-size law firms, and roughly how do they price?",
+    "should_trigger": false,
+    "use_instead": "competitor-research"
+  },
+  {
+    "query": "Pressure-test our positioning, ICP and offer before launch and score it. Don't be nice about it.",
+    "should_trigger": false,
+    "use_instead": "startup-positioning-audit"
+  }
+]

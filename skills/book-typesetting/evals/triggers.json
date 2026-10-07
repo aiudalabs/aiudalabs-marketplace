@@ -1,0 +1,10 @@
+[
+  { "query": "IngramSpark keeps bouncing my interior PDF with 'TrimBox not defined' and 'fonts not embedded'. It's a 280-page memoir exported from Quarto. How do I fix it so it passes?", "should_trigger": true },
+  { "query": "I need to convert my RGB book PDF into a CMYK PDF/X-1a file for an offset printer. Can you walk me through it?", "should_trigger": true },
+  { "query": "I have 14 chapters of a field guide to Andean birds written in markdown. I want a properly typeset 8x10 print interior with running heads, decent margins and figures that don't float into the wrong chapter.", "should_trigger": true },
+  { "query": "Before I send the whole thing to the printer I want to read chapter 3 on paper. Can you make me a quick proof copy of just that chapter, single-sided, with wide margins for notes?", "should_trigger": true },
+  { "query": "My hardcover is going through IngramSpark and I need the case-wrap cover laid out with the right bleed and hinge, based on a 412-page count on cream paper.", "should_trigger": true },
+  { "query": "I just want a fast EPUB for Kindle out of my one-file markdown novel, nothing fancy, plus a basic 5x8 PDF.", "should_trigger": false, "use_instead": "kindle-book" },
+  { "query": "Should I print through KDP or IngramSpark, and is it worth buying my own ISBNs for the paperback?", "should_trigger": false, "use_instead": "ebook-publishing" },
+  { "query": "Here's my finished, approved manuscript folder for a 300-page physics textbook. Produce everything: paperback and hardcover interiors, the EPUB, covers, the KDP audit and the listing.", "should_trigger": false, "use_instead": "production-book-publisher" }
+]

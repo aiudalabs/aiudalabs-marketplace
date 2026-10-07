@@ -1,0 +1,7 @@
+[
+  { "query": "TODO: a request, in a user's own words, that should load {{name}}", "should_trigger": true },
+  { "query": "TODO: a second one, phrased differently, with concrete details", "should_trigger": true },
+  { "query": "TODO: a third one", "should_trigger": true },
+  { "query": "TODO: a near miss that a neighboring skill owns; set use_instead to its name", "should_trigger": false, "use_instead": "TODO-neighbor" },
+  { "query": "TODO: another near miss, same domain, that should not load {{name}}", "should_trigger": false }
+]

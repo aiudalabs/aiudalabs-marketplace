@@ -4,12 +4,12 @@ description: "End-to-end editorial and scientific QA pipeline for book-length ma
 license: "MIT"
 compatibility: "Runs a panel of review agents in parallel, so it needs a harness with subagents. The manuscript checks need Python 3."
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: "aiudalabs"
   source: "https://github.com/aiudalabs/aimprenta"
   argument-hint: "[book-source-dir]"
   requires: "citation-audit line-and-copy-editor manuscript-checks manuscript-revision paper-review sciwrite"
-  agents: "bibliography-auditor consistency-checker logic-reviewer paper-review technical-reviewer writing-reviewer"
+  agents: "bibliography-auditor consistency-checker logic-reviewer technical-reviewer writing-reviewer"
 ---
 
 # Scientific Book Editor — Editorial QA Orchestrator

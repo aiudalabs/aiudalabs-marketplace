@@ -5,7 +5,7 @@ license: "MIT"
 compatibility: "Runs reviewer calls as fresh subagents, so it needs a harness with subagents. The bundled tools need Python 3 and bash."
 allowed-tools: "Bash(*), Read, Grep, Glob, Edit, Write, Agent, WebSearch, WebFetch"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "wanshuiyin"
   source: "https://github.com/OpenGHz/academic-human-in-the-loop"
   argument-hint: "[paper-directory-or-bib-file] [--uncited] [— soft-only]"

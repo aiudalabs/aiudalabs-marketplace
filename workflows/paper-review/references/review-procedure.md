@@ -72,7 +72,7 @@ Use `figure-review-guide.md`. Do figures accurately represent the data? Are axes
 
 ## 8. Assess writing quality
 
-Technical terms defined before or at first use; consistent terminology (no mid-paper synonyms); concise (flag repetition); abbreviations defined once; abstract reflects the content; methods complete per the target journal. Flag pervasive AI-writing tells (significance inflation, em-dash overuse, "evolving landscape" filler, rule-of-three padding, synonym cycling, generic positive conclusions) and point the author to `manuscript:humanizer`. Cite specific pattern numbers (e.g., pattern 1 significance inflation, pattern 14 em-dash overuse) only when the humanizer skill is loaded; otherwise name the pattern by description, since the full pattern list lives in that skill, not in these references.
+Technical terms defined before or at first use; consistent terminology (no mid-paper synonyms); concise (flag repetition); abbreviations defined once; abstract reflects the content; methods complete per the target journal. Flag pervasive AI-writing tells (significance inflation, em-dash overuse, "evolving landscape" filler, rule-of-three padding, synonym cycling, generic positive conclusions) and point the author to `humanizer`. Cite specific pattern numbers (e.g., pattern 1 significance inflation, pattern 14 em-dash overuse) only when the humanizer skill is loaded; otherwise name the pattern by description, since the full pattern list lives in that skill, not in these references.
 
 ## 9. Produce the review output
 
@@ -98,4 +98,4 @@ Consult `review-principles.md` for the full rationale before finalizing severity
 - `figure-review-guide.md` - figure quality assessment criteria
 - `review-principles.md` - review philosophy and calibration guidance
 - `review-output-template.md` - the review output format with examples
-- Sister skill `manuscript:humanizer` - AI-writing patterns to flag in the prose-quality pass
+- Sister skill `humanizer` - AI-writing patterns to flag in the prose-quality pass

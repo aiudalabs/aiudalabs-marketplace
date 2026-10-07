@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Before we publish this landing page, check it against our brand guidelines and tell me everything that's wrong.",
+    "should_trigger": true
+  },
+  {
+    "query": "Our agency just sent over the new trade-show banner. Is it on-brand?",
+    "should_trigger": true
+  },
+  {
+    "query": "Run a brand consistency check on our app's stylesheet. I suspect people have been sneaking in random greys and blues.",
+    "should_trigger": true
+  },
+  {
+    "query": "Brand QA on these five Instagram posts please, guidelines attached. Tell me what must be fixed versus what's just taste.",
+    "should_trigger": true
+  },
+  {
+    "query": "Roast our homepage headline and CTA. It gets traffic but it's not converting.",
+    "should_trigger": false,
+    "use_instead": "homepage-copy-audit"
+  },
+  {
+    "query": "Check whether our new palette passes WCAG contrast and fix the shades that fail.",
+    "should_trigger": false,
+    "use_instead": "color-system"
+  },
+  {
+    "query": "Write the brand guidelines document from the colors, fonts and logo we've already decided.",
+    "should_trigger": false,
+    "use_instead": "brand-guidelines"
+  }
+]
