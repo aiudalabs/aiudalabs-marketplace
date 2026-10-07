@@ -78,6 +78,53 @@ Paranoid about security rules, methodical about idempotency.
   read when `docs/AGENT_ROSTER.md` does not exist. The project's root
   `AGENTS.md` is the repository constitution, a different document.
 
+## Screens: `docs/UI_SCREENS.md`
+
+Written by `ui-screens-spec`; checked whenever it exists. One `## App X — app-id`
+section per app, with a `### Navigation graph — app-id` and then one section per
+screen, its anchor on the line before its heading:
+
+```markdown
+<a id="s-1.2.3"></a>
+### 1.2.3 — Search results
+
+**Header**
+- Title: [COPY: "Resultados"]; filter icon opens 1.2.4
+
+**Body** ...
+**Primary CTA** ...
+**Navigation**
+- Back: 1.2.2. Card tap → 1.3.1
+
+**Data**
+- Reads: providers. Serves: FR-SEARCH-1
+
+**Permissions**
+- Auth required: yes. Role: customer
+```
+
+- A screen id is `X.Y.Z` or `X.Y` (`1.0`, the splash). A heading
+  `### X.Y.Z — Title` without the anchor before it is a warning: links to
+  `docs/UI_SCREENS.md#s-1.2.3` would be dead. An anchor whose id differs from the
+  heading after it, or a screen defined twice, is an error.
+- Every screen has the six blocks **Header**, **Body**, **Primary CTA**,
+  **Navigation**, **Data** and **Permissions**, written `**Header**`,
+  `- **Data:** ...`, `#### Body` or `Header` alone on its line. A screen missing a
+  block is a warning; an empty block says "None", it is never dropped.
+- Navigation targets must be screens of this document. Every id in a navigation
+  graph and in a **Navigation** block counts, and elsewhere every id after an
+  arrow (`→ 1.3.1`, `-> 1.3.1`). `1.1.x` stands for any screen of section 1.1.
+  Ids inside `[COPY: ...]` and backticks are ignored. A target that is not a
+  screen is an error.
+- Any document in `docs/` that links `UI_SCREENS.md#s-<id>` or
+  `mockups/<app-id>.html#s-<id>` (the key screens' back-links, an issue's
+  `reads:`) must name a screen that exists: an error otherwise. A mockup link
+  under the wrong app is a warning. Once `mockups/<app-id>.html` exists, a linked
+  screen with no element `id="s-<id>"` in it is a warning: the mockup is missing
+  or stale. Only linked screens are checked, because only key screens have mockups.
+- `FR-...` and `D-xx` ids cited in it are checked like in any other document:
+  each must exist in the PRD or the decisions.
+
 ## Backlog: `docs/ISSUES.md`
 
 Sprints are `#` headings, issues are `##` headings followed by frontmatter:

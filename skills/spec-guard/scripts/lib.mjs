@@ -13,6 +13,7 @@ export const DOCS = {
   legacyRoster: 'docs/AGENTS.md',
   issues: 'docs/ISSUES.md',
   waves: 'docs/WAVE_DAG.md',
+  screens: 'docs/UI_SCREENS.md',
 };
 
 const PROFILE_ALIASES = { 'aiuda-flutter-firebase': 'flutter-firebase', 'python-fastapi-react': 'fastapi-react' };
@@ -91,6 +92,126 @@ export function citations(text) {
   });
   return found;
 }
+
+// ---------------------------------------------------------------- screens
+
+export const SCREEN_BLOCKS = ['Header', 'Body', 'Primary CTA', 'Navigation', 'Data', 'Permissions'];
+
+const SCREEN_ID = '\\d+\\.\\d+(?:\\.\\d+)?';
+const SCREEN_HEADING = new RegExp(`^###\\s+(${SCREEN_ID})\\s*[—–:-]\\s*(.+?)\\s*$`);
+const ANCHOR = /<a\s+(?:name|id)="s-([^"]+)"\s*>\s*<\/a>/;
+const BLOCK_NAMES = SCREEN_BLOCKS.map((name) => name.replace(' ', '\\s+')).join('|');
+// `**Header**`, `**Data:** reads ...`, `- **Data:** ...`, `#### Body`, `Header` alone or `Header:` at the start of a line.
+const BLOCK_LINE = new RegExp(`^\\s*(?:[-*]\\s+)?(?:#{4,6}\\s+)?(?:\\*\\*(${BLOCK_NAMES})(?::\\*\\*|\\*\\*)|(${BLOCK_NAMES})\\s*(?::|$))`, 'i');
+// A screen id cited in navigation: `1.2.3`, `1.0`, or a whole section `1.1.x`. Not part of a longer number or a word.
+const SCREEN_REF = /(?<![\w.$/#-])(\d+\.\d+\.x|\d+\.\d+(?:\.\d+)?)(?![\w-]|\.\d)/g;
+const ARROW_REF = /(?:→|->)\s*(\d+\.\d+\.x|\d+\.\d+(?:\.\d+)?)(?![\w-]|\.\d)/g;
+export const SCREEN_LINK = /UI_SCREENS\.md#s-([\w.-]+)/g;
+export const MOCKUP_LINK = /mockups\/([a-z0-9]+(?:-[a-z0-9]+)*)\.html#s-([\w.-]+)/g;
+
+// Copy and code spans carry prices, sizes and versions, never navigation.
+const proseOf = (line) => line.replace(/\[COPY:[^\]]*\]/gi, '').replace(/`[^`]*`/g, '');
+
+const blockName = (line) => {
+  const match = BLOCK_LINE.exec(line);
+  if (!match) return null;
+  const name = (match[1] ?? match[2]).replace(/\s+/g, ' ').toLowerCase();
+  return SCREEN_BLOCKS.find((block) => block.toLowerCase() === name);
+};
+
+// docs/UI_SCREENS.md: `## App X — app-id` sections, each with a navigation graph and
+// screens headed `<a id="s-X.Y.Z"></a>` + `### X.Y.Z — Title`, and six blocks per screen.
+export function parseScreens(text) {
+  const file = DOCS.screens;
+  const problems = [];
+  const screens = new Map();
+  const anchors = new Map();
+  const refs = [];
+  const apps = new Map();
+  let app = null;
+  let screen = null;
+  let inNavigation = false;
+  let fenced = false;
+  let pendingAnchor = null;
+  const lines = text.split('\n');
+  lines.forEach((line, index) => {
+    const number = index + 1;
+    if (/^\s*```/.test(line)) {
+      fenced = !fenced;
+      return;
+    }
+    if (!fenced) {
+      const appHeading = /^##\s+App\s+(\d+)\s*[—–:-]\s*`?([a-z0-9]+(?:-[a-z0-9]+)*)`?/i.exec(line);
+      if (/^##\s/.test(line)) {
+        app = appHeading ? { number: appHeading[1], id: appHeading[2] } : null;
+        if (app) apps.set(app.number, app.id);
+        screen = null;
+        inNavigation = false;
+        pendingAnchor = null;
+        return;
+      }
+      const anchor = ANCHOR.exec(line);
+      if (anchor) {
+        const id = anchor[1];
+        if (anchors.has(id)) problems.push(error('duplicate-screen', `${file}:${number}`, `screen anchor s-${id} is defined twice (also line ${anchors.get(id)})`));
+        else anchors.set(id, number);
+        pendingAnchor = { id, line: number };
+        screen = null;
+        inNavigation = false;
+        return;
+      }
+      const heading = SCREEN_HEADING.exec(line);
+      if (heading) {
+        const [, id, title] = heading;
+        if (!pendingAnchor) problems.push(warning('screen-no-anchor', `${file}:${number}`, `screen ${id} has no \`<a id="s-${id}"></a>\` line before its heading, so links to docs/UI_SCREENS.md#s-${id} are dead`));
+        else if (pendingAnchor.id !== id) problems.push(error('screen-anchor-mismatch', `${file}:${number}`, `screen ${id} is preceded by the anchor s-${pendingAnchor.id}`));
+        if (screens.has(id)) {
+          // A duplicated anchor was reported already; a heading copied without its anchor is reported here.
+          if (pendingAnchor?.id !== id) problems.push(error('duplicate-screen', `${file}:${number}`, `screen ${id} is defined twice (also line ${screens.get(id).line})`));
+        } else {
+          screen = { id, title, line: number, app: app?.id ?? null, blocks: new Set() };
+          screens.set(id, screen);
+        }
+        pendingAnchor = null;
+        inNavigation = false;
+        return;
+      }
+      if (/^#{1,3}\s/.test(line)) {
+        screen = null;
+        inNavigation = app !== null && /^###\s+Navigation graph/i.test(line);
+      }
+      if (line.trim()) pendingAnchor = null;
+    }
+    if (!app) return;
+    const block = screen && blockName(line);
+    if (block) {
+      screen.blocks.add(block);
+      screen.block = block;
+    }
+    // Every id in the navigation graph and in a Navigation block is a target; elsewhere, only arrows are.
+    const prose = proseOf(line);
+    const navigating = inNavigation || screen?.block === 'Navigation';
+    for (const match of prose.matchAll(navigating ? SCREEN_REF : ARROW_REF)) {
+      refs.push({ id: match[1], line: number, from: screen?.id ?? `the navigation graph of ${app.id}` });
+    }
+  });
+  return { screens, anchors, refs, apps, problems };
+}
+
+// Links to a screen anywhere in a document: `docs/UI_SCREENS.md#s-1.2.3` and `mockups/player-app.html#s-1.2.3`.
+export function screenLinks(text) {
+  const found = [];
+  let fenced = false;
+  text.split('\n').forEach((line, index) => {
+    if (/^\s*```/.test(line)) fenced = !fenced;
+    if (fenced) return;
+    for (const match of line.matchAll(SCREEN_LINK)) found.push({ kind: 'screen', id: match[1], line: index + 1 });
+    for (const match of line.matchAll(MOCKUP_LINK)) found.push({ kind: 'mockup', app: match[1], id: match[2], line: index + 1 });
+  });
+  return found;
+}
+
+const screenDefined = (ids, id) => (id.endsWith('.x') ? [...ids].some((other) => other.startsWith(id.slice(0, -1))) : ids.has(id));
 
 // ---------------------------------------------------------------- brief
 
@@ -427,6 +548,8 @@ export function checkProject(project, { strict = false } = {}) {
     }
   }
 
+  if (project.screens) found.push(...checkScreens(project));
+
   // Before Phase 6 there is no backlog yet: the documents that exist are checked, and that is all.
   if (!issues) return found;
   if (!roster) found.push(warning('no-roster', DOCS.roster, 'no agent roster found, so owners and lanes are not checked'));
@@ -509,6 +632,40 @@ export function checkProject(project, { strict = false } = {}) {
   return found;
 }
 
+// docs/UI_SCREENS.md and every link into it or into a mockup. FR and D ids are checked as citations, above.
+function checkScreens(project) {
+  const found = [];
+  const { screens, anchors, refs } = project.screens;
+  const ids = new Set([...screens.keys(), ...anchors.keys()]);
+  const file = DOCS.screens;
+  for (const screen of screens.values()) {
+    const missing = SCREEN_BLOCKS.filter((block) => !screen.blocks.has(block));
+    if (missing.length) found.push(warning('screen-blocks', `${file}:${screen.line}`, `screen ${screen.id} has no ${missing.join(', ')} block${missing.length > 1 ? 's' : ''}; write "None" in an empty block, never drop it`));
+  }
+  const seen = new Set();
+  for (const ref of refs) {
+    const key = `${ref.id}@${ref.line}`;
+    if (seen.has(key) || screenDefined(ids, ref.id)) continue;
+    seen.add(key);
+    found.push(error('unknown-screen', `${file}:${ref.line}`, `${/^\d/.test(ref.from) ? `screen ${ref.from}` : ref.from} points to ${ref.id}, which is not a screen in ${file}`));
+  }
+  for (const { file: doc, links } of project.screenLinks ?? []) {
+    for (const link of links) {
+      const where = `docs/${doc}:${link.line}`;
+      if (!ids.has(link.id)) {
+        found.push(error('unknown-screen', where, `links to ${link.kind === 'screen' ? file : `mockups/${link.app}.html`}#s-${link.id}, but ${link.id} is not a screen in ${file}`));
+        continue;
+      }
+      if (link.kind !== 'mockup') continue;
+      const app = screens.get(link.id)?.app;
+      if (app && app !== link.app) found.push(warning('mockup-app', where, `screen ${link.id} belongs to ${app}, so its mockup is mockups/${app}.html, not mockups/${link.app}.html`));
+      const mockup = project.mockups?.get(link.app);
+      if (mockup && !mockup.has(link.id)) found.push(warning('mockup-missing-screen', where, `mockups/${link.app}.html has no element with id="s-${link.id}"; build or refresh the mockup (navegable-mockups)`));
+    }
+  }
+  return found;
+}
+
 // ---------------------------------------------------------------- waves --write
 
 // Sets `wave:` in every issue's frontmatter. Returns the new ISSUES.md text.
@@ -559,21 +716,35 @@ export function readProject(root) {
   const rosterFile = existsSync(join(root, DOCS.roster)) ? DOCS.roster : existsSync(join(root, DOCS.legacyRoster)) ? DOCS.legacyRoster : null;
   const issuesText = read(root, DOCS.issues);
   const briefText = read(root, DOCS.brief);
+  const screensText = read(root, DOCS.screens);
 
   const decisions = decisionsText ? parseDecisions(decisionsText) : null;
   const requirements = requirementsText ? parseRequirements(requirementsText) : null;
   const roster = rosterFile ? parseRoster(read(root, rosterFile), rosterFile) : null;
   const issues = issuesText && issuesText.trim() ? parseIssues(issuesText) : null;
-  for (const part of [decisions, requirements, roster, issues]) if (part) problems.push(...part.problems);
+  const screens = screensText && screensText.trim() ? parseScreens(screensText) : null;
+  for (const part of [decisions, requirements, roster, issues, screens]) if (part) problems.push(...part.problems);
   if (roster && roster.agents.size === 0) problems.push(warning('empty-roster', rosterFile, 'no `## agent-name` sections found'));
+
+  const docFiles = existsSync(join(root, 'docs')) ? readdirSync(join(root, 'docs')).filter((name) => name.endsWith('.md')) : [];
+  const linking = screens ? docFiles.map((file) => ({ file, links: screenLinks(read(root, `docs/${file}`)) })).filter((entry) => entry.links.length) : [];
+  // Only key screens have mockups, and only once Phase 7 has run: an app's file is read when something links into it.
+  const mockups = new Map();
+  for (const app of new Set(linking.flatMap((entry) => entry.links.filter((link) => link.kind === 'mockup').map((link) => link.app)))) {
+    const html = read(root, `mockups/${app}.html`);
+    if (html) mockups.set(app, new Set([...html.matchAll(/\bid=["']s-([^"']+)["']/g)].map((match) => match[1])));
+  }
 
   return {
     root,
     problems,
+    screens,
+    screenLinks: linking,
+    mockups,
     issuesText,
     rosterFile,
     brief: briefText && briefText.trim() ? parseBrief(briefText) : null,
-    citing: existsSync(join(root, 'docs')) ? readdirSync(join(root, 'docs')).filter((name) => name.endsWith('.md') && !DEFINING.has(name)).map((file) => ({ file, cites: citations(read(root, `docs/${file}`)) })) : [],
+    citing: docFiles.filter((name) => !DEFINING.has(name)).map((file) => ({ file, cites: citations(read(root, `docs/${file}`)) })),
     // Before Phase 1 the scaffold's AGENTS.md is the only place the profile is written.
     profile: decisions?.profile ?? (parseDecisions(read(root, 'AGENTS.md') ?? '').profile),
     decisions: decisions && decisions.decisions.size ? decisions.decisions : null,

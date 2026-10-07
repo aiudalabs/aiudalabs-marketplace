@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { ROOT } from '../lib/components.mjs';
 import {
   assignWaves, checkProject, globCovers, globsOverlap, matches, mergedIds, nextWave, parseDecisions, parseIssues,
-  parseRequirements, parseRoster, readProject, toCsv, toGithubScript, writeWavesInto,
+  parseRequirements, parseRoster, parseScreens, readProject, toCsv, toGithubScript, writeWavesInto,
 } from '../skills/spec-guard/scripts/lib.mjs';
 
 const SKILL = join(ROOT, 'skills/spec-guard');
@@ -217,6 +217,73 @@ test('check: other documents may only cite decisions and requirements that exist
   writeFileSync(join(dir, 'docs/UI_SCREENS.md'), '# Screens\n\nServes FR-BOOKING-7 under D-42.\n');
   const found = checkProject(readProject(dir));
   assert.deepEqual(found.map((p) => [p.code, p.where]), [['dangling-ref', 'docs/UI_SCREENS.md:3'], ['dangling-ref', 'docs/UI_SCREENS.md:3']]);
+});
+
+const SCREEN = (id, title, { anchor = id, blocks = ['Header', 'Body', 'Primary CTA', 'Navigation', 'Data', 'Permissions'], nav = 'Back: 1.1' } = {}) => [
+  anchor && `<a id="s-${anchor}"></a>`, `### ${id} — ${title}`, '',
+  ...blocks.map((block) => (block === 'Navigation' ? `**Navigation**\n- ${nav}\n` : block === 'Data' ? '- **Data:** reads courts. Serves: FR-BOOKING-1.\n' : `**${block}**\n- None. Price [COPY: "$12.50 por 1.5 h"], cold start < 2.5 s.\n`)),
+].filter(Boolean).join('\n');
+
+const UI_SCREENS = [
+  '# UI Screens — Courts', '', '## 1. Apps inventory', '', 'Version 3.22.0 of Flutter.', '',
+  '## App 1 — player-app', '', '### Navigation graph — player-app', '', 'Entry points: Home (1.1).', '', '```',
+  'Home (1.1)', '  → Court (1.2.1)          tap', '  → Auth (1.3.x)           signed out', '```', '',
+  SCREEN('1.1', 'Home', { nav: 'Tab bar. Card tap → 1.2.1' }),
+  SCREEN('1.2.1', 'Court'),
+  SCREEN('1.3.1', 'Sign-in'),
+  '## Key screens', '', '| 1.2.1 Court | The detail view | mockup: mockups/player-app.html#s-1.2.1 |', '',
+].join('\n');
+
+test('screens: anchors, the six blocks and navigation targets', () => {
+  const { screens, refs, apps, problems } = parseScreens(UI_SCREENS);
+  assert.deepEqual(problems, []);
+  assert.deepEqual([...screens.keys()], ['1.1', '1.2.1', '1.3.1']);
+  assert.equal(screens.get('1.2.1').app, 'player-app');
+  assert.equal(screens.get('1.2.1').blocks.size, 6);
+  assert.deepEqual(Object.fromEntries(apps), { 1: 'player-app' });
+  assert.deepEqual([...new Set(refs.map((ref) => ref.id))].sort(), ['1.1', '1.2.1', '1.3.x'], 'prices, sizes and versions are not screen ids');
+});
+
+test('check: docs/UI_SCREENS.md, the links into it and the mockups', (t) => {
+  const dir = copyExample(t);
+  const write = (text) => writeFileSync(join(dir, 'docs/UI_SCREENS.md'), text);
+  write(UI_SCREENS);
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'no mockups yet is fine');
+
+  write(UI_SCREENS + SCREEN('1.2.1', 'Court again'));
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['duplicate-screen']);
+  write(UI_SCREENS.replace('<a id="s-1.3.1"></a>', '<a id="s-1.3.2"></a>'));
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['screen-anchor-mismatch']);
+  write(UI_SCREENS.replace('<a id="s-1.3.1"></a>\n', ''));
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['screen-no-anchor']);
+  write(UI_SCREENS.replace('**Permissions**\n- None. Price [COPY: "$12.50 por 1.5 h"], cold start < 2.5 s.\n\n<a id="s-1.2.1">', '<a id="s-1.2.1">'));
+  const blocks = checkProject(readProject(dir));
+  assert.deepEqual(blocks.map((p) => [p.level, p.code, p.where]), [['warning', 'screen-blocks', 'docs/UI_SCREENS.md:20']]);
+  assert.match(blocks[0].message, /screen 1\.1 has no Permissions block/);
+
+  for (const [from, to] of [['  → Court (1.2.1)', '  → Court (1.2.9)'], ['Card tap → 1.2.1', 'Card tap → 1.4.1'], ['Back: 1.1\n', 'Back: 7.1\n'], ['(1.3.x)', '(1.4.x)']]) {
+    write(UI_SCREENS.replace(from, to));
+    assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-screen'], to);
+  }
+  write(UI_SCREENS.replaceAll('Serves: FR-BOOKING-1.', 'Serves: FR-BOOKING-8.'));
+  assert.deepEqual(codes(checkProject(readProject(dir))).filter((code) => code === 'dangling-ref').length, 3, 'FR ids are checked as citations, once per line');
+
+  write(UI_SCREENS.replace('mockups/player-app.html#s-1.2.1', 'mockups/player-app.html#s-1.2.2'));
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-screen']);
+  write(UI_SCREENS.replace('mockups/player-app.html#s-1.2.1', 'mockups/owner-app.html#s-1.2.1'));
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['mockup-app']);
+  write(UI_SCREENS);
+  edit(dir, 'ISSUES.md', '---\n**Objetivo:**', 'reads:\n  - docs/UI_SCREENS.md#s-1.9.9\n---\n**Objetivo:**');
+  const issueLink = checkProject(readProject(dir));
+  assert.deepEqual(issueLink.map((p) => p.code), ['unknown-screen']);
+  assert.match(issueLink[0].where, /^docs\/ISSUES\.md:\d+$/);
+  edit(dir, 'ISSUES.md', '#s-1.9.9', '#s-1.2.1');
+
+  mkdirSync(join(dir, 'mockups'));
+  writeFileSync(join(dir, 'mockups/player-app.html'), '<section id="s-1.1"></section>');
+  assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['mockup-missing-screen']);
+  writeFileSync(join(dir, 'mockups/player-app.html'), '<section id="s-1.2.1"></section>');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), []);
 });
 
 test('install and hooks: commits and agent edits stay inside the active issue', { skip: !hasGit && 'git is not installed' }, (t) => {

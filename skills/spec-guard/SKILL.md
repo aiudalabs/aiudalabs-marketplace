@@ -69,6 +69,7 @@ Every message names the file, the line and the issue. The ones that need a decis
 - **uncovered-decision** or **uncovered-requirement**: a locked decision or requirement has no issue. Either the backlog dropped scope silently, or it was deferred and the document should say `(deferred)`, or the code already implements it (an adopted repository) and it should say `(existing)`. Ask the user which.
 - **wave-mismatch** or **no-wave**: never fix by hand; run `waves --write`.
 - **dependency-cycle**: two issues wait for each other. One of them is really two issues.
+- **unknown-screen** or **mockup-missing-screen**: `docs/UI_SCREENS.md` (or a link into it or into a mockup) names a screen id that does not exist, or a mockup lacks a key screen. Renumbering a screen means updating every link to it; a stale mockup is refreshed with `navegable-mockups`. The screen checks are in [references/formats.md](references/formats.md).
 
 The overlap test between globs errs toward "overlap" and the lane test errs toward "outside". A false alarm costs a minute to look at; a missed overlap costs a merge conflict at the wave barrier.
 
