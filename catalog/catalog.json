@@ -338,13 +338,14 @@
       "path": "skills/academic-writing-principles",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "book-typesetting",
       "description": "Use when typesetting a book for print or ebook with Quarto/LaTeX — building a print interior, converting a PDF to press-ready CMYK PDF/X-1a for IngramSpark, KDP or another print-on-demand service, laying out a wraparound cover, turning chapter markdown into a galley proof, or when a print uploader rejects a file over trim size, safety area, TrimBox, annotations, or unembedded fonts.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -376,6 +377,7 @@
         "assets/templates/chapter-proof.qmd.tmpl",
         "assets/templates/example-chapter.md",
         "assets/templates/quarto.yml.tmpl",
+        "evals/triggers.json",
         "reference/cover-geometry.md",
         "reference/galley-recipe.md",
         "reference/getting-started.md",
@@ -405,6 +407,7 @@
         "THIRD_PARTY_NOTICES.md",
         "assets/asset-manifest.template.json",
         "assets/og-image.template.html",
+        "evals/triggers.json",
         "references/deliverables.csv",
         "references/platform-sizes.md",
         "scripts/render-assets.mjs"
@@ -422,6 +425,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/brand-guidelines-template.md",
+        "evals/triggers.json",
         "references/asset-naming.md",
         "references/governance.md"
       ]
@@ -440,6 +444,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/review-report-template.md",
+        "evals/triggers.json",
         "references/review-checklist.md",
         "scripts/scan-colors.mjs"
       ]
@@ -455,6 +460,7 @@
       "files": [
         "SKILL.md",
         "assets/brand-brief-template.md",
+        "evals/triggers.json",
         "references/attributes-to-visual-decisions.md",
         "references/visual-competitor-audit.md"
       ]
@@ -462,7 +468,7 @@
     {
       "name": "citation-audit",
       "description": "Zero-context verification that every bibliographic entry in the paper is real, correctly attributed, and used in a context the cited paper actually supports — catching hallucinated authors, wrong years, fabricated venues, version mismatches, and wrong-context citations. Use when user says \"审查引用\", \"check citations\", \"citation audit\", \"verify references\", \"引用核对\", or before submission to ensure bibliography integrity.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -473,6 +479,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "shared-references/acceptance-gate.md",
         "shared-references/assurance-contract.md",
         "shared-references/citation-discipline.md",
@@ -503,6 +510,7 @@
       "files": [
         "SKILL.md",
         "assets/palette.template.json",
+        "evals/triggers.json",
         "references/accessibility.md",
         "references/color-roles.md",
         "scripts/color-lib.mjs",
@@ -523,6 +531,7 @@
       "files": [
         "SKILL.md",
         "assets/competitor-research-brief.md",
+        "evals/triggers.json",
         "references/competitor-analysis-framework.md",
         "scripts/perplexity_research.py"
       ]
@@ -537,7 +546,8 @@
       "path": "skills/cross-reference-discipline",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -552,6 +562,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/example.tokens.json",
+        "evals/triggers.json",
         "references/format-cheatsheet.md",
         "references/token-architecture.md",
         "scripts/export-tokens.mjs",
@@ -561,8 +572,8 @@
     },
     {
       "name": "ebook-publishing",
-      "description": "The complete ebook and audiobook self-publishing skill — write, format, convert, and publish across all major platforms. Use this skill whenever the user asks about Amazon KDP, Apple Books, Gumroad, Payhip, Kobo, Draft2Digital, IngramSpark, Barnes & Noble Press, Google Play Books, PublishDrive, StreetLib, ACX, ElevenLabs audiobooks, KDP Virtual Voice, INaudio (formerly Findaway Voices), EPUB formatting, HTML-to-PDF Puppeteer workflow, book cover design specs, ISBN strategy, KDP Select vs wide distribution, permafree strategy, BookBub, series pricing, royalty calculations, book descriptions, Amazon A+ content, keyword research, ARC readers, or any launch strategy. Also trigger for lead magnet ebooks, digital downloads, online courses packaged as ebooks, audiobook production with AI narration, print-on-demand, or any content intended for digital or print distribution and sale. MCP available for Gumroad only (rmarescu/gumroad-mcp). All other platforms require manual upload.",
-      "version": "0.1.0",
+      "description": "Self-publishing know-how for ebooks and audiobooks: choosing and using platforms (Amazon KDP, Apple Books, Kobo, Google Play Books, Draft2Digital, IngramSpark, Barnes & Noble Press, Gumroad, Payhip, PublishDrive, StreetLib, ACX, INaudio, KDP Virtual Voice, ElevenLabs), ISBN strategy, KDP Select versus wide distribution, permafree, BookBub, series pricing, royalty calculations, Amazon A+ content, ARC readers, launch plans, audiobook production with AI narration, and lead-magnet or course ebooks. Use for publishing strategy and platform questions. To build the book files use kindle-book (quick EPUB and PDF) or book-typesetting (press-ready print); to check a manuscript against KDP rules use kdp-audit; to write the KDP blurb, keywords and categories use kdp-listing.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -571,6 +582,7 @@
         "LICENSE",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/audiobooks.md",
         "references/cover-specs.md",
         "references/formatting.md",
@@ -590,6 +602,7 @@
       "files": [
         "SKILL.md",
         "assets/homepage-rewrite-template.md",
+        "evals/triggers.json",
         "references/homepage-audit-framework.md",
         "scripts/extract_site_text.py"
       ]
@@ -597,7 +610,7 @@
     {
       "name": "humanizer",
       "description": "Use this skill for \"humanize this text\", \"remove AI tells\", \"make this less AI-sounding\", \"strip AI patterns\", \"de-AI my writing\", \"reduce AI-isms\", \"final natural-writing pass\", \"check for AI vocabulary\", \"em dash overuse\", \"rule of three overuse\", \"AI vocabulary\", \"signs of AI writing\", or when polishing prose (papers, grants, lit reviews, abstracts, cover letters, responses to reviewers) to remove signs of AI-generated text while preserving meaning and discipline-appropriate conventions.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -605,13 +618,14 @@
       "files": [
         "LICENSE",
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "kdp-audit",
       "description": "Audit a book manuscript against Amazon KDP requirements: interior formatting, cover specs, metadata, and genre-specific checks. Handles technical books (LaTeX, math), fiction, and nonfiction. Produces a structured gap report with Critical and Warnings sections plus automation suggestions.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -622,13 +636,14 @@
         "docs/audit-report-template.md",
         "docs/kdp-exemplars.md",
         "docs/kdp-reference.md",
-        "docs/user-config-template.md"
+        "docs/user-config-template.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "kdp-listing",
       "description": "Craft the four marketing artifacts for an Amazon KDP listing: blurb (with HTML formatting), keywords, BISAC categories, and author bio. Reads manuscript context to generate variants, then saves outputs to the user config. These four artifacts determine discoverability and conversion on Amazon.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -639,13 +654,14 @@
         "docs/audit-report-template.md",
         "docs/kdp-exemplars.md",
         "docs/kdp-reference.md",
-        "docs/user-config-template.md"
+        "docs/user-config-template.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "kindle-book",
-      "description": "Convert markdown (.md) or plain text (.txt) files into Amazon KDP-ready book files: EPUB3 for Kindle digital publishing and a print-ready PDF for KDP paperback (6×9\", 5×8\", or custom trim). Use this skill whenever the user wants to: publish a book on Amazon Kindle, create an ebook from markdown, generate a KDP-ready EPUB or print PDF, self-publish a book, convert a manuscript to Kindle format, or make digital + print book files. Trigger even for partial phrases like \"make it a Kindle book\", \"publish this as an ebook\", \"KDP files\", \"format my book for Amazon\", or \"I want to sell this on Kindle\".",
-      "version": "0.1.0",
+      "description": "Converts markdown or plain-text files into an EPUB3 for Kindle and a simple print PDF for a KDP paperback (6x9, 5x8 or custom trim) with one Python script. Use for \"make it a Kindle book\", \"create an ebook from this markdown\", \"KDP files for my book\" or \"format my book for Amazon\". For a typeset, press-ready print interior or cover use book-typesetting; for the full production run of a finished book use production-book-publisher; for platform, pricing and launch advice use ebook-publishing.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -658,14 +674,15 @@
         "THIRD_PARTY_NOTICES.md",
         "assets/epub-styles.css",
         "assets/print-template.tex",
+        "evals/triggers.json",
         "references/trim-sizes.md",
         "scripts/build_kindle.py"
       ]
     },
     {
       "name": "line-and-copy-editor",
-      "description": "Combined line and copy editing for nonfiction manuscripts: sentence-level prose work plus grammar, consistency, and factual cross-checks in one pass. Use for a line edit, copy edit, combined or stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, removing AI-drafting and humanizer artifacts from a manuscript, or editing AI-assisted text toward genuinely human prose. Produces real Word tracked changes, a running style sheet, and an editorial cover letter.",
-      "version": "2.1.0",
+      "description": "Combined line and copy editing for book-length or chapter nonfiction manuscripts: sentence-level prose work plus grammar, consistency and factual cross-checks in one pass, delivered as real Word tracked changes, a running style sheet and an editorial cover letter. Use for a line edit, copy edit, stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, or editing AI-assisted text toward human prose. For a writing-quality audit of a research paper use sciwrite; to strip AI tells from a short text use humanizer.",
+      "version": "2.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -673,6 +690,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/ai-prose-patterns.md",
         "references/pre-delivery-checklist.md",
         "references/style-guide-template.md"
@@ -681,7 +699,7 @@
     {
       "name": "lit-review",
       "description": "Use this skill for \"literature review workflow\", \"multi-phase lit review\", \"direction paper\", \"review paper protocol\", \"strand-based literature review\", \"citation-grounded review\", \"systematic lit review with paper cards\", \"build a lit review corpus\", \"lit review pipeline\", \"orchestrate a literature review\", \"research directions document\", \"write a literature review\", \"synthesize papers\", \"thematic review\", \"narrative review\", \"systematic review\", \"scoping review\", \"gap analysis\", or when the user wants either a rigorous multi-phase citation-traceable lit review or a single-pass thematic synthesis for an Introduction/Background section.",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -689,6 +707,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/brief-template.md",
         "references/direction-paper-template.md",
         "references/license-rules.md",
@@ -711,6 +730,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/logo-brief-template.md",
+        "evals/triggers.json",
         "references/logo-styles.csv",
         "references/mark-types.md",
         "references/usage-rules.md",
@@ -729,6 +749,7 @@
       "path": "skills/manuscript-checks",
       "files": [
         "SKILL.md",
+        "evals/triggers.json",
         "scripts/check_claims.py",
         "scripts/check_readability.py",
         "scripts/check_structure.py"
@@ -736,8 +757,8 @@
     },
     {
       "name": "manuscript-drafting",
-      "description": "Use this skill for \"write a paper\", \"draft manuscript\", \"write introduction\", \"write methods section\", \"write results\", \"write discussion\", \"write abstract\", \"structure a paper\", \"academic writing\", \"write for journal\", or when the user wants to draft or revise sections of an academic manuscript.",
-      "version": "0.2.1",
+      "description": "Drafts or restructures individual sections of an academic manuscript: introduction, methods, results, discussion and abstract, following IMRaD conventions for a journal. Use for \"write the introduction\", \"draft the methods section\", \"write the abstract\" or \"structure this paper\". For taking a whole paper from idea to a review-ready draft use paper-author; for revising existing text use manuscript-revision.",
+      "version": "0.3.0",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -745,14 +766,15 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/revision-response.md",
         "references/section-templates.md"
       ]
     },
     {
       "name": "manuscript-revision",
-      "description": "Use when revising or reviewing scientific, technical, or academic manuscripts, proposals, abstracts, reports, or related writing for precision, concision, logical cohesion, citation support, evidence alignment, and objective scholarly tone.",
-      "version": "0.1.0",
+      "description": "Rewrites scientific, technical or academic text in place, or comments on it, for precision, concision, logical cohesion, citation support, evidence alignment and objective scholarly tone: papers, proposals, grant text, abstracts and reports. Use when the user wants the text revised, not only reviewed. For a report of writing issues by pass use sciwrite; for peer review of methods and results use paper-review; for drafting sections from scratch use manuscript-drafting.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -761,6 +783,7 @@
         "LICENSE",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/revision-checklist.md"
       ]
     },
@@ -774,13 +797,14 @@
       "path": "skills/notebook-paired-with-prose",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "sciwrite",
-      "description": "Use this skill when asked to review, edit, or improve the writing quality of a scientific or engineering manuscript. Triggers include: \"review my writing,\" \"check my manuscript,\" \"improve clarity,\" \"clean up the prose,\" \"edit for journal submission,\" \"writing review,\" or any request to evaluate sentence-level quality, eliminate clutter, fix passive voice, or enforce keyword consistency in a research paper draft. Also triggers when asked to prepare a manuscript for submission to a specific journal. Do NOT use for content/technical review of methods or results, statistical analysis, or citation formatting.",
-      "version": "0.1.0",
+      "description": "Audits the writing quality of a scientific or engineering manuscript in five passes (clutter, voice and verbs, sentence architecture, terminology, numbers and citations) and reports prioritized fixes. Use for \"review my writing\", \"improve clarity\", \"clean up the prose\", \"fix passive voice\", \"keyword consistency\" or \"edit for journal submission\" in a research paper. Not for methods, results or statistics (use paper-review), not for rewriting the text in place (use manuscript-revision), and not for a book-length line and copy edit with tracked changes (use line-and-copy-editor).",
+      "version": "0.2.0",
       "license": "CC-BY-4.0",
       "requires": [],
       "tools": [],
@@ -790,7 +814,8 @@
         "LICENSE",
         "README.md",
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -811,6 +836,7 @@
         "assets/launch-readiness-template.md",
         "assets/scoring-matrix-template.md",
         "evals/evals.json",
+        "evals/triggers.json",
         "references/icp-framework.md",
         "references/offer-design-framework.md",
         "references/positioning-framework.md",
@@ -831,7 +857,8 @@
       "path": "skills/textbook-methodology",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -845,6 +872,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/font-licensing.md",
         "references/font-pairings.csv",
         "references/selection-and-pairing.md",
@@ -863,6 +891,7 @@
       "files": [
         "SKILL.md",
         "assets/direction.template.json",
+        "evals/triggers.json",
         "references/making-directions-different.md",
         "references/reading-an-existing-identity.md",
         "references/starting-from-zero.md",
@@ -888,7 +917,8 @@
       "path": "skills/visual-identity",
       "files": [
         "SKILL.md",
-        "assets/owner-decisions.template.md"
+        "assets/owner-decisions.template.md",
+        "evals/triggers.json"
       ]
     }
   ],
@@ -906,7 +936,8 @@
       "tools": [],
       "path": "workflows/article-author",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": []
     },
@@ -928,7 +959,8 @@
       "tools": [],
       "path": "workflows/book-author",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "brainstormer",
@@ -952,7 +984,8 @@
       "path": "workflows/bookwright-iterator",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": []
     },
@@ -966,7 +999,8 @@
       "path": "workflows/bookwright-reviewer",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "cross-ref-auditor",
@@ -985,7 +1019,8 @@
       "path": "workflows/bookwright-rewriter",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "cross-ref-auditor",
@@ -1005,7 +1040,8 @@
       "path": "workflows/bookwright-writer",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "quality-auditor",
@@ -1017,7 +1053,7 @@
     {
       "name": "paper-author",
       "description": "Idea to a review-ready single-document academic manuscript (journal article, conference paper, preprint) — the paper-length sibling of book-author, reusing the same underlying research/writing skills without book-author's multi-chapter machinery. Orchestrates framing, mandatory literature grounding, a single-pass IMRaD draft, an independent review pass (paper-review + citation-audit + sciwrite), and gated revision. Use when the user says \"/paper-author\", \"write a paper about X\", \"draft a manuscript for submission\", \"start a new paper\", or wants a paper (not a book, not a short article) taken from idea to revised, review-ready prose. Hands off to paper-publisher for venue formatting and submission prep. Do NOT use for a multi-chapter book (book-author) or a short-form piece meant for a blog/LinkedIn/newsletter (article-author).",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "requires": [
         "citation-audit",
@@ -1031,7 +1067,8 @@
       "tools": [],
       "path": "workflows/paper-author",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "paper-crawler",
@@ -1054,14 +1091,15 @@
       "files": [
         "SKILL.md",
         "assets/templates/arxiv-article.tex.tmpl",
+        "evals/triggers.json",
         "references/venue-templates.md"
       ],
       "agents": []
     },
     {
       "name": "paper-review",
-      "description": "Use this skill for \"review this paper\", \"review this manuscript\", \"peer review\", \"review my paper\", \"critique this manuscript\", \"review this submission\", \"give me feedback on my paper\", \"check my methods\", \"review my statistics\", \"review as a peer reviewer\", \"evaluate this manuscript\", \"review this PDF\", or mentions manuscript review, peer review, paper critique, or methodological review.",
-      "version": "0.1.0",
+      "description": "Independent peer review of an academic manuscript's methods, statistics, logic, figures and reproducibility, run as a fresh-context reviewer in single or panel mode, returning Critical, Major and Minor issues. Use for \"review this paper\", \"peer review my manuscript\", \"critique this submission\", \"check my methods\", \"review my statistics\" or \"review as a peer reviewer\". For sentence-level writing quality use sciwrite; for checking that references are real and correctly used use citation-audit.",
+      "version": "0.2.0",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -1069,6 +1107,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "examples/sample-manuscript-excerpt.md",
         "examples/sample-manuscript-review.md",
         "references/figure-review-guide.md",
@@ -1103,14 +1142,15 @@
       ],
       "path": "workflows/production-book-publisher",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": []
     },
     {
       "name": "scientific-book-editor",
       "description": "End-to-end editorial and scientific QA pipeline for book-length manuscripts (scientific, technical, nonfiction). Orchestrates seven phases: global editorial assessment with a publishability verdict, scientific peer review, citation and evidence audit, scientific-writing improvement (sciwrite), manuscript revision, a final line/copy edit, and a mandatory whole-manuscript coherence read that no chapter-sharded phase can substitute for. Use when the user says \"/scientific-book-editor\", \"edit my book\", \"editorial pipeline\", \"review this book for publication\", \"run the editorial QA\", or wants a publish / major-revision / don't-publish verdict on a full manuscript. Report-only until the user approves revisions. For production (PDF/EPUB/covers/KDP) use production-book-publisher instead.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [
         "citation-audit",
@@ -1123,7 +1163,8 @@
       "tools": [],
       "path": "workflows/scientific-book-editor",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "bibliography-auditor",

@@ -1,0 +1,37 @@
+[
+  {
+    "query": "I'm writing a review paper on soil microbiome responses to drought. Can you help me set up strands, collect papers into cards with BibTeX, and keep every claim traceable to a source?",
+    "should_trigger": true
+  },
+  {
+    "query": "Write the Background section for my grant on wearable EEG for epilepsy monitoring: synthesize the last ten years of work thematically and end with the gap we fill.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need a scoping review of LLM-based tutoring systems in K-12. Where do I even start with finding and organizing the papers?",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you pull together what's been published on microplastics in freshwater fish and tell me where the open questions are?",
+    "should_trigger": true
+  },
+  {
+    "query": "our lab wants a direction paper on federated learning for hospital imaging, grounded in the actual literature, not vibes. help me plan the phases",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's my finished paper on coral bleaching. Check that every reference in the .bib actually exists and supports the sentence it's cited in.",
+    "should_trigger": false,
+    "use_instead": "citation-audit"
+  },
+  {
+    "query": "I have results from a field trial on cover crops. Draft the Introduction and Methods sections for Agronomy Journal.",
+    "should_trigger": false,
+    "use_instead": "manuscript-drafting"
+  },
+  {
+    "query": "Take my idea about graph neural networks for protein docking all the way to a full review-ready manuscript, lit search included.",
+    "should_trigger": false,
+    "use_instead": "paper-author"
+  }
+]

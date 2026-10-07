@@ -3,7 +3,7 @@ name: "kdp-listing"
 description: "Craft the four marketing artifacts for an Amazon KDP listing: blurb (with HTML formatting), keywords, BISAC categories, and author bio. Reads manuscript context to generate variants, then saves outputs to the user config. These four artifacts determine discoverability and conversion on Amazon."
 license: "MIT"
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: "Alexander Towell"
   source: "https://github.com/queelius/claude-anvil"
 ---

@@ -1,0 +1,33 @@
+[
+  {
+    "query": "I've finished a 70,000-word business history book. Please do a line and copy edit in Word with tracked changes so I can accept or reject each one.",
+    "should_trigger": true
+  },
+  {
+    "query": "Edit chapter 4 of my nonfiction manuscript: tighten it by about 12%, fix grammar and Chicago style, and keep a running style sheet.",
+    "should_trigger": true
+  },
+  {
+    "query": "My memoir chapters were partly drafted with AI and the voice is uneven. I need sentence-level editing plus consistency checks, delivered as a .docx with changes tracked.",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you copyedit my trade nonfiction book on the history of semiconductors? Spellings of names, dates and in-text citations need to match the references.",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's a 300-word blurb that sounds AI-written. Just make it sound more human.",
+    "should_trigger": false,
+    "use_instead": "humanizer"
+  },
+  {
+    "query": "Audit the writing of my journal article on enzyme kinetics and give me a list of prose issues by pass.",
+    "should_trigger": false,
+    "use_instead": "sciwrite"
+  },
+  {
+    "query": "I want a full editorial review of my finished science book with a publish or don't-publish verdict.",
+    "should_trigger": false,
+    "use_instead": "scientific-book-editor"
+  }
+]

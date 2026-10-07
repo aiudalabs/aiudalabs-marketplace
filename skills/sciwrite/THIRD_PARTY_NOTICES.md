@@ -7,6 +7,7 @@ Changes made here:
 - Frontmatter converted to this marketplace format (`license`, `metadata.version` and `metadata.source`; harness-specific fields moved into `metadata`).
 - Plugin-scoped names (such as `manuscript:humanizer`) and fixed install paths (such as `~/.claude/skills/<name>`), wherever they occur in the Markdown files, are rewritten to the component names and folder placeholders used here, so the text works in every harness.
 - Renamed from `manuscript-writing-review` to `sciwrite`, the name the workflows use to call it.
+- Description rewritten to say where this skill stops and which neighboring skill to use instead, so skills installed together do not compete for the same requests.
 
 License of the upstream project:
 

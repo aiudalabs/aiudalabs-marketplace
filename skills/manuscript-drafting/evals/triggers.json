@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Write the Methods section for my study: 48 mice, two diets, 12 weeks, RNA-seq on liver tissue, DESeq2 for analysis.",
+    "should_trigger": true
+  },
+  {
+    "query": "I have my results and figures for a paper on urban heat islands. Can you draft the Discussion, about five paragraphs?",
+    "should_trigger": true
+  },
+  {
+    "query": "Help me structure this paper. I've got three experiments on bacterial biofilms and I'm not sure how to order the Results.",
+    "should_trigger": true
+  },
+  {
+    "query": "Draft a 250-word abstract for my conference paper on sparse attention for long documents, from the intro and results I'm pasting.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to start a new paper on remote sensing of wildfire fuel loads, from the idea all the way to a draft that's ready for review.",
+    "should_trigger": false,
+    "use_instead": "paper-author"
+  },
+  {
+    "query": "This Introduction is already written but it's wordy and vague. Revise it in place.",
+    "should_trigger": false,
+    "use_instead": "manuscript-revision"
+  },
+  {
+    "query": "Write a LinkedIn article explaining our new study on sleep and memory for a general audience.",
+    "should_trigger": false,
+    "use_instead": "article-author"
+  }
+]

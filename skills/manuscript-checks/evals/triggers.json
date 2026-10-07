@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Before the editorial review, scan my book chapters for stub markers, TODOs, truncated sections and broken markdown.",
+    "should_trigger": true
+  },
+  {
+    "query": "Which chapters of my book are readability outliers compared with the rest? Give me the Flesch scores per chapter.",
+    "should_trigger": true
+  },
+  {
+    "query": "Rerun the tests behind each chapter's claim ledger and tell me if any of the numbers in the book no longer hold.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run the deterministic manuscript checks on book/chapters before I send it to production.",
+    "should_trigger": true
+  },
+  {
+    "query": "Read my manuscript and tell me whether it's publishable, with peer review and a citation audit.",
+    "should_trigger": false,
+    "use_instead": "scientific-book-editor"
+  },
+  {
+    "query": "Check my manuscript against KDP requirements for interior formatting, cover specs and metadata.",
+    "should_trigger": false,
+    "use_instead": "kdp-audit"
+  },
+  {
+    "query": "Remove the AI-sounding phrases and em dash overuse from chapter 2.",
+    "should_trigger": false,
+    "use_instead": "humanizer"
+  }
+]

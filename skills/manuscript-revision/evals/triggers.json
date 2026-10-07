@@ -1,0 +1,37 @@
+[
+  {
+    "query": "Here's the Specific Aims page for my NIH R01. Rewrite it for precision and concision without overstating what our pilot data shows.",
+    "should_trigger": true
+  },
+  {
+    "query": "Polish this abstract for my paper on perovskite solar cells. Tighten it and keep the numbers exactly as they are; return the revised text.",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you edit this technical report on our pipeline corrosion study directly in the .docx? Save a revised copy, don't touch my original.",
+    "should_trigger": true
+  },
+  {
+    "query": "My results paragraph overclaims. Revise it so each sentence matches what the data in Table 2 actually shows.",
+    "should_trigger": true
+  },
+  {
+    "query": "Leave comments on this grant narrative wherever the evidence doesn't support the claim, but don't change the text itself.",
+    "should_trigger": true
+  },
+  {
+    "query": "I just want a prioritized list of writing problems in my paper, organized by clutter, passive voice, sentence length and terminology.",
+    "should_trigger": false,
+    "use_instead": "sciwrite"
+  },
+  {
+    "query": "I have no Discussion yet. Write one from scratch based on these results and the three papers I'm comparing against.",
+    "should_trigger": false,
+    "use_instead": "manuscript-drafting"
+  },
+  {
+    "query": "This cover letter reads like ChatGPT wrote it. Make it sound like a person, kill the em dashes and 'delve'.",
+    "should_trigger": false,
+    "use_instead": "humanizer"
+  }
+]

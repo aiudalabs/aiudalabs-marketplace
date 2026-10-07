@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Before I submit to NeurIPS, can you go through references.bib and confirm none of the 62 entries are hallucinated? Some were suggested by ChatGPT.",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm worried a couple of my citations say the opposite of what I claim. Check each \\cite in the related work against what the cited paper actually found.",
+    "should_trigger": true
+  },
+  {
+    "query": "verify references in my thesis chapter, wrong years and arXiv versions vs the published venue especially",
+    "should_trigger": true
+  },
+  {
+    "query": "Audit the bibliography of my paper on transformer pruning: real papers, right authors, right venue, cited in the right context.",
+    "should_trigger": true
+  },
+  {
+    "query": "My .bib file is fine, I just need the paper reformatted into the IEEE conference template with the bibliography style they require.",
+    "should_trigger": false,
+    "use_instead": "paper-publisher"
+  },
+  {
+    "query": "Review my manuscript on vaccine uptake as a peer reviewer would: are the statistics and methods sound?",
+    "should_trigger": false,
+    "use_instead": "paper-review"
+  },
+  {
+    "query": "I need to find 30 good papers on battery degradation modeling and organize them for a literature review.",
+    "should_trigger": false,
+    "use_instead": "lit-review"
+  }
+]

@@ -94,6 +94,39 @@ const CITATION_AUDIT_REFERENCES = [
 
 const SKILL_FOLDER_NOTE = '`<book-typesetting skill folder>` stands for the folder this file was loaded from. Replace it with that path before running a command.';
 
+// Descriptions rewritten so neighboring skills say where each one stops; the
+// upstream ones all claim requests like "review my manuscript".
+const DESCRIPTIONS = {
+  "sciwrite": "Audits the writing quality of a scientific or engineering manuscript in five passes (clutter, voice and verbs, sentence architecture, terminology, numbers and citations) and reports prioritized fixes. Use for \"review my writing\", \"improve clarity\", \"clean up the prose\", \"fix passive voice\", \"keyword consistency\" or \"edit for journal submission\" in a research paper. Not for methods, results or statistics (use paper-review), not for rewriting the text in place (use manuscript-revision), and not for a book-length line and copy edit with tracked changes (use line-and-copy-editor).",
+  "manuscript-revision": "Rewrites scientific, technical or academic text in place, or comments on it, for precision, concision, logical cohesion, citation support, evidence alignment and objective scholarly tone: papers, proposals, grant text, abstracts and reports. Use when the user wants the text revised, not only reviewed. For a report of writing issues by pass use sciwrite; for peer review of methods and results use paper-review; for drafting sections from scratch use manuscript-drafting.",
+  "manuscript-drafting": "Drafts or restructures individual sections of an academic manuscript: introduction, methods, results, discussion and abstract, following IMRaD conventions for a journal. Use for \"write the introduction\", \"draft the methods section\", \"write the abstract\" or \"structure this paper\". For taking a whole paper from idea to a review-ready draft use paper-author; for revising existing text use manuscript-revision.",
+  "paper-review": "Independent peer review of an academic manuscript's methods, statistics, logic, figures and reproducibility, run as a fresh-context reviewer in single or panel mode, returning Critical, Major and Minor issues. Use for \"review this paper\", \"peer review my manuscript\", \"critique this submission\", \"check my methods\", \"review my statistics\" or \"review as a peer reviewer\". For sentence-level writing quality use sciwrite; for checking that references are real and correctly used use citation-audit.",
+  "line-and-copy-editor": "Combined line and copy editing for book-length or chapter nonfiction manuscripts: sentence-level prose work plus grammar, consistency and factual cross-checks in one pass, delivered as real Word tracked changes, a running style sheet and an editorial cover letter. Use for a line edit, copy edit, stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, or editing AI-assisted text toward human prose. For a writing-quality audit of a research paper use sciwrite; to strip AI tells from a short text use humanizer.",
+  "kindle-book": "Converts markdown or plain-text files into an EPUB3 for Kindle and a simple print PDF for a KDP paperback (6x9, 5x8 or custom trim) with one Python script. Use for \"make it a Kindle book\", \"create an ebook from this markdown\", \"KDP files for my book\" or \"format my book for Amazon\". For a typeset, press-ready print interior or cover use book-typesetting; for the full production run of a finished book use production-book-publisher; for platform, pricing and launch advice use ebook-publishing.",
+  "ebook-publishing": "Self-publishing know-how for ebooks and audiobooks: choosing and using platforms (Amazon KDP, Apple Books, Kobo, Google Play Books, Draft2Digital, IngramSpark, Barnes & Noble Press, Gumroad, Payhip, PublishDrive, StreetLib, ACX, INaudio, KDP Virtual Voice, ElevenLabs), ISBN strategy, KDP Select versus wide distribution, permafree, BookBub, series pricing, royalty calculations, Amazon A+ content, ARC readers, launch plans, audiobook production with AI narration, and lead-magnet or course ebooks. Use for publishing strategy and platform questions. To build the book files use kindle-book (quick EPUB and PDF) or book-typesetting (press-ready print); to check a manuscript against KDP rules use kdp-audit; to write the KDP blurb, keywords and categories use kdp-listing."
+};
+// Versions bumped here when this marketplace changed what an imported component
+// says or does, so `update` offers the new copy. They override upstream's.
+const VERSIONS = {
+  "sciwrite": "0.2.0",
+  "manuscript-revision": "0.2.0",
+  "manuscript-drafting": "0.3.0",
+  "line-and-copy-editor": "2.2.0",
+  "kindle-book": "0.2.0",
+  "ebook-publishing": "0.2.0",
+  "citation-audit": "0.2.0",
+  "paper-review": "0.2.0",
+  "book-typesetting": "0.1.1",
+  "humanizer": "0.1.1",
+  "lit-review": "0.2.3",
+  "kdp-audit": "0.1.1",
+  "kdp-listing": "0.1.1",
+  "paper-author": "0.2.1",
+  "scientific-book-editor": "0.1.1"
+};
+
+const DESCRIPTION_CHANGE = 'Description rewritten to say where this skill stops and which neighboring skill to use instead, so skills installed together do not compete for the same requests.';
+
 const SKILLS = [
   {
     name: 'lit-review', upstream: 'research-skills', from: `${RS}/skills/lit-review`,
@@ -434,9 +467,11 @@ function importSkill(spec) {
   if (spec.rewrite) text = spec.rewrite(text);
   let { data, body } = parseFrontmatter(portable(text));
   if (spec.prefaceFile) body = `${spec.preface(readFileSync(join(aimprenta, spec.prefaceFile), 'utf8')).trimEnd()}\n\n${body}`;
-  const frontmatter = skillFrontmatter({ name: spec.name, data, description: spec.description, license: info.license, compatibility: spec.compatibility, info, metadata: spec.metadata });
+  const description = spec.description ?? DESCRIPTIONS[spec.name];
+  const metadata = { ...spec.metadata, ...(VERSIONS[spec.name] ? { version: VERSIONS[spec.name] } : {}) };
+  const frontmatter = skillFrontmatter({ name: spec.name, data, description, license: info.license, compatibility: spec.compatibility, info, metadata });
   writeFileSync(join(target, 'SKILL.md'), stringifyFrontmatter(frontmatter, body));
-  writeNotice(target, spec.upstream, spec.changes ?? []);
+  writeNotice(target, spec.upstream, [...(spec.changes ?? []), ...(DESCRIPTIONS[spec.name] ? [DESCRIPTION_CHANGE] : [])]);
   return `skill/${spec.name}`;
 }
 
@@ -519,11 +554,11 @@ function importWorkflow(spec) {
   const info = spec.upstream ? upstreamInfo(spec.upstream) : AIMPRENTA;
   const frontmatter = {
     name: spec.name,
-    description: spec.description ?? data.description,
+    description: spec.description ?? DESCRIPTIONS[spec.name] ?? data.description,
     license: info.license,
     compatibility: spec.compatibility,
     metadata: {
-      version: spec.version ?? '0.1.0',
+      version: VERSIONS[spec.name] ?? spec.version ?? '0.1.0',
       author: info.author,
       source: info.repo,
       ...(data['argument-hint'] ? { 'argument-hint': data['argument-hint'] } : {}),
@@ -533,7 +568,7 @@ function importWorkflow(spec) {
     },
   };
   writeFileSync(join(target, 'SKILL.md'), stringifyFrontmatter(frontmatter, body));
-  if (spec.upstream) writeNotice(target, spec.upstream, spec.changes ?? []);
+  if (spec.upstream) writeNotice(target, spec.upstream, [...(spec.changes ?? []), ...(DESCRIPTIONS[spec.name] ? [DESCRIPTION_CHANGE] : [])]);
   return `workflow/${spec.name}`;
 }
 

@@ -1,0 +1,33 @@
+[
+  {
+    "query": "There's a review report at docs/superpowers/reviews/2026-10-05-chapter-3.md. Fix everything in it at substantive severity or worse.",
+    "should_trigger": true
+  },
+  {
+    "query": "Apply the findings from the latest chapter 7 review: route each one to the right agent, verify the fixes, and write the paired revision report.",
+    "should_trigger": true
+  },
+  {
+    "query": "The reviewers flagged broken labels, a wrong derivation and a missing checklist item in chapter 2. Work through that report and fix them.",
+    "should_trigger": true
+  },
+  {
+    "query": "Take the blocking issues from the book review report and resolve them, checking each fix with the auditor that raised it.",
+    "should_trigger": true
+  },
+  {
+    "query": "Review chapter 3 and then fix what you find, over and over until nothing substantive is left.",
+    "should_trigger": false,
+    "use_instead": "bookwright-iterator"
+  },
+  {
+    "query": "I haven't reviewed chapter 3 yet. Tell me what's wrong with it in a report.",
+    "should_trigger": false,
+    "use_instead": "bookwright-reviewer"
+  },
+  {
+    "query": "Do a line and copy edit of chapter 3 of my memoir-style science book with tracked changes in Word and a style sheet.",
+    "should_trigger": false,
+    "use_instead": "line-and-copy-editor"
+  }
+]

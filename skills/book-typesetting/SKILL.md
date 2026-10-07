@@ -3,7 +3,7 @@ name: "book-typesetting"
 description: "Use when typesetting a book for print or ebook with Quarto/LaTeX — building a print interior, converting a PDF to press-ready CMYK PDF/X-1a for IngramSpark, KDP or another print-on-demand service, laying out a wraparound cover, turning chapter markdown into a galley proof, or when a print uploader rejects a file over trim size, safety area, TrimBox, annotations, or unembedded fonts."
 license: "MIT"
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: "Yoel Frischoff"
   source: "https://github.com/yoelf22/book-typesetting-skill"
   requires-tools: "quarto pandoc xelatex gs python3"

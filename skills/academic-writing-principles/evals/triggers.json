@@ -1,0 +1,32 @@
+[
+  {
+    "query": "What are the academic writing principles for citing evidence? I keep seeing E2 referenced in reviewer notes and want the actual rule.",
+    "should_trigger": true
+  },
+  {
+    "query": "Is there a principle about negation-contrast sentences like 'not X, but Y' in academic prose? What does it say to do instead?",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm reviewing a student's thesis chapter and want to check it against the principles on paragraph closers and claim-first exposition. List them.",
+    "should_trigger": true
+  },
+  {
+    "query": "Give me the principle set on figures and limitations for academic papers, with the identifiers.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run a five-pass writing audit on my manuscript and report the fixes in priority order.",
+    "should_trigger": false,
+    "use_instead": "sciwrite"
+  },
+  {
+    "query": "Rewrite my paper's Related Work so it flows better and is more concise.",
+    "should_trigger": false,
+    "use_instead": "manuscript-revision"
+  },
+  {
+    "query": "Check that each figure in my LaTeX paper is placed well in the compiled PDF and the captions match.",
+    "should_trigger": false
+  }
+]

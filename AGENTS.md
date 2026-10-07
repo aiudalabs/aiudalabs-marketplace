@@ -29,6 +29,7 @@ npm run site       # build the website into _site/ (open _site/index.html to pre
 node bin/cli.mjs list
 node bin/cli.mjs add <name> --harness <id> --dir <project> --dry-run
 node bin/cli.mjs new <kind> <name>   # skeleton of a skill, agent, workflow, stack or external
+node scripts/eval-triggers.mjs <name> --dry-run   # routing evals; without --dry-run it calls the Claude API
 ```
 
 There is nothing to install. The repository has zero dependencies.
@@ -53,7 +54,11 @@ CI runs the last two and fails when generated files are stale.
 - **Port only what the license allows.** Check the source's LICENSE file, keep its copyright notice in a `THIRD_PARTY_NOTICES.md` inside the skill, and note the origin at the top of each adapted file. No license means no porting.
 - **Skill scripts are dependency-free.** A script in a skill runs with the Node.js or Python standard library alone, or the skill states what it needs in `compatibility`.
 - **Stay inside the frontmatter subset** described in `docs/component-formats.md`. Quote any value that contains `: ` or ` #`.
-- **Names are lowercase-hyphenated** and must match the folder name (skills, stacks) or file name (agents).
+- **Names are lowercase-hyphenated** and must match the folder name (skills, stacks) or file name (agents). An agent may not share a name with a skill, workflow or external.
+- **No harness paths in content.** Never write `~/.claude/skills/<name>`, `CLAUDE_PLUGIN_ROOT` or another harness's folder in a skill or agent; say "this skill's folder" or name the skill.
+- **Every skill and workflow has trigger evals** in `evals/triggers.json`. When you change a description, check its near misses still go to the neighbor named in `use_instead`.
+- **Bump the version of a component you change**, or `update` will never offer it to people who installed it.
+- **Ported content changes go through `scripts/import-aimprenta.mjs`** when the component came from aimprenta, so a re-import keeps them.
 
 ## Where things live
 

@@ -1,10 +1,10 @@
 ---
 name: "paper-review"
-description: "Use this skill for \"review this paper\", \"review this manuscript\", \"peer review\", \"review my paper\", \"critique this manuscript\", \"review this submission\", \"give me feedback on my paper\", \"check my methods\", \"review my statistics\", \"review as a peer reviewer\", \"evaluate this manuscript\", \"review this PDF\", or mentions manuscript review, peer review, paper critique, or methodological review."
+description: "Independent peer review of an academic manuscript's methods, statistics, logic, figures and reproducibility, run as a fresh-context reviewer in single or panel mode, returning Critical, Major and Minor issues. Use for \"review this paper\", \"peer review my manuscript\", \"critique this submission\", \"check my methods\", \"review my statistics\" or \"review as a peer reviewer\". For sentence-level writing quality use sciwrite; for checking that references are real and correctly used use citation-audit."
 license: "BSD-3-Clause"
 compatibility: "Dispatches the paper-reviewer agent once (single mode) or several times in parallel (panel mode), so it needs a harness with subagents."
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "Seyed (Yahya) Shirazi"
   source: "https://github.com/neuromechanist/research-skills"
   agents: "paper-reviewer"

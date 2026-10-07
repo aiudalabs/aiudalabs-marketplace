@@ -1,9 +1,9 @@
 ---
 name: "kindle-book"
-description: "Convert markdown (.md) or plain text (.txt) files into Amazon KDP-ready book files: EPUB3 for Kindle digital publishing and a print-ready PDF for KDP paperback (6×9\", 5×8\", or custom trim). Use this skill whenever the user wants to: publish a book on Amazon Kindle, create an ebook from markdown, generate a KDP-ready EPUB or print PDF, self-publish a book, convert a manuscript to Kindle format, or make digital + print book files. Trigger even for partial phrases like \"make it a Kindle book\", \"publish this as an ebook\", \"KDP files\", \"format my book for Amazon\", or \"I want to sell this on Kindle\"."
+description: "Converts markdown or plain-text files into an EPUB3 for Kindle and a simple print PDF for a KDP paperback (6x9, 5x8 or custom trim) with one Python script. Use for \"make it a Kindle book\", \"create an ebook from this markdown\", \"KDP files for my book\" or \"format my book for Amazon\". For a typeset, press-ready print interior or cover use book-typesetting; for the full production run of a finished book use production-book-publisher; for platform, pricing and launch advice use ebook-publishing."
 license: "MIT"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "Nik McFly"
   source: "https://github.com/nikmcfly/kindle-book-skill"
   requires-tools: "python3"

@@ -1,0 +1,33 @@
+[
+  {
+    "query": "This paragraph screams ChatGPT: 'delve', 'tapestry', three em dashes. Make it sound like I wrote it.",
+    "should_trigger": true
+  },
+  {
+    "query": "Do a final pass on my response-to-reviewers letter to remove anything that sounds machine-generated, but keep it formal.",
+    "should_trigger": true
+  },
+  {
+    "query": "My cover letter for a postdoc in marine ecology feels robotic. Strip the AI patterns without changing what it says.",
+    "should_trigger": true
+  },
+  {
+    "query": "can you de-AI this 400-word grant summary? too many lists of three and 'pivotal'",
+    "should_trigger": true
+  },
+  {
+    "query": "I have a 90,000-word nonfiction book drafted with AI help. I need a full line and copy edit with tracked changes and a style sheet.",
+    "should_trigger": false,
+    "use_instead": "line-and-copy-editor"
+  },
+  {
+    "query": "Review the writing quality of my geophysics paper and report the issues by category.",
+    "should_trigger": false,
+    "use_instead": "sciwrite"
+  },
+  {
+    "query": "Rewrite the Results section of my paper so the claims match the data more precisely.",
+    "should_trigger": false,
+    "use_instead": "manuscript-revision"
+  }
+]

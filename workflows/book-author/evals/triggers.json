@@ -1,0 +1,37 @@
+[
+  {
+    "query": "I want to write a book on Bayesian methods for ecologists. Help me go from this rough idea all the way to a full draft manuscript I can send off for editing.",
+    "should_trigger": true
+  },
+  {
+    "query": "Start a new book project: a practical guide to time-series forecasting for supply-chain analysts, about 12 chapters. Frame it, outline it, gather the literature and draft the chapters.",
+    "should_trigger": true
+  },
+  {
+    "query": "I've got a half-finished outline and two chapters of a nonfiction book about soil microbiomes. Can you take it the rest of the way to a complete draft that's ready for review?",
+    "should_trigger": true
+  },
+  {
+    "query": "Write a book about reinforcement learning for robotics engineers, with runnable code for each chapter. I need the whole thing drafted, not just one chapter.",
+    "should_trigger": true
+  },
+  {
+    "query": "/book-author quantum computing for chemists",
+    "should_trigger": true
+  },
+  {
+    "query": "My 280-page manuscript on climate economics is finished. Run the full editorial pass and tell me if it's publishable or needs major revision.",
+    "should_trigger": false,
+    "use_instead": "scientific-book-editor"
+  },
+  {
+    "query": "The book is approved. Build the paperback PDF, the Kindle EPUB and the cover, and get it ready for KDP.",
+    "should_trigger": false,
+    "use_instead": "production-book-publisher"
+  },
+  {
+    "query": "Write a 1500-word LinkedIn article on why most data teams fail at MLOps.",
+    "should_trigger": false,
+    "use_instead": "article-author"
+  }
+]

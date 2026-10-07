@@ -1,0 +1,33 @@
+[
+  {
+    "query": "What's the atom-outward approach for sequencing chapters in a technical textbook? Should I really draft the foundation chapter last?",
+    "should_trigger": true
+  },
+  {
+    "query": "How should I handle mentioning a topic in chapter 2 that only gets full treatment in chapter 9 of my bookwright project? I want a proper deferral convention.",
+    "should_trigger": true
+  },
+  {
+    "query": "My textbook sections keep coming in 40% over their page budgets. What's the methodology guidance on budgets and running threads across chapters?",
+    "should_trigger": true
+  },
+  {
+    "query": "Explain the Path A subagent cadence for drafting a section of a technical non-fiction book: drafter, spec audit, quality audit, fix.",
+    "should_trigger": true
+  },
+  {
+    "query": "Draft all the sections in the chapter 4 plan and audit each one.",
+    "should_trigger": false,
+    "use_instead": "bookwright-writer"
+  },
+  {
+    "query": "What label prefixes should I use for theorems and equations, and when do I write \\Cref versus a prose reference?",
+    "should_trigger": false,
+    "use_instead": "cross-reference-discipline"
+  },
+  {
+    "query": "Draft the methods and results sections of my journal paper on soil nitrogen.",
+    "should_trigger": false,
+    "use_instead": "manuscript-drafting"
+  }
+]

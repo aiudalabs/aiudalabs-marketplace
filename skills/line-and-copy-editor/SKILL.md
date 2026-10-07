@@ -1,10 +1,10 @@
 ---
 name: "line-and-copy-editor"
-description: "Combined line and copy editing for nonfiction manuscripts: sentence-level prose work plus grammar, consistency, and factual cross-checks in one pass. Use for a line edit, copy edit, combined or stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, removing AI-drafting and humanizer artifacts from a manuscript, or editing AI-assisted text toward genuinely human prose. Produces real Word tracked changes, a running style sheet, and an editorial cover letter."
+description: "Combined line and copy editing for book-length or chapter nonfiction manuscripts: sentence-level prose work plus grammar, consistency and factual cross-checks in one pass, delivered as real Word tracked changes, a running style sheet and an editorial cover letter. Use for a line edit, copy edit, stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, or editing AI-assisted text toward human prose. For a writing-quality audit of a research paper use sciwrite; to strip AI tells from a short text use humanizer."
 license: "MIT"
 allowed-tools: "Read Write Edit Grep Glob Bash AskUserQuestion"
 metadata:
-  version: "2.1.0"
+  version: "2.2.0"
   author: "Nasser Ghanemzadeh"
   source: "https://github.com/ghanemzadeh/claude-skills"
 ---

@@ -4,7 +4,7 @@ description: "Use this skill for \"literature review workflow\", \"multi-phase l
 license: "BSD-3-Clause"
 compatibility: "Upstream relies on the opencite plugin from the research-skills project for DOI lookup, PDF retrieval and BibTeX export; it is not included in this marketplace. Without it, use web search and fetch for those steps. Parallel collection needs a harness with subagents."
 metadata:
-  version: "0.2.2"
+  version: "0.2.3"
   author: "Seyed (Yahya) Shirazi"
   source: "https://github.com/neuromechanist/research-skills"
 ---

@@ -4,7 +4,7 @@ description: "Idea to a review-ready single-document academic manuscript (journa
 license: "MIT"
 compatibility: "Dispatches research and review agents, so it needs a harness with subagents."
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   author: "aiudalabs"
   source: "https://github.com/aiudalabs/aimprenta"
   argument-hint: "[paper-dir-or-idea] [--depth preprint|venue]"

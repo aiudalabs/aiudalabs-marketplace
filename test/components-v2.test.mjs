@@ -21,6 +21,13 @@ function write(root, path, content) {
 const skillFile = (name, metadata = '', body = 'Instructions.') =>
   `---\nname: ${name}\ndescription: Does ${name}. Use when asked.\nmetadata:\n  version: "0.1.0"\n${metadata}---\n\n${body}\n`;
 
+// Valid trigger evals: three requests for the component, two near misses.
+const triggers = (name) => [
+  ...['first', 'second', 'third'].map((n) => ({ query: `A ${n} request for ${name}`, should_trigger: true })),
+  { query: `Something close to ${name} but not it`, should_trigger: false },
+  { query: `Another near miss for ${name}`, should_trigger: false },
+];
+
 // A small marketplace on disk: one skill, one workflow, one agent, one external, one stack.
 function fixture(t, overrides = {}) {
   const root = mkdtempSync(join(tmpdir(), 'marketplace-v2-'));
@@ -31,6 +38,8 @@ function fixture(t, overrides = {}) {
     'agents/writing/prose-polisher.md': '---\nname: prose-polisher\ndescription: Rewrites prose for clarity.\nversion: 0.1.0\nsource: https://github.com/example/agents\nlicense: MIT\n---\n\nYou rewrite prose.\n',
     'externals/cover-art/external.json': { name: 'cover-art', description: 'Designs a cover.', version: '0.1.0', kind: 'skill', repo: 'https://github.com/example/cover-art', commit: 'a'.repeat(40), path: '', license: 'none' },
     'stacks/write-article/stack.json': { name: 'write-article', description: 'Write an article.', version: '0.1.0', workflows: ['article-author'] },
+    'skills/humanizer/evals/triggers.json': triggers('humanizer'),
+    'workflows/article-author/evals/triggers.json': triggers('article-author'),
     ...overrides,
   };
   for (const [path, content] of Object.entries(files)) if (content !== null) write(root, path, content);

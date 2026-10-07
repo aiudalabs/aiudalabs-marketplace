@@ -66,7 +66,26 @@ When a skill includes content adapted from another project, add a `THIRD_PARTY_N
 
 ### Evals
 
-A skill may include `evals/evals.json` with test prompts and expected outputs. The folder is optional and the validator does not check its contents yet.
+Every skill and workflow has `evals/triggers.json`: requests that should load it, and near misses that should not. A harness picks a skill by its description alone, so two skills with overlapping descriptions compete for the same requests. These cases are how that shows up.
+
+```json
+[
+  { "query": "Review the writing in my hydrology paper; the journal asked for language editing", "should_trigger": true },
+  { "query": "Rewrite this abstract so it is tighter, I will paste it straight in", "should_trigger": false, "use_instead": "manuscript-revision" }
+]
+```
+
+| Field | Rule |
+| --- | --- |
+| `query` | A request in a user's own words, with concrete details. Paraphrase; do not copy the description. |
+| `should_trigger` | `true` when this component should be loaded, `false` for a near miss |
+| `use_instead` | Optional, only on a near miss: the skill, workflow or external that owns the request |
+
+The validator requires at least 3 cases that should trigger and 2 near misses, and checks every field. Write near misses from the neighbors a user could confuse with this component, and say in the description where this one stops and which neighbor to use instead.
+
+`node scripts/eval-triggers.mjs` runs the cases: it shows a model the name and description of everything in the catalog, as a harness does at discovery time, and reports each case it routes wrongly and the pairs it confuses. Pass component names to run only theirs, `--stack <name>` to route among what one stack installs, and `--dry-run` to see the size of the run first. It needs `ANTHROPIC_API_KEY`, and every case is one paid request.
+
+A skill may also include `evals/evals.json` with test prompts and expected outputs, in the format of Anthropic's skill-creator. It is optional and the validator does not check it.
 
 ### Body
 

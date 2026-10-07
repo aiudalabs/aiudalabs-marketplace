@@ -337,12 +337,15 @@ function create(kind, name, options) {
   if (!CHECKOUT_FOLDERS.every((folder) => existsSync(join(root, folder)))) {
     throw new InstallError(`${root} is not a clone of the marketplace; run \`new\` from the clone you are contributing to, or pass --dir`);
   }
-  const { path, content } = planScaffold(kind, name, { category: options.category, components: loadAll(root) });
-  const file = join(root, path);
-  if (existsSync(file)) throw new InstallError(`${path} already exists`);
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, content);
-  console.log(`created    ${path}`);
+  const { path, content, extra } = planScaffold(kind, name, { category: options.category, components: loadAll(root) });
+  const files = [{ path, content }, ...extra];
+  const existing = files.find((entry) => existsSync(join(root, entry.path)));
+  if (existing) throw new InstallError(`${existing.path} already exists`);
+  for (const entry of files) {
+    mkdirSync(dirname(join(root, entry.path)), { recursive: true });
+    writeFileSync(join(root, entry.path), entry.content);
+    console.log(`created    ${entry.path}`);
+  }
   console.log('\nNext: replace every TODO, then run `npm run catalog`, `npm run validate` and `npm test`.');
   console.log('What goes in it: CONTRIBUTING.md. Every field and rule: docs/component-formats.md.');
 }

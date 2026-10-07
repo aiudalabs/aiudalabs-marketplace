@@ -3,7 +3,7 @@ name: "humanizer"
 description: "Use this skill for \"humanize this text\", \"remove AI tells\", \"make this less AI-sounding\", \"strip AI patterns\", \"de-AI my writing\", \"reduce AI-isms\", \"final natural-writing pass\", \"check for AI vocabulary\", \"em dash overuse\", \"rule of three overuse\", \"AI vocabulary\", \"signs of AI writing\", or when polishing prose (papers, grants, lit reviews, abstracts, cover letters, responses to reviewers) to remove signs of AI-generated text while preserving meaning and discipline-appropriate conventions."
 license: "BSD-3-Clause"
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: "Seyed (Yahya) Shirazi"
   source: "https://github.com/neuromechanist/research-skills"
 ---
