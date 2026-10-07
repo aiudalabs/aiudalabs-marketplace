@@ -4,7 +4,7 @@ description: "Reviews one implemented backlog issue as the gate before merge: ch
 license: MIT
 compatibility: Needs git and Node.js 20 or later for the spec-guard commands, plus the toolchain of the project's test gate.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires: spec-guard
 ---
@@ -42,7 +42,7 @@ Note which files changed and whether the change matches the issue's intent, not 
 
 ## Step 3: Read the cited spec
 
-Open each section the issue cites and read it whole. If the issue implements "ARCHITECTURE.md §3 createBooking", read the full block: failure modes and idempotency are where reviews find things.
+Open each section the issue cites and read it whole. If the issue implements "ARCHITECTURE.md §3 createBooking", read the full block: failure modes and idempotency are where reviews find things. For a UI issue, the screen's `docs/UI_SCREENS.md#s-<screen-id>` section is the spec; a mockup anchor (`mockups/<app-id>.html#s-<screen-id>`) is cited only for key screens, and when it is, the screen must match it.
 
 ## Step 4: Run the lane check
 
@@ -50,7 +50,7 @@ Open each section the issue cites and read it whole. If the issue implements "AR
 node tools/spec-guard/spec.mjs verify S3-07 --base <base>
 ```
 
-A failure is a blocker: a file outside `files_touched` or outside the owner's lane is a violation even when the change looks right. The fix is an amended issue or a new issue for the right owner, never a quiet approval. If `tools/spec-guard/` is missing, say so; compare the diff with `files_touched` by hand and mark the verdict "lane check: manual".
+A failure is a blocker: a file outside `files_touched` or outside the owner's lane is a violation even when the change looks right. That includes a lockfile, a CI workflow or a generated barrel owned by another lane, and any change to `tools/spec-guard/**`, `.githooks/**` or `.github/workflows/spec-guard.yml`, which only the `spec-guard` installer writes. The fix is an amended issue or a new issue for the right owner, never a quiet approval. If `tools/spec-guard/` is missing, say so; compare the diff with `files_touched` by hand and mark the verdict "lane check: manual".
 
 ## Step 5: Evidence for every acceptance criterion
 
@@ -78,6 +78,8 @@ and, depending on what changed:
 - a migration is included: upgrade, downgrade, upgrade.
 
 Never trust "all pass" from the SUMMARY. A red test, a lint warning or a format error makes the verdict changes-requested. There are no flakes at the gate; a flaky test is a finding.
+
+A command is green only when it ran: its output shows the script and, for tests, a count of tests run. pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script"; that ran nothing. Rerun it as `pnpm --dir <package folder> run <script>`, which fails on a missing script; if the script truly does not exist, the gate is broken: report it as a blocker when the issue should have created the script, and as a finding for the orchestrator otherwise.
 
 ## Step 7: Check the hard rules
 
@@ -119,6 +121,7 @@ When the user says "cerrar sprint N", "cierra el sprint N" or "sprint N está co
 
 - Writing or changing code, even one line.
 - Approving with a red test, a lint warning or a failed lane check.
+- Counting a command that ran nothing (no package matched, no such script) as a pass.
 - Approving a criterion without `file:line` and a test that ran.
 - Skipping the gate because the change is small.
 - Approving because the agent says it works, or because the sprint is late.

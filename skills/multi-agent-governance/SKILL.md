@@ -3,7 +3,7 @@ name: multi-agent-governance
 description: "Turns a finished product spec into the governance of a multi-agent repository: the root AGENTS.md constitution (plus a CLAUDE.md that imports it), docs/AGENT_ROSTER.md with exclusive lanes, docs/ORCHESTRATOR.md, a sprint backlog in docs/ISSUES.md whose waves are computed by spec-guard, and paste-ready prompts for Sprint 0 and Sprint 1. Use when the spec documents (brief, defaults, PRD, schema, UI screens, architecture) exist and the user wants the repo ready for coding agents: \"preparemos esto para los agentes\", \"vamos al build\", \"backlog de issues\", \"sprint planning\", \"AGENTS.md\". Phase 6 of product-spec-orchestrator. Stops when inputs are missing. It plans the whole backlog once; preparing a later sprint from the repo's real state is execution-router, running a sprint with agents is sprint-runner, and bringing an existing codebase into the method is project-adopt."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires: spec-guard stack-profile-flutter-firebase stack-profile-fastapi-react
 ---
@@ -30,15 +30,17 @@ Do not use it when:
 
 ## What it produces
 
-| File | Purpose | Approximate size |
+| File | Purpose | Typical size |
 |---|---|---|
 | `AGENTS.md` (root) | Repository constitution every coding agent reads first | 100-200 lines |
 | `CLAUDE.md` (root) | One line, `@AGENTS.md`, so Claude Code imports the constitution | 1 line |
 | `docs/AGENT_ROSTER.md` | The agents and their exclusive lanes | 40-120 lines |
-| `docs/ORCHESTRATOR.md` | The orchestrator role and the sprint loop | 150-250 lines |
-| `docs/ISSUES.md` | The backlog by sprint, one frontmatter block per issue | 700-1000 lines |
+| `docs/ORCHESTRATOR.md` | The orchestrator role and the sprint loop | 100-250 lines |
+| `docs/ISSUES.md` | The backlog by sprint, one frontmatter block per issue | about 20-25 lines per issue: typically 2500-5000 lines for 120-200 issues |
 | `docs/WAVE_DAG.md` | Waves per sprint, written by `spec.mjs waves --write` | generated |
-| `docs/SPRINT_PROMPTS.md` | Orchestrator and executor prompts for Sprint 0 and Sprint 1 only | 300-500 lines |
+| `docs/SPRINT_PROMPTS.md` | Orchestrator and executor prompts for Sprint 0 and Sprint 1 only | two orchestrator prompts plus about 50 lines per executor prompt: 1000-1600 lines |
+
+Sizes are guidance: completeness wins over the budget. Never drop an issue, a criterion or the inlined issue text in a prompt to fit a line count.
 
 `AGENTS.md` lives at the root because Codex, Copilot, Cursor and OpenCode read it natively there, and Claude Code reads it through the `CLAUDE.md` import. The roster is `docs/AGENT_ROSTER.md`, never `docs/AGENTS.md`: two files called AGENTS.md with different jobs confuse people and tools.
 
@@ -95,10 +97,14 @@ The roster uses the exact format from `formats.md`: one `## <agent-name>` headin
 
 Rules that are not negotiable:
 
-- **Exclusive ownership.** No path is owned by two agents. A file two lanes want (a root `package.json`) goes to one; the other asks for changes.
+- **Exclusive ownership.** No path is owned by two agents, and globs may not overlap (`.github/**` in one lane and `.github/workflows/flutter.yml` in another fails `check`). A file two lanes want (a root `package.json`) goes to one; the other asks for changes.
 - **No test agent, no docs agent.** Tests and docs belong to the agent that owns the code.
-- **DevOps is split.** Platform config sits in the backend agent's lane; each CI workflow belongs to the lane it validates; production deploys run from CI on tagged `main`, never as an agent action.
+- **DevOps is split.** Platform config sits in the backend agent's lane. Each CI workflow file belongs to one lane: a workflow that validates only one lane belongs to that lane; a workflow that spans lanes, and every deploy workflow, belongs to the lane the profile gives the pipeline (the one that owns `.github/**` in the profile). When you give any workflow to another lane, list the workflow files one by one instead of `.github/**`. Production deploys run from CI on tagged `main`, never as an agent action.
+- **Shared and generated files have one owner.** Lockfiles go to the lane that owns their workspace manifest; an aggregator every issue of a lane would edit (a `functions/src/index.ts` barrel, a route registry) is generated at build time or wired by one issue per sprint, so it does not serialize the waves; generated code belongs to the lane that owns its source. The rules and the root dotfiles are in [references/documents.md](references/documents.md#shared-and-generated-files).
+- **Paths outside every lane.** The spec documents (`docs/**`, `mockups/**`), the root `AGENTS.md` and `CLAUDE.md`, and what the `spec-guard` installer writes (`tools/spec-guard/**`, `.githooks/**`, `.github/workflows/spec-guard.yml`) belong to no build lane. List them under a closing `## Paths outside every lane` heading in the roster. No issue lists them in `files_touched`.
+- **A change in another lane is asked for, never made.** An issue that needs two lanes is two issues, wired with `depends_on`. When a lane needs a change in a file it does not own, the owner's issue makes it.
 - **Profile defaults first.** An agent reused across profiles (`react-dev`) gets its concrete lane from the profile, not from its own file.
+- **The roster holds build agents and `qa-tester`.** A consultant that reviews spec documents and owns no lane (`product-advisor`) is not a roster entry, even when the profile mentions it.
 
 #### When to add an agent beyond the profile
 
@@ -139,6 +145,7 @@ Write the root `AGENTS.md`, at most 200 lines, and a root `CLAUDE.md` containing
    - Stay inside your issue's `files_touched` and your lane; the spec-guard hooks block the rest.
    - One worktree per issue (`wt/<issue-id>`); merges happen at the wave barrier, never mid-wave.
    - Every deliverable goes through `qa-tester` before merge.
+   - A change in another agent's lane is requested from its owner (through the orchestrator), never made.
 8. **What this repo does NOT do**: explicit boundaries
 
 Project rules may be added ("amounts are integers in cents, never floats"). Code style is not the constitution's job; linters do that.
@@ -178,11 +185,11 @@ Field rules beyond the format:
 - **`decision_refs`** and **`requirement_refs`**: the `D-xx` and `FR-...` ids the issue implements. Empty only for pure setup work.
 - **`autonomous: false`** for destructive migrations, anything that moves money, deletes user data or changes permissions.
 - **`commit_strategy: squash`** only for lockstep refactors (a rename across 30 files); atomic is the default because it keeps waves debuggable with `git bisect`.
-- **`reads`**: the documents the executor opens first. **UI issues must list both** `docs/UI_SCREENS.md#<screen-id>` and `mockups/<app>-app.html#s-<screen-id>` (the anchor `navegable-mockups` produces), and their criteria cite the screen id ("renders screen 1.2.1 per UI_SCREENS").
+- **`reads`**: the documents the executor opens first. Every UI issue lists `docs/UI_SCREENS.md#s-<screen-id>` for each screen it builds (the `<a id="s-<screen-id>"></a>` that precedes each screen heading). A **key screen** (one of the screens UI_SCREENS picks for mockups, with its mockup back-link) also lists `mockups/<app-id>.html#s-<screen-id>`, copied from that back-link, where `<app-id>` is the app id exactly as the brief names it (`player-app`, `admin-dashboard`). Other screens have no mockup anchor; they may list the app's mockup file without an anchor for its visual language. Criteria cite the screen id ("renders screen 1.2.1 per UI_SCREENS"). If UI_SCREENS has no `<a id="s-...">` anchors, add them before each screen heading as a mechanical fix and tell the user.
 
 ### Step 6: Install guardrails and compute waves
 
-1. **Install the guardrails.** Ask the user to run the `spec-guard` installer from the project root (it needs a git repository):
+1. **Install or refresh the guardrails.** Ask the user to run the `spec-guard` installer from the project root (it needs a git repository). Run it even when `tools/spec-guard/` already exists (the kickstart installs it): it is safe to run again, replaces `tools/spec-guard/` with the scripts of the installed `spec-guard` skill and keeps the hooks and settings, so an updated `spec-guard` reaches the project only this way. Run it again after every `spec-guard` update.
 
    ```bash
    node <spec-guard skill folder>/scripts/install.mjs --ci           # every harness
@@ -206,15 +213,16 @@ Field rules beyond the format:
 2. Then do the checks code cannot do, and surface anything you find to the user instead of fixing it silently:
    - `AGENTS.md` (and `CLAUDE.md`) contradict nothing in `docs/`.
    - Deferred items in `ISSUES.md` match the deferred list in `ARCHITECTURE.md`.
-   - The commands in `AGENTS.md` actually work: run them if the repo is scaffolded; otherwise check each one against the profile's tooling.
-   - Every agent except `qa-tester` owns at least one issue; an idle agent leaves the roster.
+   - The commands in `AGENTS.md` actually work: run them if the repo is scaffolded; otherwise check each one against the profile's tooling. A command passes only when it ran something: the script exists in the package's `package.json` (or `melos.yaml`, `pyproject.toml`) and the output shows it ran. pnpm exits 0 for `pnpm --filter <name> <script>` when no package matches the name ("No projects matched the filters") and when the package lacks the script ("None of the selected packages has a ... script"), so write per-package commands as `pnpm --dir <package folder> run <script>`, which fails on a missing script, and count those two messages as a failure. A command that cannot run yet because a Sprint 0 issue creates its script is listed to the user as pending, not as passing.
+   - Every `reads` anchor resolves: a heading slug, an explicit `<a id>`, or for a key screen the mockup back-link in UI_SCREENS (the mockup file itself may not exist yet).
+   - Every build agent in the roster owns at least one issue; a build agent with no issue leaves the roster. `qa-tester` owns none by design. A consultant such as `product-advisor` was never in the roster (Step 2), so it is not affected.
 
 ### Step 8: Write the Sprint 0 and Sprint 1 prompts
 
 `docs/SPRINT_PROMPTS.md` holds one **orchestrator prompt** per sprint and one **executor prompt** per issue, for Sprint 0 and Sprint 1 only. Templates are in [references/documents.md](references/documents.md#sprint-prompts).
 
-- **Orchestrator prompt** (60-90 lines): context anchor (read `AGENTS.md`, the roster, `ORCHESTRATOR.md`, the sprint in `ISSUES.md` and `WAVE_DAG.md`); current state; the wave-by-wave plan with owners and worktrees; an approval gate ("output the wave plan first, spawn nothing until I approve").
-- **Executor prompt** (25-40 lines): identity and worktree; the `reads` list, in order, and nothing else; the issue inlined verbatim; commit discipline; the done signal (summary, commits, deviations, handoff to `qa-tester`, no self-merge). When the `issue-delivery` skill is installed, the prompt tells the executor to follow it.
+- **Orchestrator prompt** (typically 60-90 lines): context anchor (read `AGENTS.md`, the roster, `ORCHESTRATOR.md`, the sprint in `ISSUES.md` and `WAVE_DAG.md`); current state; the wave-by-wave plan with owners and worktrees; an approval gate ("output the wave plan first, spawn nothing until I approve").
+- **Executor prompt** (typically 25-40 lines around the inlined issue): identity and worktree; the `reads` list, in order, and nothing else; the issue inlined verbatim; commit discipline; the done signal (summary, commits, deviations, handoff to `qa-tester`, no self-merge). When the `issue-delivery` skill is installed, the prompt tells the executor to follow it.
 
 End the file with a note: "Prompts for Sprint 2 onward are generated by `execution-router` when the previous sprint closes."
 
@@ -243,9 +251,39 @@ Last check: every executor prompt matches its issue's frontmatter exactly. A pro
 
 ## Handoff
 
-Write `docs/SESSION.md` (overwrite, not append) with the 7-phase table (Phase 6 complete), 3-5 concrete decisions locked in this phase, open questions or "None", and "Sprint 0 ready".
+Overwrite the whole `docs/SESSION.md` with exactly this shape. Mark each phase `done` or `pending` from what `spec.mjs status` reports, with Phase 6 done:
 
-Then close in Spanish:
+```markdown
+# Session — {project title}
+
+_Narrative for the next session. What is done is decided by `node tools/spec-guard/spec.mjs status`, which reads the documents; when they disagree, status wins._
+
+## Phases
+
+| Phase | Skill | State |
+| --- | --- | --- |
+| 1 | product-discovery | done |
+| 2 | product-requirements | done |
+| 3 | schema-design | done |
+| 4 | ui-screens-spec | done |
+| 5 | system-architecture | done |
+| 6 | multi-agent-governance | done |
+| 7 | navegable-mockups | {done / pending} |
+
+## Last phase: 6 — multi-agent-governance
+
+- {3 to 5 bullets the build must know: roster and lanes, the CI and lockfile owners, issues that need a person, scope moved between sprints}
+
+## Open questions
+
+- {items marked [SUPUESTO] or deferred to a later phase, or "None"}
+
+## Next
+
+{Phase 7 — navegable-mockups, if pending; otherwise the build: Sprint 0 with sprint-runner}
+```
+
+Then close in Spanish. Under `product-spec-orchestrator`, its phase gate replaces this closing message: give it the counts below and the decisions worth verifying.
 
 > Governance lista. {N} sprints, {M} issues, {K} agentes. `spec.mjs check --strict` pasa. Prompts listos para Sprint 0 y 1.
 >

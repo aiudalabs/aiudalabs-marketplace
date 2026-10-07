@@ -5,6 +5,11 @@ The checks each default developer agent adds to the test gate in the root
 `AGENTS.md` lists different commands, the root `AGENTS.md` wins: it is the
 project's own gate. Lanes come from `docs/AGENT_ROSTER.md`, never from this page.
 
+The script names below are the usual ones; use the ones the package's
+`package.json` defines. The pnpm commands use `--dir <folder> run`, which fails
+when the script is missing; `--filter <name>` exits 0 when nothing matched or
+the script does not exist, and such a run is not a pass.
+
 ## flutter-dev (profile `flutter-firebase`)
 
 **Implementation patterns**
@@ -69,12 +74,12 @@ Global coverage does not go down.
 
 **Gate additions**
 ```bash
-pnpm --filter functions lint
-pnpm --filter functions typecheck
-pnpm --filter functions test
-pnpm --filter functions test:rules
+pnpm --dir functions run lint
+pnpm --dir functions run typecheck
+pnpm --dir functions run test
+pnpm --dir functions run test:rules
 firebase emulators:exec --only firestore,functions,auth \
-  "pnpm --filter functions test:integration"
+  "pnpm --dir functions run test:integration"
 ```
 
 **SUMMARY extras:** functions changed, rules and index changes, whether the
@@ -82,8 +87,8 @@ shared types changed (and so flutter-dev must regenerate the Dart mirror).
 
 ## react-dev (admin app in `flutter-firebase`, frontend in `fastapi-react`)
 
-The package filter below is the one in the roster lane: `admin` in
-`flutter-firebase`, the frontend app's name in `fastapi-react`.
+The package folder below is the one in the roster lane: `admin` in
+`flutter-firebase`, `frontend` (or its app folder) in `fastapi-react`.
 
 **Implementation patterns**
 - shadcn/ui primitives instead of custom equivalents (Dialog, Table, Form...).
@@ -108,10 +113,10 @@ The package filter below is the one in the roster lane: `admin` in
 
 **Gate additions**
 ```bash
-pnpm --filter <app> lint
-pnpm --filter <app> typecheck
-pnpm --filter <app> test
-pnpm --filter <app> build
+pnpm --dir <app folder> run lint
+pnpm --dir <app folder> run typecheck
+pnpm --dir <app folder> run test
+pnpm --dir <app folder> run build
 ```
 No new console warnings in development mode.
 

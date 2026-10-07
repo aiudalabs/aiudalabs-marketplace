@@ -4,7 +4,7 @@ description: "Implements one backlog issue from docs/ISSUES.md end to end as its
 license: MIT
 compatibility: Needs git and Node.js 20 or later for the spec-guard commands, plus whatever toolchain the project's test gate uses (Flutter and melos, pnpm, Python and pytest).
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
   requires: spec-guard
 ---
@@ -49,7 +49,9 @@ Split the work into tasks, each one small enough to be one commit that passes th
 
 Every file you create or modify must match a path or glob in the issue's `files_touched`, and those already sit inside your lane.
 
-When the work needs a file outside that list (a type in another package, an extra test helper, a rule file), stop. Tell the orchestrator which file, why, and whose lane it is in, and ask for the issue to be amended or for a new issue. Never widen the scope silently, never "just fix it" in another lane, and never move code into your lane to avoid asking.
+When the work needs a file outside that list (a type in another package, an extra test helper, a rule file, a lockfile, a CI workflow, a barrel `index.ts`), stop. Tell the orchestrator which file, why, and whose lane it is in, and ask for the issue to be amended or for a new issue. Never widen the scope silently, never "just fix it" in another lane, and never move code into your lane to avoid asking.
+
+A new dependency is declared in your own package manifest only. If installing it rewrites a lockfile your lane does not own, do not commit that lockfile: list the refresh under "Cross-lane follow-ups" in the SUMMARY so the lockfile's owner gets an issue. Never edit `tools/spec-guard/**`, `.githooks/**` or `.github/workflows/spec-guard.yml`; the `spec-guard` installer writes them.
 
 Implement with the conventions of your stack: [references/stack-conventions.md](references/stack-conventions.md) has the patterns, test expectations and gate commands for each default developer agent.
 
@@ -71,7 +73,7 @@ S3-07 task-1: validate booking input [refs: D-03, FR-BOOKING-2]
 
 Before declaring done, run, from the project root:
 
-1. Every validation command listed in the root `AGENTS.md` (the profile's test gate), plus the agent-specific checks in [references/stack-conventions.md](references/stack-conventions.md). All must pass.
+1. Every validation command listed in the root `AGENTS.md` (the profile's test gate), plus the agent-specific checks in [references/stack-conventions.md](references/stack-conventions.md). All must pass, and each must have run something: its output shows the script ran and, for tests, a count of tests. pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script"; that is a broken command, not a pass. Use `pnpm --dir <package folder> run <script>`, which fails on a missing script, and report a broken `AGENTS.md` command to the orchestrator instead of counting it.
 2. `node tools/spec-guard/spec.mjs verify S3-07` (add `--base <branch>` when the base is not the default). It fails when the diff leaves `files_touched` or the lane. Fix the cause; do not edit the issue to make it pass.
 3. `git diff --check <base>...HEAD` for whitespace errors.
 4. Walk the acceptance criteria once more. For each, find the line that meets it and the test that proves it, and run that test by name.
@@ -98,10 +100,10 @@ Post this block in the issue thread or in chat, and stop. qa-tester takes it fro
 1. Rejects unauthenticated calls — functions/src/callable/createBooking.ts:18; test `createBooking rejects unauthenticated`
 2. Moves requested to confirmed in one transaction — createBooking.ts:41-67; test `createBooking confirms atomically`
 
-**Gate:** `pnpm --filter functions lint` pass, `... typecheck` pass, `... test` pass, emulator integration pass
+**Gate:** `pnpm --dir functions run lint` pass, `... run typecheck` pass, `... run test` pass (24 tests), emulator integration pass
 **Lane check:** `spec.mjs verify S3-07` pass
 **Deviations from spec:** none
-**Cross-lane follow-ups:** types changed in packages-ts/types; flutter-dev must regenerate the Dart mirror
+**Cross-lane follow-ups:** new dependency `zod` in functions/package.json; pnpm-lock.yaml (firebase-dev) needs a refresh
 **Open questions for qa-tester:** none
 ```
 
@@ -126,6 +128,7 @@ Spec gaps are governance bugs, not implementation problems.
 - Touching a file outside `files_touched` "because it was a one-line fix".
 - One commit for the whole issue, or commits without the issue id and refs.
 - Committing with a red or skipped test, or calling the gate green without running it.
+- Counting a command that matched no package or found no script as green.
 - Declaring done without `spec.mjs verify`.
 - A SUMMARY that says "all criteria met" without a `file:line` and test for each.
 - Merging your own branch.

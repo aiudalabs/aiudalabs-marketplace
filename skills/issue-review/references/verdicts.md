@@ -10,7 +10,7 @@
 2. Moves requested to confirmed in one transaction — createBooking.ts:41-67; test `createBooking confirms atomically` (ran, pass)
 3. Duplicate request returns the cached response — createBooking.ts:24-30; test `createBooking is idempotent on clientRequestId` (ran, pass)
 
-**Gate:** every command in AGENTS.md run locally, all pass.
+**Gate:** every command in AGENTS.md run locally, each one ran its script (tests counted), all pass.
 **Lane check:** `spec.mjs verify S3-07` pass.
 **Commits:** all carry the issue id and refs.
 **Hard rules:** no violations.
@@ -37,7 +37,7 @@ Ready for merge.
 - `spec.mjs verify S3-07` fails: packages-ts/types/booking.ts is outside files_touched. Ask the orchestrator to amend the issue, or move the change to a new issue.
 
 **Gate:**
-- `pnpm --filter functions test:integration` fails on `createBooking handles double confirm`.
+- `pnpm --dir functions run test:integration` fails on `createBooking handles double confirm`.
 
 **Suggestions (non-blocking):**
 - The 200-line `processBooking` could be split into helpers for testability.
