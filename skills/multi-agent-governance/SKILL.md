@@ -3,7 +3,7 @@ name: multi-agent-governance
 description: "Turns a finished product spec into the governance of a multi-agent repository: the root AGENTS.md constitution (plus a CLAUDE.md that imports it), docs/AGENT_ROSTER.md with exclusive lanes, docs/ORCHESTRATOR.md, a sprint backlog in docs/ISSUES.md whose waves are computed by spec-guard, and paste-ready prompts for Sprint 0 and Sprint 1. Use when the spec documents (brief, defaults, PRD, schema, UI screens, architecture) exist and the user wants the repo ready for coding agents: \"preparemos esto para los agentes\", \"vamos al build\", \"backlog de issues\", \"sprint planning\", \"AGENTS.md\". Phase 6 of product-spec-orchestrator. Stops when inputs are missing. It plans the whole backlog once; preparing a later sprint from the repo's real state is execution-router, running a sprint with agents is sprint-runner, and bringing an existing codebase into the method is project-adopt."
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
   author: aiudalabs
   requires: spec-guard stack-profile-flutter-firebase stack-profile-fastapi-react
 ---
@@ -143,9 +143,9 @@ Write the root `AGENTS.md`, at most 200 lines, and a root `CLAUDE.md` containing
    - Never commit if tests are red.
    - Never bypass the authorization layer (security rules, endpoint permissions).
    - Every state machine transition runs on the server, never in the client.
-   - Atomic commits, one task per commit: `S3-07 task-1: <summary> [refs: D-03, FR-BOOKING-2]`.
+   - Atomic commits, one task per commit, the issue id first: `S3-07 task-1: <summary> [refs: D-03, FR-BOOKING-2]`. `[refs: ...]` is optional and lists only the issue's own refs.
    - Stay inside your issue's `files_touched` and your lane; the spec-guard hooks block the rest.
-   - One worktree per issue (`wt/<issue-id>`); merges happen at the wave barrier, never mid-wave.
+   - One worktree per issue (`wt/<issue-id>`), synced only by merging the base; merges into the base happen at the wave barrier, never mid-wave.
    - Every deliverable goes through `qa-tester` before merge.
    - A change in another agent's lane is requested from its owner (through the orchestrator), never made.
 8. **What this repo does NOT do**: explicit boundaries
@@ -215,14 +215,14 @@ Criterion rules:
 
 ### Step 6: Install guardrails and compute waves
 
-1. **Install or refresh the guardrails.** Ask the user to run the `spec-guard` installer from the project root (it needs a git repository). Run it even when `tools/spec-guard/` already exists (the kickstart installs it): it is safe to run again, replaces `tools/spec-guard/` with the scripts of the installed `spec-guard` skill and keeps the hooks and settings, so an updated `spec-guard` reaches the project only this way. Run it again after every `spec-guard` update.
+1. **Install or refresh the guardrails.** Ask the user to run the `spec-guard` installer from the project root (it needs a git repository). Run it even when `tools/spec-guard/` already exists (the kickstart installs it): it is safe to run again, replaces `tools/spec-guard/` and the hooks it wrote with those of the installed `spec-guard` skill, adds new hooks and keeps settings, so an updated `spec-guard` reaches the project only this way. Run it again after every `spec-guard` update.
 
    ```bash
    node <spec-guard skill folder>/scripts/install.mjs --ci           # every harness
    node <spec-guard skill folder>/scripts/install.mjs --ci --claude  # when they use Claude Code
    ```
 
-   It copies the tools into `tools/spec-guard/`, sets the pre-commit and commit-msg hooks, adds the CI check, and with `--claude` a hook that blocks edits outside the lane. If there is no repository yet, say that `project-kickstart` creates it and run the checks from the skill's folder meanwhile.
+   It copies the tools into `tools/spec-guard/`, sets the pre-commit, commit-msg and pre-merge-commit hooks, adds the CI check, and with `--claude` a hook that blocks edits outside the lane. If there is no repository yet, say that `project-kickstart` creates it and run the checks from the skill's folder meanwhile.
 
 2. **Compute waves.** Run `spec.mjs waves --write`. It writes `wave:` into each issue and `docs/WAVE_DAG.md`. Never edit a wave by hand; change `depends_on` or `files_touched` and re-run.
 
@@ -248,11 +248,11 @@ Criterion rules:
 `docs/SPRINT_PROMPTS.md` holds one **orchestrator prompt** per sprint and one **executor prompt** per issue, for Sprint 0 and Sprint 1 only. Templates are in [references/documents.md](references/documents.md#sprint-prompts).
 
 - **Orchestrator prompt** (typically 60-90 lines): context anchor (read `AGENTS.md`, the roster, `ORCHESTRATOR.md`, the sprint in `ISSUES.md` and `WAVE_DAG.md`); current state; the wave-by-wave plan with owners and worktrees; an approval gate ("output the wave plan first, spawn nothing until I approve").
-- **Executor prompt** (typically 25-40 lines around the inlined issue): identity and worktree; the `reads` list, in order, then the decisions and requirements the issue cites, and nothing else; the issue inlined verbatim; commit discipline; the done signal (summary, commits, deviations, handoff to `qa-tester`, no self-merge). When the `issue-delivery` skill is installed, the prompt tells the executor to follow it.
+- **Executor prompt** (typically 25-40 lines around the inlined issue): identity and worktree; the `reads` list, in order, then the decisions and requirements the issue cites, and nothing else; the issue inlined verbatim, followed by the `Commits:` line; commit discipline; the done signal (summary, commits, deviations, handoff to `qa-tester`, no self-merge). When the `issue-delivery` skill is installed, the prompt tells the executor to follow it.
 
 End the file with a note: "Prompts for Sprint 2 onward are generated by `execution-router` when the previous sprint closes."
 
-Last check: every executor prompt matches its issue's frontmatter exactly. A prompt that drifts from its issue is fixed in the prompt, never in the issue. After an amendment, the prompt is regenerated from the issue (`spec.mjs amend`, or `execution-router`), never patched by hand.
+Last check: run `spec.mjs prompts --write`, then `spec.mjs check`. `prompts --write` syncs each executor prompt's copy of its issue and `Read these ...` list, and each orchestrator prompt's `- Wave N:` lines, with `docs/ISSUES.md`; keep those parts in the templates' shape, or `check` reports `prompt-drift`. A prompt that drifts is fixed in the prompt, never in the issue. The orchestrator amends an issue's files, dependencies or reads only with `spec.mjs amend`, which syncs the prompts too.
 
 ## Anti-patterns
 

@@ -13,8 +13,8 @@
 5. Booking confirmation email — deferred by amendment `9f8e7d6` (on develop) to S3-09
 
 **Gate:** the issue's `gate:` list and every command in AGENTS.md run locally, each one ran its script and counted its tests, all pass. (A suite that found no tests is written `ran, 0 tests` and is acceptable only when the issue adds nothing it could test. A command marked `from <id>` is listed as skipped while that issue is unmerged.)
-**Lane check:** `spec.mjs verify S3-07` pass, on a clean tree.
-**Commits:** all carry the issue id and refs (merges from the base exempt).
+**Lane check:** `spec.mjs verify S3-07` pass, no merge or refs warnings.
+**Commits:** all start with the issue id; refs only from the issue's (merges from the base exempt).
 **Hard rules:** no violations.
 
 **Suggestions (non-blocking):**

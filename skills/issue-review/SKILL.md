@@ -4,7 +4,7 @@ description: "Reviews one implemented backlog issue as the gate before merge: ch
 license: MIT
 compatibility: Needs git and Node.js 20 or later for the spec-guard commands, plus the toolchain of the project's test gate.
 metadata:
-  version: "1.2.1"
+  version: "1.2.2"
   author: aiudalabs
   requires: spec-guard
 ---
@@ -38,9 +38,9 @@ git diff <base>...HEAD
 git log --oneline <base>..HEAD
 ```
 
-Note which files changed and whether the change matches the issue's intent, not something adjacent to it. Every commit subject must start with the issue id and carry `[refs: ...]` when the issue has refs (format: `S3-07 task-1: validate input [refs: D-03, FR-BOOKING-2]`). Refs come from the issue's `decision_refs` and `requirement_refs`; a placeholder such as `[refs: setup]` is a finding. The issue id is what `spec.mjs` traces.
+Note which files changed and whether the change matches the issue's intent, not something adjacent to it. Every commit subject must start with the issue id: it is the trace key `spec.mjs` follows (format: `S3-07 task-1: validate input [refs: D-03, FR-BOOKING-2]`). `[refs: ...]` is optional and may list only the issue's `decision_refs` and `requirement_refs`; an id outside them or a placeholder such as `[refs: setup]` is a finding. The commit-msg hook enforces both.
 
-A merge from the base is exempt from the id rule: its second parent is on the base (`git merge-base --is-ancestor <commit>^2 <base>`) and it brings only what the base already has. So is the merge of `wt/<manifest id>` into a lockfile-refresh issue paired with it through `merge_with`. Any other merge, or one whose second parent is not on the base, is a blocker.
+A merge from the base is exempt from the id rule: its second parent is on the base (`git merge-base --is-ancestor <commit>^2 <base>`) and it brings only what the base already has. The pre-merge-commit hook refuses any other merge into an issue branch, and `verify` warns on one: such a merge is a blocker. A lockfile-refresh issue paired through `merge_with` does not merge its manifest issue; its branch starts from `wt/<manifest id>`, which is its base in Step 4.
 
 ## Step 3: Read the cited spec
 
@@ -48,13 +48,13 @@ Open each section the issue cites and read it whole. If the issue implements "AR
 
 ## Step 4: Run the lane check
 
-Run it on a clean tree: `git status --short` must be empty first. Files your own install or bootstrap wrote (`pnpm-lock.yaml`, `pubspec_overrides.yaml`) are not the branch's change; restore or remove them (`git checkout -- <file>`, never `mv` someone's file aside), then run:
+`verify` judges only what the branch committed since it left the base. Files your own install or bootstrap wrote (`pnpm-lock.yaml`, `pubspec_overrides.yaml`) are not the branch's change: it lists them as `warning (uncommitted)` without failing. Restore or remove them once the gate is done (`git checkout -- <file>`, never `mv` someone's file aside). Run:
 
 ```bash
 node tools/spec-guard/spec.mjs verify S3-07 --base <base>
 ```
 
-A failure is a blocker: a file outside `files_touched` or outside the owner's lane is a violation even when the change looks right. That includes a lockfile, a CI workflow or a generated barrel owned by another lane, any change to `tools/spec-guard/**` or `.githooks/**`, which only the `spec-guard` installer writes, and a change to `.github/workflows/spec-guard.yml` outside its owner's lane (the roster names it). The fix is an amended issue or a new issue for the right owner, never a quiet approval. If `tools/spec-guard/` is missing, say so; compare the diff with `files_touched` by hand and mark the verdict "lane check: manual".
+`--base` takes any branch (`wt/<manifest id>` for a paired lockfile refresh). A failure is a blocker: a file outside `files_touched` or outside the owner's lane is a violation even when the change looks right. That includes a lockfile, a CI workflow or a generated barrel owned by another lane, any change to `tools/spec-guard/**` or `.githooks/**`, which only the `spec-guard` installer writes, and a change to `.github/workflows/spec-guard.yml` outside its owner's lane (the roster names it). So is a warning on a merge or on a `[refs: ...]` the issue does not cite. The fix is an amended issue (`spec.mjs amend`) or a new issue for the right owner, never a quiet approval. If `tools/spec-guard/` is missing, say so; compare the diff with `files_touched` by hand and mark the verdict "lane check: manual".
 
 ## Step 5: Evidence for every acceptance criterion
 
@@ -103,7 +103,7 @@ and, depending on what changed:
 
 Skip a command that `AGENTS.md` marks `from <issue id>` while that issue is not merged, and list it in the verdict as skipped, with the reason.
 
-When the lockfile refresh belongs to another, unmerged issue, the frozen install fails for reasons outside this branch. Install with `--no-frozen-lockfile`, run the gate, then `git checkout -- pnpm-lock.yaml` and confirm `git status --short` is empty before Step 4. Say in the verdict that CI stays red until the refresh issue merges.
+When the lockfile refresh belongs to another, unmerged issue, the frozen install fails for reasons outside this branch. Install with `--no-frozen-lockfile`, run the gate, then `git checkout -- pnpm-lock.yaml` and confirm `git status --short` is empty. Say in the verdict that CI stays red until the refresh issue merges.
 
 If the gate started emulators, confirm afterwards that none started from your checkout is still running, and stop only those. Never stop another agent's process; report a port held by one to the orchestrator.
 

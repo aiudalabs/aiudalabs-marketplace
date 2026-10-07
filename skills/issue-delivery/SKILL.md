@@ -4,7 +4,7 @@ description: "Implements one backlog issue from docs/ISSUES.md end to end as its
 license: MIT
 compatibility: Needs git and Node.js 20 or later for the spec-guard commands, plus whatever toolchain the project's test gate uses (Flutter and melos, pnpm, Python and pytest).
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
   author: aiudalabs
   requires: spec-guard
 ---
@@ -35,7 +35,7 @@ Talk to the user in Spanish. Code, comments, commit messages and the SUMMARY are
 
 - The branch or worktree name must carry the issue id: `wt/S3-07`, `S3-07-create-booking`. Check with `git branch --show-current`. If you are on the base branch or on another issue's branch, stop and ask; never implement on `develop` or `main`.
 - The working tree must be clean before the first change (`git status --short`). Unknown changes belong to someone; ask before touching them.
-- If the spec-guard git hooks are installed, they read the active issue from the branch name and block staged files outside `files_touched`. Treat a block as information, never something to bypass with `--no-verify`.
+- If the spec-guard git hooks are installed, they read the active issue from the branch name and block staged files outside `files_touched`. Treat a block as information: stop and ask the orchestrator to amend the issue (`spec.mjs amend`). Never skip a hook; CI runs the same checks.
 
 ## Step 3: Plan the tasks
 
@@ -67,11 +67,11 @@ S3-07 task-1: validate booking input [refs: D-03, FR-BOOKING-2]
 ```
 
 - The issue id first, then `task-<k>`, then an imperative summary in English.
-- `[refs: ...]` lists the `decision_refs` and `requirement_refs` that this task serves. Setup work with no refs omits the brackets; never write a placeholder such as `[refs: setup]`. `spec.mjs impact` and `spec.mjs why` trace through the issue id and the issue's frontmatter; the refs record which decisions each task serves, so do not drop them.
+- The issue id is the trace key: `spec.mjs impact` and `spec.mjs why` follow it to the issue's frontmatter. `[refs: ...]` is optional and lists only the issue's own `decision_refs` and `requirement_refs` that this task serves; the commit-msg hook refuses any other id. With no refs, omit the brackets; never write a placeholder such as `[refs: setup]`.
 - Run the gate before each commit. Never commit red. A failing test is fixed in the code or in the test when the test is wrong, never skipped, deleted or marked flaky to get past the gate.
 - Do not squash or amend published commits. `commit_strategy: squash` tells the orchestrator how to merge, not you how to commit.
 - Do not push to the base branch, merge, tag or deploy. The orchestrator merges at the wave barrier; deploys go through CI.
-- One exception: when the orchestrator tells you an amendment landed on the base, run `git merge <base>` into your branch (never rebase). A merge from the base is the only allowed commit without a task subject; it brings the amended issue, and you reread the issue block before going on.
+- One exception: when the orchestrator tells you an amendment landed on the base, run `git merge <base>` into your branch (never rebase). A merge from the base is the only allowed commit without a task subject, and the only merge the pre-merge-commit hook allows; it brings the amended issue, and you reread the issue block before going on.
 
 ## Step 6: Run the gate and the lane check
 
@@ -80,7 +80,7 @@ Before declaring done, run, from the project root:
 1. The issue's `gate:` list first, when it has one, then every validation command listed in the root `AGENTS.md` (the profile's test gate), plus the agent-specific checks in [references/stack-conventions.md](references/stack-conventions.md), which also names the gates for scripts, workflows, docs and static sites. All must pass, and each must have run something: its output shows the script ran and, for tests, a count of tests. pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script"; that is a broken command, not a pass. Use `pnpm --dir <package folder> run <script>`, which fails on a missing script, and report a broken `AGENTS.md` command to the orchestrator instead of counting it.
    "No test files found" (or "No tests found") with exit 0, as Vitest's `--passWithNoTests` and similar flags allow, is a run of 0 tests, not a pass. Report it as `ran, 0 tests`. It is acceptable only when the issue adds no code that suite could test; otherwise write the tests.
    If the gate started emulators, confirm none started from this worktree is still running (`ps -o pid,args` plus the process cwd); stop only your own, never another agent's process. Use the emulator port offset or config the orchestrator assigned, if any.
-2. Commit or discard everything first: `git status --short` must be empty, so the check sees only the branch. Generated files are never committed (`pubspec_overrides.yaml`, `.dart_tool/`, `build/`, `dist/`); if one is untracked and not ignored, report the missing ignore line instead of committing it. Then run `node tools/spec-guard/spec.mjs verify S3-07` (add `--base <branch>` when the base is not the default). It fails when the diff leaves `files_touched` or the lane. Fix the cause; do not edit the issue to make it pass.
+2. Commit or discard everything first: `git status --short` must be empty. `verify` judges only what the branch committed and lists anything left uncommitted as `warning (uncommitted)`; `--worktree` counts it too. Generated files are never committed (`pubspec_overrides.yaml`, `.dart_tool/`, `build/`, `dist/`); if one is untracked and not ignored, report the missing ignore line instead of committing it. Then run `node tools/spec-guard/spec.mjs verify S3-07` (add `--base <branch>` when the base is not the default). It fails when the diff leaves `files_touched` or the lane. Fix the cause; do not edit the issue to make it pass.
 3. `git diff --check <base>...HEAD` for whitespace errors.
 4. Walk the acceptance criteria once more. For each, find the line that meets it and the evidence that proves it, and run that test by name. A test counts only if it fails without the behavior: break the code for each criterion once (comment out the check, flip the comparison), show the test goes red, then revert with `git checkout -- <file>`. A test that compares a constant with itself proves nothing. A criterion with no natural test takes other evidence:
    - config, ignore or env criterion: a command whose output line shows the setting in effect, plus a negative check that fails without it;
@@ -111,7 +111,7 @@ Post this block in the issue thread, and stop. qa-tester takes it from here. Wit
 2. Moves requested to confirmed in one transaction — createBooking.ts:41-67; test `createBooking confirms atomically`
 
 **Gate:** `pnpm --dir functions run lint` pass, `... run typecheck` pass, `... run test` pass (24 tests), emulator integration pass
-**Lane check:** `spec.mjs verify S3-07` pass (clean tree)
+**Lane check:** `spec.mjs verify S3-07` pass (clean tree, no warnings)
 **Deviations from spec:** none
 **Deviations approved at the plan gate:** none
 **Tasks added after approval:** none

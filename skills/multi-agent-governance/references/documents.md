@@ -75,7 +75,7 @@ Every path an issue will write sits in exactly one lane. These files are the one
 | Generated code (`*.g.dart`, `*.freezed.dart`, generated API clients, the Dart mirror of shared types) | The lane that owns the source it is generated from, unless the consumer generates it in its own folder | The issue that changes the source lists the generated paths too, or a follow-up issue of the consuming lane regenerates them |
 | Root dotfiles (`.gitignore`, `.env.example`, `.tool-versions`, `.editorconfig`, root `README.md`) | Assign each one explicitly, usually to the pipeline lane | Asked for like any other file |
 
-An issue that needs two lanes is two issues, wired with `depends_on`. When an executor finds mid-issue that it needs a file outside its lane, it stops and asks the orchestrator; the orchestrator adds or amends an issue for the owner (`execution-router` between sprints), and the original issue waits for it. An amendment to the running issue itself is committed on the base (`spec.mjs amend`); the orchestrator regenerates its executor prompt and the owner merges the base into `wt/<id>`.
+An issue that needs two lanes is two issues, wired with `depends_on`. When an executor finds mid-issue that it needs a file outside its lane, it stops and asks the orchestrator; the orchestrator adds or amends an issue for the owner (`execution-router` between sprints), and the original issue waits for it. An amendment to the running issue itself is committed on the base with `spec.mjs amend`, which syncs its executor prompt; the owner merges the base into `wt/<id>`.
 
 ## Orchestrator
 
@@ -124,7 +124,7 @@ code. When the sprint closes, the role passes on.
 - Sends every finished issue to `qa-tester`.
 - Gives each worktree its emulator port offset; stops what the wave left running before removing a worktree.
 - Merges approved issues at the wave barrier, in id order; a manifest issue with `merge_with` merges together with its lockfile refresh.
-- Commits approved amendments on the base, regenerates the issue's executor prompt, and has the owner merge the base into `wt/<id>`.
+- Commits approved amendments on the base with `spec.mjs amend` (never a hand edit of files, dependencies or reads; it syncs the prompts), and has the owner merge the base into `wt/<id>`.
 - Stops for a person on `autonomous: false` issues and before each wave.
 - Closes the sprint with a retro.
 
@@ -244,7 +244,7 @@ docs/ISSUES.md (Sprint {N}), docs/WAVE_DAG.md (Sprint {N}).
 Run `node tools/spec-guard/spec.mjs status` and confirm the scope in one paragraph.
 
 Current state: Sprints 0..{N-1} are merged. {Key facts about the repo.}
-This sprint has {W} waves:
+This sprint has {M} issues in {W} waves:
 - Wave 1: S{N}-01 (owner, wt/S{N}-01), S{N}-02 (...), ...
 - Wave 2: ...
 Within each wave files_touched are disjoint (computed by spec.mjs waves).
@@ -256,9 +256,9 @@ barrier, in id order. A merge conflict stops the sprint.
 Give the k-th worktree of a wave emulator port offset k*100; every gate stops
 what it starts, and you stop what is left before removing a worktree.
 Merge a `merge_with` issue together with its lockfile refresh: {pairs or "none"}.
-An approved amendment: commit it on {base branch} with `spec.mjs amend`,
-regenerate the executor prompt, and have the owner merge {base branch} into
-wt/<id>.
+An approved amendment: commit it on {base branch} with `spec.mjs amend`
+(it syncs the prompts), and have the owner merge {base branch} into wt/<id>;
+the hooks allow no other merge into an issue branch.
 
 Issues that need a person mid-way: {ids with autonomous: false}.
 
@@ -273,9 +273,9 @@ You are {owner}. You will deliver issue {S{N}-nn} in worktree wt/{S{N}-nn}.
 Your lane is docs/AGENT_ROSTER.md § {owner}. Refuse anything outside it.
 Follow the `issue-delivery` skill if it is installed.
 
-Read these first, in order, then the decisions and requirements your issue
-cites, and nothing else:
-{issue.reads}
+Read these first, in order:
+  {issue.reads, one per line}
+Then the decisions and requirements your issue cites, and nothing else.
 
 The issue:
 {full issue: heading, frontmatter, Objetivo, acceptance criteria — verbatim}
@@ -297,4 +297,5 @@ at the wave barrier.
 Rendering notes:
 - Omit ` [refs: ...]` from the commit line when both `decision_refs` and `requirement_refs` are empty; never write `[refs: setup]`.
 - Omit the `{issue.gate}` part when the issue has no `gate:`.
+- Keep the parts `spec.mjs prompts --write` syncs in this shape: the `Read these ...` line with the reads indented under it, the issue copy followed by the `Commits:` line, and one `- Wave N:` line per wave after `This sprint has ...`.
 - `{offset}` is the worktree's emulator port offset (`sprint-runner`); omit the line for a lane without emulators.
