@@ -47,7 +47,7 @@ frontend    depends on: the HTTP API only (TS types mirrored from shared enums)
 tests       depend on:  the installed package (never sys.path or PYTHONPATH hacks)
 ```
 
-No service imports another service's internals; services talk over HTTP or through the database queue. Enum and type parity between `shared` and the frontend's TypeScript types is a CI check.
+No service imports another service's internals; services talk over HTTP or through the database queue. Enum and type parity between `shared` and the frontend's TypeScript types is checked by `qa-tester` on every change that touches either side; no parity tool ships with the profile, and a project that wants one adds it as a Sprint 0 issue.
 
 ## Workflow-engine guard: defaults for this stack
 
@@ -82,6 +82,8 @@ POST /bookings/{id}/accept
 ```
 
 Required fields: pattern, owner, trigger or fires-when, validates, side effects, idempotency, performance, failure modes, tests, **auth**, **secrets accessed**. Worker tasks add claim semantics, the retry and zombie policy (stale timeout and maximum attempts) and cost reporting when the task spends money (LLM calls).
+
+The side effects copy each transition's single owner from the schema (`data-layer.md` in this folder); a unit that would transition a status the schema gives to another unit is raised for the coherence check instead of becoming a second owner. `Idempotency` names where the key lives, as the schema records it (a UNIQUE column or the `idempotency_keys` table); if the schema has no place for it, raise it for the coherence check.
 
 ## Transactional consistency menu
 
@@ -138,12 +140,12 @@ SQLite by default (zero infrastructure); `DATABASE_URL` switches to Postgres; th
 
 | Trigger | What runs |
 |---|---|
-| Pull request | ruff, typecheck, `pytest -q` on SQLite, frontend lint, typecheck and build |
-| Pull request, second job | pytest against a Postgres service container |
+| Pull request, `backend.yml` | ruff, typecheck, `pytest -q` on SQLite, and a second job with pytest against a Postgres service container |
+| Pull request, `frontend.yml` | Frontend lint, typecheck and build |
 | Merge to main | The above, build the image, deploy to staging (pull, migrate, up) |
 | Tag `v*` | Manual approval, production deploy (migrate, then up) |
 
-Versions pinned in `pyproject.toml` and the lockfiles; CI mirrors dev. Secrets in the CI provider's store.
+One workflow per lane, each limited to its lane's paths, so a workflow belongs to the lane it validates (`agents.md` in this folder). Versions pinned in `pyproject.toml` and the lockfiles; CI mirrors dev. Secrets in the CI provider's store.
 
 ## Observability stack
 

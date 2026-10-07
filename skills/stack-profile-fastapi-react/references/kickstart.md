@@ -16,6 +16,7 @@ The scaffold is done by the `project-kickstart` skill, which reads the locked pr
 │   ├── control/core/config.py  # env-driven settings; dev defaults that fail hard in production
 │   ├── control/db/models.py, control/db/store.py
 │   └── worker/runner.py     # queue consumer stub (claim → no-op → report), entry point {pkg}-worker
+├── package.json, pnpm-workspace.yaml, pnpm-lock.yaml   # only with frontend/
 ├── frontend/{app}/          # Vite + React + TypeScript (pnpm), .env.example with the API URL
 ├── tests/test_skeleton.py   # seed tests: /healthz returns 200, the transition validator works
 ├── deploy/
@@ -23,7 +24,7 @@ The scaffold is done by the `project-kickstart` skill, which reads the locked pr
 │   └── .env.example         # every secret empty; ${VAR:?} enforced in compose
 ├── Dockerfile               # multi-stage, single image, non-root
 ├── scripts/demo.sh
-├── .github/workflows/ci.yml # the CI shape from architecture.md in this folder
+├── .github/workflows/       # backend.yml and frontend.yml (only with frontend/): the CI shape from architecture.md
 ├── .gitignore               # deploy/.env, build/, dist/, __pycache__, .venv
 ├── mockups/
 └── docs/                    # the spec documents of the product-spec workflow
@@ -34,4 +35,5 @@ The scaffold is done by the `project-kickstart` skill, which reads the locked pr
 - **Green from the first commit:** `pip install -e ".[dev]" && python -m pytest -q` passes on the scaffold, and git is initialized with that state committed.
 - **Frontend folders** come from the web apps in `docs/PRODUCT_BRIEF.md`, one `frontend/{app}/` each. An API-only product gets no `frontend/`.
 - **The root `AGENTS.md`** states the stack, the dev commands and the test gate from `architecture.md` in this folder, and points to `docs/AGENT_ROSTER.md` for lanes. The root `CLAUDE.md` contains only `@AGENTS.md`, so Claude Code imports the same constitution that Codex, Copilot, Cursor and OpenCode read natively.
+- **Lanes:** every file the scaffold writes has one owner in `agents.md` in this folder; lockfiles are committed, and `spec-guard.yml` is added by the `spec-guard` installer, not by the scaffold.
 - **No secret has a value** in any committed file. Development defaults exist only where the config refuses them in production.

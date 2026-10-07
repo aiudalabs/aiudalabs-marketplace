@@ -9,7 +9,7 @@ import { ROOT, loadAll } from '../lib/components.mjs';
 import { expand, resolveReference } from '../lib/install.mjs';
 import { globsOverlap, parseRoster } from '../skills/spec-guard/scripts/lib.mjs';
 
-const PROFILES = { 'flutter-firebase': ['flutter-dev', 'firebase-dev', 'react-dev', 'qa-tester', 'product-advisor'], 'fastapi-react': ['python-dev', 'react-dev', 'qa-tester', 'product-advisor'] };
+const PROFILES = { 'flutter-firebase': ['flutter-dev', 'firebase-dev', 'react-dev', 'qa-tester'], 'fastapi-react': ['python-dev', 'react-dev', 'qa-tester'] };
 
 test('each stack profile ships a roster spec-guard can read, with lanes that do not overlap', () => {
   const agentNames = new Set(loadAll().agents.map((agent) => agent.id));

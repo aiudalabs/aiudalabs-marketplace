@@ -1,9 +1,9 @@
 ---
 name: stack-profile-flutter-firebase
-description: "Stack profile for Flutter apps on Firebase with a React admin, the default profile of the product-spec workflow: Firestore and RTDB placement, TypeScript types as the contract mirrored to Dart, status transitions only through callable Cloud Functions, custom claims and security rules, per-function IAM and Secret Manager, Melos plus pnpm monorepo, emulator-first dev, and the agent roster with its lanes (flutter-dev, firebase-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is flutter-firebase. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Firestore en este stack?', 'qué va en RTDB y qué en Firestore', 'qué campos lleva el bloque de una Cloud Function' or 'quién es dueño de firestore.rules'. For a Python FastAPI and Postgres stack, use stack-profile-fastapi-react."
+description: "Stack profile for Flutter apps on Firebase with a React admin, the default profile of the product-spec workflow: Firestore and RTDB placement, TypeScript types as the contract mirrored to Dart, status transitions only through Cloud Functions with one owner each, custom claims or membership documents with security rules, least-privilege IAM and Secret Manager, Melos plus pnpm monorepo, emulator-first dev, and the agent roster with its lanes (flutter-dev, firebase-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is flutter-firebase. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Firestore en este stack?', 'qué va en RTDB y qué en Firestore', 'qué campos lleva el bloque de una Cloud Function' or 'quién es dueño de firestore.rules'. For a Python FastAPI and Postgres stack, use stack-profile-fastapi-react."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: aiudalabs
 ---
 
@@ -27,7 +27,7 @@ The nine sections below are the profile contract. Every profile answers all nine
 
 ## 1. Identity
 
-- **Stack:** Flutter for mobile and tablet apps; Firebase (Firestore, Realtime Database, Auth, Storage, Cloud Functions on Node 20 with TypeScript, Cloud Messaging); React with Vite for the admin dashboard. Monorepo with Melos (Dart) and pnpm (TypeScript).
+- **Stack:** Flutter for mobile and tablet apps; Firebase (Firestore, Realtime Database, Auth, Storage, Cloud Functions (2nd gen) on Node 22 with TypeScript, Cloud Messaging); React with Vite for the admin dashboard. Monorepo with Melos (Dart) and pnpm (TypeScript).
 - **Use when:** consumer or B2B products with mobile-first apps, realtime needs, LATAM markets, a small team that benefits from serverless ($0 idle cost, no infrastructure to operate).
 - **Do not use when:** the product needs Kubernetes, microservices or long-running backends; heavy relational reporting is the core feature; or the team is Python-native with no mobile apps (use `fastapi-react`, the `stack-profile-fastapi-react` skill).
 
@@ -37,34 +37,36 @@ Firestore is the source of truth (queryable, security rules, indexes). The Realt
 
 ## 3. Contracts
 
-TypeScript types are the contract. They live in `packages-ts/types/` and are mirrored to Dart in `packages/core/types/`; a CI script checks parity against the schema document. `Timestamp`, never `Date`; literal unions, never bare strings; no `any` or `unknown`. Details in [references/data-layer.md](references/data-layer.md).
+TypeScript types are the contract. They live in `packages-ts/types/` and are mirrored to Dart in `packages/core/types/`. No parity tool ships with this profile: `qa-tester` checks both sides against the schema document on every change that touches either, and a project that wants it automated adds a parity script as its own Sprint 0 issue. `Timestamp`, never `Date`; literal unions, never bare strings; no `any` or `unknown`. Details in [references/data-layer.md](references/data-layer.md).
 
 ## 4. State-machine enforcement
 
-Clients never write `status`. Every transition goes through one **callable Cloud Function** running with Admin SDK privileges. Security rules deny client writes to `status`, `total`, `commission` and other computed fields regardless of role. The schema document names the function that owns each transition.
+Clients never write `status`. Every transition goes through a **Cloud Function** (callable, trigger, scheduled or HTTPS) running with Admin SDK privileges: a user action is a callable, an expiry or no-show is scheduled, a payment confirmation is an HTTPS webhook. Security rules deny client writes to `status`, `total`, `commission` and other computed fields regardless of role. Each transition has exactly **one owning function**, named in the schema document; other functions only read the status. Offline apps queue callable calls on the device instead of writing status. Details in [references/data-layer.md](references/data-layer.md).
 
 ## 5. Execution units
 
-Cloud Functions in four patterns: **callable** (client to server), **trigger** (Firestore, Auth, Storage), **scheduled** (cron) and **https** (webhooks). Each function gets one block in `ARCHITECTURE.md` with pattern, owner, trigger, validates, side effects, idempotency (`clientRequestId`), performance, failure modes, tests, service account, IAM permissions and secrets accessed. Format in [references/architecture.md](references/architecture.md).
+Cloud Functions (2nd gen) in four patterns: **callable** (client to server), **trigger** (Firestore, Storage, Pub/Sub; for Auth see below), **scheduled** (cron) and **https** (webhooks). 2nd gen has no Auth user-created trigger, only blocking functions: a non-blocking on-create is a 1st-gen function (`firebase-functions/v1`) and its block says so. Each function gets one block in `ARCHITECTURE.md` with pattern, owner, trigger, validates, side effects, idempotency (`clientRequestId`), performance, failure modes, tests, service account, IAM permissions and secrets accessed. Format in [references/architecture.md](references/architecture.md).
 
 ## 6. Tooling and gates
 
 - **Monorepo:** `melos.yaml` for Flutter packages, `pnpm-workspace.yaml` for TypeScript.
-- **Dev loop:** emulator-first (`firebase emulators:start --import=./emulator-data --export-on-exit`), never against production Firestore.
+- **Dev loop:** emulator-first: one `firebase emulators:start --import=./emulator-data --export-on-exit` (functions included) plus the functions package's `build:watch`, which recompiles while the emulator reloads. Never a second functions emulator, never production Firestore.
 - **Test gate:** `flutter analyze`, `melos run test`, `pnpm --filter functions test`, `pnpm --filter admin lint` and `pnpm --filter admin typecheck`. All green before a merge.
-- **CI:** GitHub Actions or Bitbucket Pipelines. Pull request: lint, types, tests, build. Merge to `develop`: deploy to staging. Tag `v*` on `main`: manual approval, then production.
+- **CI:** GitHub Actions or Bitbucket Pipelines. Pull request: lint, types, tests, build, in one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`). Merge to `develop`: deploy to staging. Tag `v*` on `main`: manual approval, then production.
 - **Extra Phase 5 output:** `docs/IAM_REQUIREMENTS.md` (service accounts, APIs, secrets, per-function IAM) is required for this profile because it runs on managed cloud.
 
 ## 7. Permissions model
 
 Two independent layers; never confuse them.
 
-- **End-user authorization:** Firebase Auth with custom claims (`role`, optional `verificationTier`, `tenantId`), owner-based rules (`request.auth.uid == resource.data.ownerId`) and role-based rules in `firestore.rules`. Claims are set only by a callable Cloud Function.
-- **Cloud IAM:** one service account per workload (`cf-runtime-sa`, `deploy-sa`, optional `eventarc-sa`), least privilege, secrets only in Secret Manager.
+- **End-user authorization:** Firebase Auth plus `firestore.rules`, with owner-based rules (`request.auth.uid == resource.data.ownerId`) and one of two role models, chosen in Phase 3: **custom claims** for global roles that rarely change (`admin`, `verificationTier`), or **membership documents** for roles scoped to a tenant, venue or team (a user in several, changes that must apply at once). Most products combine them. Claims and memberships are written only by Cloud Functions or an admin script, never by clients.
+- **Cloud IAM:** one runtime service account by default (`cf-runtime-sa`), a dedicated one for any function with sensitive permissions, and `deploy-sa` for CI through OIDC. Roles trace to functions, secret access is granted per secret, never project-wide. Secrets only in Secret Manager. Defaults in [references/architecture.md](references/architecture.md).
 
 ## 8. Agent roster
 
-`flutter-dev` (apps and Flutter packages), `firebase-dev` (functions, rules, indexes, shared TypeScript types), `react-dev` (admin dashboard), `qa-tester` (review only) and the stack-agnostic `product-advisor` (review only). Exact lanes, in the `docs/AGENT_ROSTER.md` format, in [references/agents.md](references/agents.md).
+`flutter-dev` (apps, Flutter packages, Dart lockfiles), `firebase-dev` (functions, rules, indexes, shared TypeScript types, the root TypeScript workspace and its lockfile, deploys), `react-dev` (admin dashboard) and `qa-tester` (review only). Each CI workflow belongs to the lane it validates. Every root and generated file has one owner; a lane asks the owner for changes to files outside it. Exact lanes, in the `docs/AGENT_ROSTER.md` format, in [references/agents.md](references/agents.md).
+
+`product-advisor` is not in the roster: it owns no issue, so it is consulted outside the roster (spec reviews between phases, scope questions), never dispatched as a build agent.
 
 ## 9. Kickstart
 
