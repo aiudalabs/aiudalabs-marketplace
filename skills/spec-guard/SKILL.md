@@ -67,6 +67,7 @@ Every message names the file, the line and the issue. The ones that need a decis
 - **outside-lane**: an issue writes a file its owner does not own. Move the file to the right agent's issue, or split the issue. Do not widen the lane to make the error go away; lanes exist so two agents never edit the same file.
 - **lanes-overlap**: two agents own the same path in the roster. Give it to one of them.
 - **uncovered-decision** or **uncovered-requirement**: a locked decision or requirement has no issue. Either the backlog dropped scope silently, or it was deferred and the document should say `(deferred)`, or the code already implements it (an adopted repository) and it should say `(existing)`. Ask the user which.
+- **dangling-ref** or **proposed-id**: a document cites a `D-xx` or `FR-...` id the decisions or PRD do not define. If the document proposes that id for an earlier document, it writes `(proposed)` after it and the error becomes a warning until the owning phase defines it; otherwise fix the id.
 - **wave-mismatch** or **no-wave**: never fix by hand; run `waves --write`.
 - **dependency-cycle**: two issues wait for each other. One of them is really two issues.
 - **unknown-screen** or **mockup-missing-screen**: `docs/UI_SCREENS.md` (or a link into it or into a mockup) names a screen id that does not exist, or a mockup lacks a key screen. Renumbering a screen means updating every link to it; a stale mockup is refreshed with `navegable-mockups`. The screen checks are in [references/formats.md](references/formats.md).

@@ -82,13 +82,17 @@ export function parseRequirements(text) {
 const DEFINING = new Set(['OPINIONATED_DEFAULTS.md', 'PRD.md', 'ISSUES.md', 'TRIAL_LOG.md', 'SESSION.md', 'WAVE_DAG.md']);
 
 // Every D-xx and FR-... id a document cites, with its line. Fenced code is skipped.
+// `FR-AUTH-3 (proposed)` marks an id the document proposes for an earlier document, not one it relies on.
 export function citations(text) {
   const found = [];
   let fenced = false;
   text.split('\n').forEach((line, index) => {
     if (/^\s*```/.test(line)) fenced = !fenced;
     if (fenced) return;
-    for (const match of line.matchAll(/\b(D-\d{2,}|FR-(?:[A-Z][A-Z0-9]*-)*\d+)\b/g)) found.push({ id: match[1], line: index + 1 });
+    for (const match of line.matchAll(/\b(D-\d{2,}|FR-(?:[A-Z][A-Z0-9]*-)*\d+)\b/g)) {
+      const proposed = /^`?\s*\(proposed\)/i.test(line.slice(match.index + match[0].length));
+      found.push({ id: match[1], line: index + 1, ...(proposed && { proposed }) });
+    }
   });
   return found;
 }
@@ -541,11 +545,26 @@ export function checkProject(project, { strict = false } = {}) {
     }
   }
 
+  // An id some document marks `(proposed)` is not dangling: it warns until the owning phase defines it.
+  // Under --strict, citing it elsewhere without the marker (relying on it as if it existed) is an error.
+  const missing = (id) => { const known = id.startsWith('D-') ? decisions : requirements; return known && !known.has(id); };
+  const home = (id) => (id.startsWith('D-') ? DOCS.decisions : DOCS.requirements);
+  const proposals = new Map();
   for (const { file, cites } of project.citing ?? []) {
-    for (const { id, line } of cites) {
-      const known = id.startsWith('D-') ? decisions : requirements;
-      if (known && !known.has(id)) found.push(error('dangling-ref', `docs/${file}:${line}`, `cites ${id}, which is not in ${id.startsWith('D-') ? DOCS.decisions : DOCS.requirements}`));
+    for (const { id, line, proposed } of cites) {
+      if (!missing(id)) continue;
+      if (!proposals.has(id)) proposals.set(id, { marked: [], unmarked: [] });
+      proposals.get(id)[proposed ? 'marked' : 'unmarked'].push(`docs/${file}:${line}`);
     }
+  }
+  for (const [id, { marked, unmarked }] of proposals) {
+    if (!marked.length) {
+      for (const where of unmarked) found.push(error('dangling-ref', where, `cites ${id}, which is not in ${home(id)}`));
+      continue;
+    }
+    const level = strict && unmarked.length ? error : warning;
+    const also = unmarked.length ? `; cited without (proposed) at ${unmarked.join(', ')}` : '';
+    found.push(level('proposed-id', marked[0], `${id} is proposed (${marked.join(', ')}) and not yet in ${home(id)}${also}`));
   }
 
   if (project.screens) found.push(...checkScreens(project));

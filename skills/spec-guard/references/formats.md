@@ -55,6 +55,21 @@ One heading per functional requirement:
 - `(deferred)` in the heading takes the requirement out of this release;
   `(existing)` marks one the code already meets.
 
+## Citations in other documents
+
+Every other document in `docs/` (the schema, the screens, the architecture) may
+cite `D-xx` and `FR-...` ids in plain text; fenced code is skipped. Each cited id
+must exist in the decisions or the PRD, or it is a `dangling-ref` error.
+
+- A document that proposes a new id for an earlier document (the architecture's
+  "Changes to earlier documents") writes `(proposed)` right after it, on the
+  same line: `FR-AUTH-3 (proposed)`, `D-13 (proposed)`. While the id is not
+  defined, that is a `proposed-id` warning listing where it is proposed, not an
+  error. Once the owning phase adds the heading, the warning goes away.
+- Other lines may cite a proposed id without the marker. That is part of the
+  same warning; under `check --strict` it is an error, because a document then
+  relies on an id that does not exist yet.
+
 ## Agent roster: `docs/AGENT_ROSTER.md`
 
 One `##` heading per agent, named exactly like its agent file, followed by its

@@ -68,7 +68,7 @@ The size is guidance: completeness wins over the budget, and no unit block or re
 12. **CI/CD**: environments and gates per trigger.
 13. **Observability**: logging, error reporting, product metrics, numeric alert thresholds.
 14. **Deferred complexity**: the v1.1 / v2 / v∞ technical list.
-15. **Changes to earlier documents**: numbered items, each naming the document and section, the change, and why. Empty reads "None".
+15. **Changes to earlier documents**: numbered items, each naming the document and section, the change, and why. Empty reads "None". A new id an item proposes is written with `(proposed)` right after it (`FR-AUTH-3 (proposed)`, `D-13 (proposed)`), so `spec-guard` warns instead of failing until the owning phase defines it.
 16. **Open questions and risks**: each with a severity (high, medium, low) and what would resolve it.
 
 Write it in English; the conversation stays in Spanish. Cite decisions (`D-04`) and requirements (`FR-ORDER-1`) by their exact ids where a unit or a choice serves them.

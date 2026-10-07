@@ -219,6 +219,31 @@ test('check: other documents may only cite decisions and requirements that exist
   assert.deepEqual(found.map((p) => [p.code, p.where]), [['dangling-ref', 'docs/UI_SCREENS.md:3'], ['dangling-ref', 'docs/UI_SCREENS.md:3']]);
 });
 
+test('check: an id a document proposes with (proposed) warns instead of dangling', (t) => {
+  const dir = copyExample(t);
+  const write = (text) => writeFileSync(join(dir, 'docs/ARCHITECTURE.md'), text);
+  write('# Architecture\n\n## 15. Changes to earlier documents\n\n1. PRD: add `FR-AUTH-3` (proposed) for account deletion.\n2. Decisions: a new D-13 (proposed), recorded by the vendor spike.\n');
+  const found = checkProject(readProject(dir), { strict: true });
+  assert.deepEqual(found.map((p) => [p.level, p.code, p.where]), [
+    ['warning', 'proposed-id', 'docs/ARCHITECTURE.md:5'],
+    ['warning', 'proposed-id', 'docs/ARCHITECTURE.md:6'],
+  ], 'open proposals pass even under --strict');
+  assert.match(found[0].message, /FR-AUTH-3 is proposed \(docs\/ARCHITECTURE\.md:5\) and not yet in docs\/PRD\.md/);
+
+  writeFileSync(join(dir, 'docs/FIREBASE_SCHEMA.md'), '# Schema\n\n`deleteAccount` serves FR-AUTH-3.\n');
+  const relied = checkProject(readProject(dir));
+  assert.deepEqual(codes(relied, 'warning'), ['proposed-id', 'proposed-id'], 'an unmarked citation of a proposed id only warns');
+  assert.match(relied[0].message, /cited without \(proposed\) at docs\/FIREBASE_SCHEMA\.md:3/);
+  assert.deepEqual(codes(checkProject(readProject(dir), { strict: true })), ['proposed-id'], '--strict fails when another line relies on it');
+
+  write('# Architecture\n\nServes FR-AUTH-4 and D-14 (proposed).\n');
+  writeFileSync(join(dir, 'docs/FIREBASE_SCHEMA.md'), '# Schema\n');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['dangling-ref'], 'the marker covers only the id it follows');
+
+  write('# Architecture\n\nAdds FR-BOOKING-1 (proposed).\n');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'once defined, a proposal is silent');
+});
+
 const SCREEN = (id, title, { anchor = id, blocks = ['Header', 'Body', 'Primary CTA', 'Navigation', 'Data', 'Permissions'], nav = 'Back: 1.1' } = {}) => [
   anchor && `<a id="s-${anchor}"></a>`, `### ${id} — ${title}`, '',
   ...blocks.map((block) => (block === 'Navigation' ? `**Navigation**\n- ${nav}\n` : block === 'Data' ? '- **Data:** reads courts. Serves: FR-BOOKING-1.\n' : `**${block}**\n- None. Price [COPY: "$12.50 por 1.5 h"], cold start < 2.5 s.\n`)),
