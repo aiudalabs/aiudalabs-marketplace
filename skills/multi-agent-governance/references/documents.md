@@ -140,11 +140,11 @@ The owner posts: files changed, commits, deviations from the spec, how to run it
 ## Validation per lane
 | Lane | Commands |
 |---|---|
-| flutter-dev | `melos run analyze && melos run format-check && melos run test` |
-| firebase-dev | `pnpm --dir functions run typecheck && pnpm --dir functions run lint && pnpm --dir functions run test && pnpm rules:test` |
+| flutter-dev | `CI=true melos bootstrap && CI=true melos run deps-check && CI=true melos run analyze && CI=true melos run format-check && CI=true melos run tests-present && CI=true melos run test` |
+| firebase-dev | `pnpm --dir functions run typecheck && pnpm --dir functions run lint && pnpm --dir functions run test && pnpm run functions:stage && pnpm rules:test && pnpm emulators:test && pnpm emulators:check && pnpm --dir packages-ts/types run typecheck` |
 | react-dev | `pnpm --dir admin run lint && pnpm --dir admin run typecheck && pnpm --dir admin run test && pnpm --dir admin run build` |
 
-Use the scripts the packages actually define (read each `package.json` and `melos.yaml`); these are the flutter-firebase scaffold's. A command is green only when its output shows the script ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", which is why the commands use `--dir <folder> run`, which fails on a missing script, instead of `--filter <name>`. A test command that reports "No test files found" verified nothing: it is pending until the package's first test exists.
+Use the scripts the packages actually define (read each `package.json` and `melos.yaml`); these are the flutter-firebase scaffold's. Melos runs with `CI=true`: without a TTY its first-run prompt crashes it. `melos run test` skips a package without `test/`, so `tests-present` runs first. A command is green only when its output shows the script ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", which is why the commands use `--dir <folder> run`, which fails on a missing script, instead of `--filter <name>`. A test command that reports "No test files found" verified nothing: it is pending until the package's first test exists. The functions suites go through `functions/scripts/vitest-suite.mjs`: a suite with no test file prints `NOT RUN (0 test files)` and exits 0, which is reported as not run, never as a pass; from its first test file on it runs strict by itself. The admin's `test` keeps `--passWithNoTests` until its first test: the issue that adds the admin's first test lists `admin/package.json` in `files_touched` and drops `--passWithNoTests` from its `test` script in the same issue.
 
 ## Anti-patterns
 - The orchestrator writing code instead of routing.
@@ -253,8 +253,11 @@ For each wave: one worktree per issue off {base branch}; dispatch the owner
 with its executor prompt from docs/SPRINT_PROMPTS.md; send each finished issue
 to qa-tester, who runs `spec.mjs verify <id>`; merge approved issues at the
 barrier, in id order. A merge conflict stops the sprint.
-Give the k-th worktree of a wave emulator port offset k*100; every gate stops
-what it starts, and you stop what is left before removing a worktree.
+Give the k-th worktree of a wave emulator port offset k*100; its emulator
+gates run with FIREBASE_CONFIG="$(node tools/emulator-config.mjs <offset>)",
+a git-ignored firebase.emulators-<offset>.json in the worktree root, deleted
+after the gate. Every gate stops what it starts, and you stop what is left
+before removing a worktree.
 Merge a `merge_with` issue together with its lockfile refresh: {pairs or "none"}.
 An approved amendment: commit it on {base branch} with `spec.mjs amend`
 (it syncs the prompts), and have the owner merge {base branch} into wt/<id>;
@@ -286,8 +289,11 @@ Never commit with red tests. Touch only files_touched.
 
 Validate with: {issue.gate, if any}, then {lane commands from AGENTS.md},
 and `node tools/spec-guard/spec.mjs verify {S{N}-nn}`.
-Emulator gates use port offset {offset}. Stop everything you start before
-you report.
+Emulator gates use port offset {offset}:
+  FIREBASE_CONFIG="$(node tools/emulator-config.mjs {offset})" pnpm rules:test
+(same for emulators:test and emulators:check). Delete the
+firebase.emulators-{offset}.json it writes and stop everything you start
+before you report.
 
 Done signal: post a SUMMARY with files changed, commits, deviations from the
 spec and how qa-tester should check it. Do not merge; the orchestrator merges
@@ -298,4 +304,4 @@ Rendering notes:
 - Omit ` [refs: ...]` from the commit line when both `decision_refs` and `requirement_refs` are empty; never write `[refs: setup]`.
 - Omit the `{issue.gate}` part when the issue has no `gate:`.
 - Keep the parts `spec.mjs prompts --write` syncs in this shape: the `Read these ...` line with the reads indented under it, the issue copy followed by the `Commits:` line, and one `- Wave N:` line per wave after `This sprint has ...`.
-- `{offset}` is the worktree's emulator port offset (`sprint-runner`); omit the line for a lane without emulators.
+- `{offset}` is the worktree's emulator port offset (`sprint-runner`); omit the lines for a lane without emulators, and keep only the last sentence when the project has no `tools/emulator-config.mjs` (its emulator gates then run one worktree at a time). The config file sits in the worktree root, not outside it: firebase-tools treats the config's folder as the project directory.

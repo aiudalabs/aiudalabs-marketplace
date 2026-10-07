@@ -3,7 +3,7 @@ name: execution-router
 description: "Prepares the next sprint just in time, from the repository's real state: reads spec-guard status, the previous sprint's retro and the code that actually got merged, corrects the sprint's issues when reality moved, classifies each issue by size, scope and risk to choose its execution mode (parallel worktree or sequential, autonomous or with a human checkpoint) and its validation rigor, and rewrites that sprint's orchestrator and executor prompts in docs/SPRINT_PROMPTS.md. Use between sprints: \"prepara el sprint 3\", \"cerramos el sprint, ¿qué sigue?\", \"regenera los prompts del próximo sprint\", \"route the next sprint\". It does not plan the whole backlog (multi-agent-governance) and does not run the sprint (sprint-runner)."
 license: MIT
 metadata:
-  version: "1.2.1"
+  version: "1.2.2"
   author: aiudalabs
   requires: spec-guard issue-delivery
 ---
@@ -123,7 +123,7 @@ The section has three parts.
 2. *Context*: "Read these first, in order:" on one line, the `reads` list under it, one indented line each (`prompts --write` syncs it), then "Then the decisions and requirements your issue cites, and nothing else."
 3. *Current state*: the two or three repo facts this issue depends on.
 4. *Task*: the issue inlined verbatim (heading, frontmatter and body, synced by `prompts --write`), the lanes not to touch, then a line starting `Commits:` with the subject `{id} task-{k}: {summary} [refs: {decision_refs}, {requirement_refs}]`. The issue id is the trace key; `[refs: ...]` is optional, lists only the issue's own refs, and is omitted when both lists are empty; never `[refs: setup]`.
-5. *Validation*: the issue's `gate:` commands first, then the exact lane commands for its rigor level, and `spec.mjs verify {id}`. Emulator gates use the worktree's port offset, and the executor stops everything it starts before it reports.
+5. *Validation*: the issue's `gate:` commands first, then the exact lane commands for its rigor level, and `spec.mjs verify {id}`. Emulator gates use the worktree's port offset: when the project ships `tools/emulator-config.mjs`, `FIREBASE_CONFIG="$(node tools/emulator-config.mjs {offset})" pnpm rules:test` (same for `emulators:test` and `emulators:check`), which writes a git-ignored `firebase.emulators-{offset}.json` in the worktree root (firebase-tools treats the config's folder as the project directory), deleted after the gate. The executor stops everything it starts before it reports.
 6. *Autonomy*: autonomous, "post your plan, then proceed"; human checkpoint, "post your plan and wait for approval before writing code".
 7. *Done signal*: summary, commits, deviations, the human checks, handoff to `qa-tester`. No self-merge.
 

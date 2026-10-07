@@ -4,7 +4,7 @@ description: "Runs one sprint of docs/ISSUES.md with coding agents, wave by wave
 license: MIT
 compatibility: Dispatches developer agents and qa-tester as subagents in separate git worktrees, so it needs a harness with subagents, git 2.5 or later and Node.js 20 or later. Without subagents, run the same loop sequentially in one session, one issue at a time.
 metadata:
-  version: "1.2.1"
+  version: "1.2.2"
   author: aiudalabs
   requires: spec-guard issue-delivery issue-review execution-router
   agents: qa-tester
@@ -49,7 +49,7 @@ git worktree add -b wt/S3-07 ../<repo>-wt/S3-07 develop
 
 One branch `wt/<id>` per issue, all off the same base commit. Issues in a wave have disjoint `files_touched` (the waves guarantee it), so they cannot see or step on each other.
 
-Files are disjoint; ports are not. Give the k-th worktree of the wave a port offset of k×100 (the base keeps 0) and put it in the owner's and the reviewer's dispatch. When the project ships `tools/emulator-config.mjs` (the flutter-firebase scaffold does), every emulator gate in that worktree runs with `--config "$(node tools/emulator-config.mjs <offset>)"`: a temporary config with the offset ports, host 127.0.0.1 and the UI off, written outside the worktree; it prints the path. The project's emulator scripts (`rules:test`, `emulators:test`) pass it through. Without such a script, run emulator gates one worktree at a time: the orchestrator hands the turn over and waits for it back. Never let an agent hand-edit a copy of `firebase.json` inside the worktree.
+Files are disjoint; ports are not. Give the k-th worktree of the wave a port offset of k×100 (the base keeps 0) and put it in the owner's and the reviewer's dispatch. When the project ships `tools/emulator-config.mjs` (the flutter-firebase scaffold does), every emulator gate in that worktree runs with `FIREBASE_CONFIG="$(node tools/emulator-config.mjs <k×100>)"` (for example `FIREBASE_CONFIG="$(node tools/emulator-config.mjs 100)" pnpm rules:test`). The script writes `firebase.emulators-<offset>.json` in the worktree root, ignored by git, with the offset ports, host 127.0.0.1 and the UI off, and prints its path. It sits in the worktree root, not outside it, because firebase-tools treats the config's folder as the project directory and resolves the rules and `functions/.deploy` against it. The project's emulator scripts (`rules:test`, `emulators:test`, `emulators:check`) pass it through as `--config`. The file is deleted after the gate. Without such a script, run emulator gates one worktree at a time: the orchestrator hands the turn over and waits for it back. Never let an agent hand-edit a copy of `firebase.json` inside the worktree.
 
 Every gate stops what it starts. An agent that starts an emulator or a server stops it before it reports, and confirms nothing it started from its worktree still listens. It never stops another agent's process.
 

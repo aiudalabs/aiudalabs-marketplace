@@ -4,7 +4,7 @@ description: "Reviews one implemented backlog issue as the gate before merge: ch
 license: MIT
 compatibility: Needs git and Node.js 20 or later for the spec-guard commands, plus the toolchain of the project's test gate.
 metadata:
-  version: "1.2.2"
+  version: "1.2.3"
   author: aiudalabs
   requires: spec-guard
 ---
@@ -109,7 +109,7 @@ If the gate started emulators, confirm afterwards that none started from your ch
 
 Never trust "all pass" from the SUMMARY. A red test, a lint warning or a format error makes the verdict changes-requested. There are no flakes at the gate; a flaky test is a finding.
 
-A command is green only when it ran: its output shows the script and, for tests, a count of tests run. A linter that prints nothing on success is rerun with a reporter or flag that prints the files checked; one that exits 0 on warnings is rerun with its deny-warnings flag. "No test files found" (or "No tests found") with exit 0 is a run of 0 tests, not a pass: report it as `ran, 0 tests`. It is acceptable only when the issue adds no code that suite could test; otherwise it is a blocker. pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script"; that ran nothing. Rerun it as `pnpm --dir <package folder> run <script>`, which fails on a missing script; if the script truly does not exist, the gate is broken: report it as a blocker when the issue should have created the script, and as a finding for the orchestrator otherwise.
+A command is green only when it ran: its output shows the script and, for tests, a count of tests run. A linter that prints nothing on success is rerun with a reporter or flag that prints the files checked; one that exits 0 on warnings is rerun with its deny-warnings flag. "No test files found" (or "No tests found") with exit 0 is a run of 0 tests, not a pass: report it as `ran, 0 tests` (the scaffold's suite wrapper prints `NOT RUN (0 test files)` for the same case). It is acceptable only when the issue adds no code that suite could test; otherwise it is a blocker. pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script"; that ran nothing. Rerun it as `pnpm --dir <package folder> run <script>`, which fails on a missing script; if the script truly does not exist, the gate is broken: report it as a blocker when the issue should have created the script, and as a finding for the orchestrator otherwise.
 
 ## Step 7: Check the hard rules
 

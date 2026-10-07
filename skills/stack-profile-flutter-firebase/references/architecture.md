@@ -18,11 +18,11 @@ Read by the `system-architecture` skill (Phase 5). This file carries the Flutter
 ├── package.json                # root TypeScript workspace
 ├── pubspec.yaml                # root Flutter workspace
 ├── firebase.json, .firebaserc  # Firebase project config
-├── firestore.rules, firestore.indexes.json, database.rules.json, storage.rules
+├── firestore.rules, firestore.indexes.json, storage.rules   # database.rules.json only when RTDB is adopted
 │
 ├── packages/                   # shared Flutter code
 │   ├── core/                   # entities, value objects, business rules; no Firebase
-│   ├── data/                   # Firebase wrappers (Firestore, RTDB, Storage, Auth)
+│   ├── data/                   # Firebase wrappers (Firestore, Storage, Auth; RTDB only when adopted)
 │   ├── ui/                     # shared widgets, design tokens, theming
 │   └── feature_auth/           # vertical feature slices (auth, booking, chat...)
 │
