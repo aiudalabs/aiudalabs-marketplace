@@ -1,0 +1,10 @@
+name: {{project_name}}_workspace
+description: Root workspace for {{project_title}} Flutter packages
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+  flutter: '>={{flutter_version}}'
+
+# This is a Melos workspace root — actual deps live in
+# apps/*/pubspec.yaml and packages/*/pubspec.yaml.

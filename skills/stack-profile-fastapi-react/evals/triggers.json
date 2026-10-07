@@ -1,0 +1,10 @@
+[
+  { "query": "¿Cómo modelamos estados en Postgres en este stack? ¿Dónde viven las transiciones legales y qué constraint evita dos tareas activas?", "should_trigger": true },
+  { "query": "In the FastAPI profile, do we need Celery and Redis for background jobs or is the Postgres queue enough?", "should_trigger": true },
+  { "query": "En el stack Python + React, ¿cómo evitamos que el cliente mande el campo status en el body del endpoint?", "should_trigger": true },
+  { "query": "¿Qué carpetas son de python-dev y cuáles de react-dev en el roster del stack fastapi-react?", "should_trigger": true },
+  { "query": "For the self-hosted FastAPI stack, where do runtime secrets live and which compose services may expose ports?", "should_trigger": true },
+  { "query": "En nuestro stack Flutter + Firebase, ¿la presencia va en RTDB o en Firestore?", "should_trigger": false, "use_instead": "stack-profile-flutter-firebase" },
+  { "query": "Escribe el ARCHITECTURE.md completo del producto con el inventario de endpoints y workers.", "should_trigger": false, "use_instead": "system-architecture" },
+  { "query": "Diseña las tablas, los índices y las máquinas de estado del sistema de reservas a partir del PRD.", "should_trigger": false, "use_instead": "schema-design" }
+]

@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "{{project_name}}-dev",
+    "staging": "{{project_name}}-staging",
+    "prod": "{{project_name}}-prod"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "product-spec",
+  "description": "Take a product idea to a buildable spec in seven gated phases: discovery with locked decisions, a PRD with Given/When/Then requirements, the data schema, UI screens, architecture, an agent roster with a sprint backlog checked by code, and navigable mockups. Includes the operational readiness track (legal, banking, app stores) and the product advisor. Stack-agnostic: Flutter + Firebase or FastAPI + React.",
+  "version": "1.0.0",
+  "agents": ["product-advisor"],
+  "skills": ["operational-readiness", "html-spec-generator"],
+  "workflows": ["product-spec-orchestrator"]
+}

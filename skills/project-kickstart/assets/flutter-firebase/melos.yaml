@@ -1,0 +1,47 @@
+name: {{project_name}}
+
+packages:
+  - apps/*
+  - packages/*
+  - packages/feature_*
+
+command:
+  bootstrap:
+    runPubGetInParallel: true
+
+  version:
+    branch: develop
+    workspaceChangelog: true
+
+scripts:
+  analyze:
+    description: Run static analysis on all packages
+    run: melos exec -- "dart analyze ."
+
+  format:
+    description: Format Dart code in all packages
+    run: melos exec -- "dart format ."
+
+  format-check:
+    description: Verify Dart code is formatted
+    run: melos exec -- "dart format --set-exit-if-changed ."
+
+  test:
+    description: Run unit + widget tests in all packages with tests
+    run: melos exec --dir-exists="test" -- "flutter test"
+
+  test-coverage:
+    description: Run tests with coverage in all packages
+    run: melos exec --dir-exists="test" -- "flutter test --coverage"
+
+  generate:
+    description: Run code generation (build_runner) where applicable
+    run: melos exec --depends-on="build_runner" -- "dart run build_runner build --delete-conflicting-outputs"
+
+  clean:
+    description: Clean Flutter caches across all packages
+    run: melos exec -- "flutter clean"
+
+  outdated:
+    description: Check for outdated packages
+    run: melos exec -- "flutter pub outdated"

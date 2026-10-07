@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Default deny-all. Expanded by firebase-dev when storage uploads are added.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

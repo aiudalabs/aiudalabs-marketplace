@@ -1,0 +1,10 @@
+[
+  { "query": "Tengo una idea: una app para reservar canchas de fútbol en Ciudad de Panamá, los dueños publican horarios y los equipos reservan y pagan. ¿Me ayudas a aterrizarla antes de programar?", "should_trigger": true },
+  { "query": "Nuevo proyecto: plataforma para que los colegios manden comunicados y cobren mensualidades a los padres. Quiero definir el MVP y las decisiones clave antes de diseñar nada.", "should_trigger": true },
+  { "query": "help me scope the MVP for a restaurant ordering app where diners order from a table QR and the kitchen sees it on a tablet. what's in, what's out?", "should_trigger": true },
+  { "query": "Quiero hacer una herramienta interna para los supervisores de bodega que hoy usan Excel. Ayúdame a fijar los opinionated defaults: auth, offline, auditoría.", "should_trigger": true },
+  { "query": "Se me ocurrió un marketplace de plomeros y electricistas en Bogotá. No sé si cobrar comisión desde el día uno ni cómo verificar a los técnicos, ayúdame a decidir.", "should_trigger": true },
+  { "query": "We're about to launch our B2B AI consulting firm. Red-team our ICP, offer and homepage claims and tell me if we're ready.", "should_trigger": false, "use_instead": "startup-positioning-audit" },
+  { "query": "Estoy creando la marca de mi app de reservas: necesito los atributos de marca, la personalidad y la dirección visual antes de pedir el logo.", "should_trigger": false, "use_instead": "brand-strategy-brief" },
+  { "query": "Ya aprobamos el PRODUCT_BRIEF y los OPINIONATED_DEFAULTS. Ahora escribe los requisitos funcionales con criterios Given/When/Then.", "should_trigger": false, "use_instead": "product-requirements" }
+]

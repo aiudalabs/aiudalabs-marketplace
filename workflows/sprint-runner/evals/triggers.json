@@ -1,0 +1,9 @@
+[
+  { "query": "Corre el sprint 0 con los agentes: una worktree por issue, revisión de qa-tester y merge al final de cada ola.", "should_trigger": true },
+  { "query": "The backlog and the prompts are ready. Run sprint 2 wave by wave and stop before each wave for my approval.", "should_trigger": true },
+  { "query": "arranca el build: ejecuta la ola 1 del sprint 3 en paralelo con flutter-dev y firebase-dev", "should_trigger": true },
+  { "query": "Execute this sprint with subagents; S4-03 touches payments so it needs me to approve the plan first.", "should_trigger": true },
+  { "query": "Prepara los prompts del sprint 4 a partir del retro del sprint 3 y del código que se mergeó.", "should_trigger": false, "use_instead": "execution-router" },
+  { "query": "Write the whole sprint backlog and the agent roster from our finished spec.", "should_trigger": false, "use_instead": "multi-agent-governance" },
+  { "query": "Revisa S3-07 contra sus criterios de aceptación antes del merge.", "should_trigger": false, "use_instead": "issue-review" }
+]

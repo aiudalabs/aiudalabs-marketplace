@@ -1,0 +1,10 @@
+[
+  { "query": "Implementa S3-07 (createBooking callable) en el worktree wt/S3-07, ya tienes el issue en docs/ISSUES.md", "should_trigger": true },
+  { "query": "You're flutter-dev. Build issue S4-02, the results screen with infinite scroll, commit per task and hand it to QA when done", "should_trigger": true },
+  { "query": "Arranca con S2-04 como python-dev: el endpoint de claim de la cola con FOR UPDATE SKIP LOCKED, y deja el SUMMARY para qa-tester", "should_trigger": true },
+  { "query": "Execute S7-04 for the admin dashboard, the provider verification queue. Stay inside files_touched and run the test gate before you say it's done", "should_trigger": true },
+  { "query": "qa-tester devolvió S3-07 con cambios pedidos en el criterio 2, aplica los fixes en la misma rama y vuelve a pasar el gate", "should_trigger": true },
+  { "query": "Revisa la implementación de S3-07 contra los criterios de aceptación antes de mergear", "should_trigger": false, "use_instead": "issue-review" },
+  { "query": "Run sprint 3 for me: dispatch every wave in parallel worktrees and merge at each barrier", "should_trigger": false, "use_instead": "sprint-runner" },
+  { "query": "Check that docs/ISSUES.md has no dependency cycles and recompute the waves", "should_trigger": false, "use_instead": "spec-guard" }
+]
