@@ -3,7 +3,7 @@ name: stack-profile-fastapi-react
 description: "Stack profile for a self-hosted Python backend (FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, Postgres, SQLite in dev) with React frontends and worker processes, deployed with Docker Compose: Postgres-first placement, separate Create/Update/Read schemas, LEGAL_TRANSITIONS and DB constraints for state machines, Postgres queues with FOR UPDATE SKIP LOCKED, default-deny auth dependencies, and the agent roster with its lanes (python-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is fastapi-react. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Postgres en este stack?', 'necesitamos Celery o basta la cola en Postgres', 'cómo evito que el cliente mande status' or 'qué carpetas son de python-dev'. For Flutter and Firebase, use stack-profile-flutter-firebase."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: aiudalabs
 ---
 

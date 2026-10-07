@@ -25,7 +25,7 @@ Lane rules:
 
 Builds the Flutter apps and shared Dart packages; obsessive about tap targets, empty states and offline behavior.
 
-**Owns:** `apps/**`, `packages/core/**`, `packages/data/**`, `packages/ui/**`, `packages/feature_*/**`, `melos.yaml`, `pubspec.yaml`, `pubspec.lock`, `.github/workflows/flutter.yml`
+**Owns:** `apps/**`, `packages/core/**`, `packages/data/**`, `packages/ui/**`, `packages/feature_*/**`, `melos.yaml`, `pubspec.yaml`, `pubspec.lock`, `tools/deps-check.mjs`, `.github/workflows/flutter.yml`
 **Reads:** `docs/**`, `mockups/**`, `packages-ts/types/**`, `firestore.rules`
 **Refuses:** Cloud Functions, security rules and indexes, the admin dashboard, the TypeScript workspace and its lockfile
 
@@ -33,7 +33,7 @@ Builds the Flutter apps and shared Dart packages; obsessive about tap targets, e
 
 Paranoid about security rules, methodical about idempotency; owns everything that runs on the server, the TypeScript workspace and the deploy pipeline.
 
-**Owns:** `functions/**`, `firestore.rules`, `firestore.indexes.json`, `database.rules.json`, `storage.rules`, `firebase.json`, `.firebaserc`, `emulator-data/**`, `packages-ts/types/**`, `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `.github/workflows/firebase.yml`, `.github/workflows/deploy-*.yml`, `.github/workflows/spec-guard.yml`, `.gitignore`, `.tool-versions`, `.env.example`, `README.md`
+**Owns:** `functions/**`, `firestore.rules`, `firestore.indexes.json`, `storage.rules`, `firebase.json`, `.firebaserc`, `emulator-data/**`, `links/**`, `tools/emulator-config.mjs`, `packages-ts/types/**`, `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `.github/workflows/firebase.yml`, `.github/workflows/deploy-*.yml`, `.github/workflows/spec-guard.yml`, `.gitignore`, `.tool-versions`, `.env.example`, `README.md`
 **Reads:** `docs/**`, `apps/**`, `packages/**`, `admin/**`
 **Refuses:** Flutter code, the admin dashboard
 

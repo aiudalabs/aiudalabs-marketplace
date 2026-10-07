@@ -14,11 +14,12 @@ export const DOCS = {
   issues: 'docs/ISSUES.md',
   waves: 'docs/WAVE_DAG.md',
   screens: 'docs/UI_SCREENS.md',
+  prompts: 'docs/SPRINT_PROMPTS.md',
 };
 
 const PROFILE_ALIASES = { 'aiuda-flutter-firebase': 'flutter-firebase', 'python-fastapi-react': 'fastapi-react' };
 const REQUIRED_KEYS = ['id', 'sprint', 'owner', 'files_touched', 'depends_on', 'decision_refs', 'requirement_refs'];
-const LIST_KEYS = ['files_touched', 'depends_on', 'decision_refs', 'requirement_refs', 'reads'];
+const LIST_KEYS = ['files_touched', 'depends_on', 'decision_refs', 'requirement_refs', 'reads', 'gate'];
 export const MAX_WAVE_SIZE = 7;
 
 const DASH = '\\s*[—–:-]\\s*';
@@ -79,7 +80,7 @@ export function parseRequirements(text) {
 // ---------------------------------------------------------------- citations
 
 // Documents that cite decisions and requirements without defining them.
-const DEFINING = new Set(['OPINIONATED_DEFAULTS.md', 'PRD.md', 'ISSUES.md', 'TRIAL_LOG.md', 'SESSION.md', 'WAVE_DAG.md']);
+const DEFINING = new Set(['OPINIONATED_DEFAULTS.md', 'PRD.md', 'ISSUES.md', 'TRIAL_LOG.md', 'SESSION.md', 'WAVE_DAG.md', 'SPRINT_PROMPTS.md']);
 
 // Every D-xx and FR-... id a document cites, with its line. Fenced code is skipped.
 // `FR-AUTH-3 (proposed)` marks an id the document proposes for an earlier document, not one it relies on.
@@ -365,7 +366,7 @@ export function parseIssues(text) {
       index++;
       continue;
     }
-    const issue = { id: heading[1], title: heading[2].trim(), line: index + 1, sprintHeading: sprint, data: {}, frontmatterRange: null };
+    const issue = { id: heading[1], title: heading[2].trim(), line: index + 1, sprintHeading: sprint, data: {}, frontmatterRange: null, headingLine: line };
     const where = `${DOCS.issues}:${index + 1}`;
     index++;
     while (index < lines.length && lines[index].trim() === '') index++;
@@ -389,9 +390,11 @@ export function parseIssues(text) {
     const bodyStart = index;
     while (index < lines.length && !/^#{1,2}\s/.test(lines[index])) index++;
     issue.body = lines.slice(bodyStart, index).join('\n');
+    if (issue.frontmatterRange) issue.frontmatterLines = lines.slice(...issue.frontmatterRange);
     issues.push(issue);
   }
   for (const issue of issues) {
+    issue.gateScalar = 'gate' in issue.data && !Array.isArray(issue.data.gate);
     for (const key of LIST_KEYS) {
       if (key in issue.data && !Array.isArray(issue.data[key])) issue.data[key] = [issue.data[key]];
       if (Array.isArray(issue.data[key])) issue.data[key] = issue.data[key].map((value) => String(value));
@@ -399,23 +402,30 @@ export function parseIssues(text) {
     issue.files = (issue.data.files_touched ?? []).map(normalizePath);
     issue.deps = issue.data.depends_on ?? [];
     issue.sprint = typeof issue.data.sprint === 'number' ? issue.data.sprint : Number(ISSUE_ID.exec(issue.id)?.[1]);
-    issue.criteria = countCriteria(issue.body);
+    issue.criteriaList = criteriaOf(issue.body);
+    issue.criteria = issue.criteriaList.length;
     issue.hasGoal = /^\*\*(Objetivo|Goal):?\*\*:?\s*\S/im.test(issue.body);
   }
   return { issues, problems };
 }
 
-function countCriteria(body) {
+// The items under "### Acceptance criteria": { number (null for a bullet), text with its continuation lines }.
+function criteriaOf(body) {
   const lines = body.split('\n');
   const start = lines.findIndex((line) => /^#{3,6}\s+(acceptance criteria|criterios de aceptaci[oó]n)/i.test(line));
-  if (start === -1) return 0;
-  let count = 0;
+  if (start === -1) return [];
+  const items = [];
   for (const line of lines.slice(start + 1)) {
     if (/^#{1,6}\s/.test(line)) break;
-    if (/^\s*(\d+[.)]|[-*])\s+\S/.test(line)) count++;
+    const item = /^\s*(?:(\d+)[.)]|[-*])\s+(\S.*)$/.exec(line);
+    if (item && (item[1] || !/^\s/.test(line) || !items.length)) items.push({ number: item[1] ? Number(item[1]) : null, text: item[2] });
+    else if (items.length && line.trim()) items.at(-1).text += ` ${line.trim()}`;
   }
-  return count;
+  return items;
 }
+
+// A criterion a person performs starts with `human:` (bold or not).
+export const isHumanCriterion = (text) => /^(?:\*\*)?human:/i.test(text.trim());
 
 // ---------------------------------------------------------------- globs
 
@@ -624,6 +634,7 @@ export function checkProject(project, { strict = false } = {}) {
   if (cycle) found.push(error('dependency-cycle', DOCS.issues, `dependency cycle: ${cycle.join(' -> ')}`));
   else if (stuck.length) found.push(error('waves-stuck', DOCS.issues, `cannot assign waves to ${stuck.join(', ')}`));
 
+  const lanes = roster ? [...roster.agents.values()].filter((agent) => agent.owns?.length) : [];
   for (const issue of issues) {
     const where = at(issue);
     const { data } = issue;
@@ -661,6 +672,30 @@ export function checkProject(project, { strict = false } = {}) {
     if ('commit_strategy' in data && !['atomic', 'squash'].includes(data.commit_strategy)) found.push(error('commit-strategy', where, `${issue.id} commit_strategy must be atomic or squash`));
     if ('autonomous' in data && typeof data.autonomous !== 'boolean') found.push(error('autonomous', where, `${issue.id} autonomous must be true or false`));
     if (issue.criteria === 0) found.push(error('no-criteria', where, `${issue.id} has no numbered list under "### Acceptance criteria"`));
+    const numbers = issue.criteriaList.map((item) => item.number).filter((number) => number !== null);
+    if (numbers.some((number, i) => number !== i + 1)) found.push(warning('criteria-order', where, `${issue.id} numbers its acceptance criteria ${numbers.join(', ')}; number them 1..${numbers.length} in order`));
+    const human = issue.criteriaList.findIndex((item) => isHumanCriterion(item.text));
+    if (human !== -1 && data.autonomous !== false) found.push(error('human-criterion', where, `${issue.id} criterion ${issue.criteriaList[human].number ?? human + 1} is \`human:\` (a person performs it), so the issue needs \`autonomous: false\``));
+    if ('gate' in data) {
+      if (issue.gateScalar) found.push(error('gate', where, `${issue.id} gate must be a list of commands (\`gate:\` then \`  - <command>\` lines)`));
+      else if (data.gate.length === 0 || data.gate.some((command) => !command.trim())) found.push(error('gate', where, `${issue.id} gate lists no command or an empty one; drop the key or list the commands`));
+    }
+    for (const { criterion, path } of criterionPaths(issue, project.exists)) {
+      // `src/index.ts` in a criterion about functions/ is relative to a package: matched as a suffix, no lane verdict.
+      const first = path.split('/')[0];
+      const anchored = path.includes('/') && (project.exists?.(first) || [...issue.files, ...lanes.flatMap((agent) => agent.owns)].some((glob) => glob.split('/')[0] === first));
+      const target = anchored ? path : `**/${path}`;
+      if (pathCovered(issue.files, target)) continue;
+      const lane = anchored && owner?.owns?.length && !owner.owns.some((glob) => globsOverlap(glob, target)) ? `; it is outside ${owner.name}'s lane, so another issue must own it` : '';
+      found.push(warning('criterion-path', where, `${issue.id} criterion ${criterion} names \`${path}\`, which no files_touched entry covers${lane}`));
+    }
+    for (const { criterion, cited } of criterionSections(issue, project.docFiles ?? [])) {
+      found.push(warning('criterion-read', where, `${issue.id} criterion ${criterion} cites ${cited}, which is not in its reads; add the section so the executor reads it`));
+    }
+    if ('merge_with' in data) {
+      const pair = data.merge_with;
+      if (typeof pair !== 'string' || !ids.has(pair) || pair === issue.id) found.push(error('merge-with', where, `${issue.id} merge_with must name another issue in ${DOCS.issues}, not "${pair}"`));
+    }
     if (!issue.hasGoal) found.push(warning('no-goal', where, `${issue.id} has no **Objetivo:** line for people reading the board`));
 
     const computed = waves.get(issue.id);
@@ -691,7 +726,67 @@ export function checkProject(project, { strict = false } = {}) {
       if (!requirement.deferred && !requirement.existing && !used.has(requirement.id)) found.push(gap('uncovered-requirement', DOCS.requirements, `${requirement.id} (${requirement.title}) is implemented by no issue, or mark it (deferred) or (existing)`));
     }
   }
+  if (project.prompts !== undefined && project.prompts !== null) {
+    for (const drift of syncPrompts(project.prompts, issues).drift) found.push(error('prompt-drift', `${DOCS.prompts}:${drift.line}`, `${drift.message}; run \`spec.mjs prompts --write\``));
+  }
   return found;
+}
+
+// ---------------------------------------------------------------- criteria and files_touched
+
+const FILE_EXTENSION = /\.(?:[cm]?[jt]sx?|json[c5]?|ya?ml|dart|md|rules|html?|css|scss|sh|toml|lock|gradle|kts|xml|plist|properties|txt|py|sql|swift|kt|java|arb|svg|png|tf|conf|ini)$/i;
+
+// Backticked repository paths an acceptance criterion names: a file name with an extension or a dotfile,
+// a glob or a folder with a `/`, or an existing folder. Docs, URLs, packages and commands are skipped.
+export function criterionPaths(issue, exists = () => false) {
+  const found = [];
+  const reads = new Set((issue.data.reads ?? []).map((read) => read.split('#')[0]));
+  (issue.criteriaList ?? []).forEach((item, index) => {
+    for (const [, raw] of item.text.matchAll(/`([^`]+)`/g)) {
+      const path = normalizePath(raw);
+      if (!/^[\w.*/-]+$/.test(path) || /^[-.]?\/|^\.\.?$|\.\.\//.test(path) || path.startsWith('docs/') || reads.has(path)) continue;
+      const last = path.replace(/\/+$/, '').split('/').at(-1);
+      const fileLike = FILE_EXTENSION.test(last) || /^\.[\w-]/.test(last);
+      const pathLike = path.includes('/') && (fileLike || path.endsWith('/') || last.includes('*') || exists(path));
+      if (fileLike || pathLike) found.push({ criterion: item.number ?? index + 1, path });
+    }
+  });
+  return found;
+}
+
+// Sections a criterion cites that its reads leave out: `ARCHITECTURE §3`, `IAM §2.1` (a document named by the start
+// of its file name) and `docs/ARCHITECTURE.md#anchor`. A read of the whole document covers every section of it.
+export function criterionSections(issue, docFiles) {
+  const found = [];
+  const reads = (issue.data.reads ?? []).map((read) => read.split('#'));
+  const whole = (doc) => reads.some(([path, anchor]) => path === doc && !anchor);
+  const docNamed = (name) => {
+    const exact = docFiles.find((file) => file === `${name}.md`);
+    const prefixed = docFiles.filter((file) => file.startsWith(name));
+    return exact ?? (prefixed.length === 1 ? prefixed[0] : null);
+  };
+  (issue.criteriaList ?? []).forEach((item, index) => {
+    const criterion = item.number ?? index + 1;
+    for (const [text, name, section] of item.text.matchAll(/\b(?:docs\/)?([A-Z][A-Z0-9_]*)(?:\.md)?\s*§\s*(\d+(?:\.\d+)*)/g)) {
+      const file = docNamed(name);
+      if (!file) continue;
+      const doc = `docs/${file}`;
+      const prefix = `${section.replace(/\./g, '')}-`;
+      if (!whole(doc) && !reads.some(([path, anchor]) => path === doc && anchor?.startsWith(prefix))) found.push({ criterion, cited: text.trim() });
+    }
+    for (const [, path, anchor] of item.text.matchAll(/((?:docs\/)?[\w-]+\.md)#([\w.-]*[\w-])/g)) {
+      const doc = path.startsWith('docs/') ? path : docFiles.includes(path) ? `docs/${path}` : null;
+      if (!doc || whole(doc) || reads.some(([read, readAnchor]) => read === doc && readAnchor === anchor)) continue;
+      found.push({ criterion, cited: `${doc}#${anchor}` });
+    }
+  });
+  return found;
+}
+
+// A path is covered when some files_touched entry may write it; a bare name (`firebase.json`) matches at the root.
+export function pathCovered(files, path) {
+  const target = path.endsWith('/') ? `${path}**` : path;
+  return files.some((file) => globsOverlap(file, target) || (!path.includes('/') && globsOverlap(file, `**/${path}`)));
 }
 
 // A `reads:` entry into a Markdown document must name a file that exists and, after `#`, an anchor it has.
@@ -821,6 +916,9 @@ export function readProject(root) {
     root,
     problems,
     anchorsOf,
+    docFiles,
+    exists: (path) => !path.includes('..') && existsSync(join(root, path)),
+    prompts: read(root, DOCS.prompts),
     screens,
     screenLinks: linking,
     mockups,
@@ -968,4 +1066,185 @@ export function toGithubScript(issues) {
     out.push(`create ${shellQuote(issue.id)} ${shellQuote(issue.title)} ${shellQuote(milestone(issue.sprint))} ${shellQuote(`sprint-${issue.sprint},agent:${issue.data.owner ?? 'unassigned'}`)} ${shellQuote(issueMarkdown(issue))}`);
   }
   return `${out.join('\n')}\n`;
+}
+
+// ---------------------------------------------------------------- sprint prompts
+
+// docs/SPRINT_PROMPTS.md, as multi-agent-governance and execution-router write it: fenced prompts. An executor
+// prompt inlines its issue (heading, frontmatter, body up to the `Commits:` line) and lists its reads after
+// "Read these files first"; an orchestrator prompt lists `- Wave N: S0-01 (owner, wt/S0-01), ...`.
+// Returns the text with every copy matching docs/ISSUES.md, and the drift found, one entry per stale part.
+// A `##` section with a `Stale:` line outside its fences is skipped: execution-router regenerates it.
+export function syncPrompts(text, issues) {
+  const lines = text.split('\n');
+  const byId = new Map(issues.map((issue) => [issue.id, issue]));
+  const edits = [];
+  const drift = [];
+  const same = (a, b) => a.length === b.length && a.every((line, i) => line.trimEnd() === b[i].trimEnd());
+  const trimBlank = (block) => {
+    let [start, end] = [0, block.length];
+    while (start < end && !block[start].trim()) start++;
+    while (end > start && !block[end - 1].trim()) end--;
+    return block.slice(start, end);
+  };
+  const replace = (start, end, next, line, message) => {
+    if (same(lines.slice(start, end), next)) return;
+    edits.push({ start, end, next });
+    drift.push({ line: line + 1, message });
+  };
+
+  const blocks = [];
+  let open = null;
+  let stale = false;
+  lines.forEach((line, index) => {
+    if (/^\s*```/.test(line)) {
+      if (open === null) open = index;
+      else { if (!stale) blocks.push([open + 1, index]); open = null; }
+      return;
+    }
+    if (open !== null) return;
+    if (/^##\s/.test(line)) stale = false;
+    if (/^\W*Stale:/i.test(line)) stale = true;
+  });
+
+  for (const [start, end] of blocks) {
+    const at = lines.slice(start, end).findIndex((line) => /^##\s+S\d+-\d+\s*[—–:-]/.test(line));
+    if (at === -1) { syncWaves(lines, start, end, issues, replace); continue; }
+    const h = start + at;
+    const id = /^##\s+(S\d+-\d+)/.exec(lines[h])[1];
+    const issue = byId.get(id);
+    if (!issue) { drift.push({ line: h + 1, message: `the executor prompt copies ${id}, which is not in ${DOCS.issues}` }); continue; }
+    if (!issue.frontmatterLines) continue;
+    let fmStart = h + 1;
+    while (fmStart < end && !lines[fmStart].trim()) fmStart++;
+    if (lines[fmStart]?.trim() !== '---') continue;
+    let fmEnd = fmStart + 1;
+    while (fmEnd < end && lines[fmEnd].trim() !== '---') fmEnd++;
+    if (fmEnd >= end) continue;
+    const commits = lines.slice(fmEnd + 1, end).findIndex((line) => /^Commits\b/.test(line));
+    let copyEnd = fmEnd + 1;
+    if (commits !== -1) {
+      copyEnd = fmEnd + 1 + commits;
+      while (copyEnd > fmEnd + 1 && !lines[copyEnd - 1].trim()) copyEnd--;
+    }
+    const canonical = [issue.headingLine, '---', ...issue.frontmatterLines, '---', ...(commits === -1 ? [] : trimBlank(issue.body.split('\n')))];
+    replace(h, copyEnd, canonical, h, `the executor prompt's copy of ${id} differs from ${DOCS.issues}${commits === -1 ? ' (frontmatter; no `Commits:` line ends the copy, so its body is not checked)' : ''}`);
+
+    const readsAt = lines.slice(start, h).findIndex((line) => /^Read these\b/i.test(line));
+    const wanted = issue.data.reads ?? [];
+    if (readsAt === -1 || wanted.length === 0) continue;
+    const listStart = start + readsAt + 1;
+    let listEnd = listStart;
+    while (listEnd < h && /^\s+\S/.test(lines[listEnd])) listEnd++;
+    const indent = /^\s+/.exec(lines[listStart] ?? '')?.[0] ?? '  ';
+    replace(listStart, listEnd, wanted.map((read) => `${indent}${read}`), listStart - 1, `the executor prompt of ${id} lists other reads than the issue`);
+  }
+
+  for (const { start, end, next } of [...edits].sort((a, b) => b.start - a.start)) lines.splice(start, end - start, ...next);
+  return { text: lines.join('\n'), drift: drift.sort((a, b) => a.line - b.line) };
+}
+
+// An orchestrator prompt's wave list and its "This sprint has N issues in W waves" line.
+function syncWaves(lines, start, end, issues, replace) {
+  const sprint = Number(/orchestrator role for Sprint\s+(\d+)/i.exec(lines.slice(start, end).join('\n'))?.[1]);
+  if (Number.isNaN(sprint)) return;
+  const waveLines = [];
+  for (let i = start; i < end; i++) if (/^- Wave \d+:/.test(lines[i])) waveLines.push(i);
+  if (!waveLines.length || waveLines.at(-1) - waveLines[0] !== waveLines.length - 1) return;
+  const entries = new Map();
+  for (const i of waveLines) for (const entry of lines[i].replace(/^- Wave \d+:\s*/, '').split(/,\s*(?=S\d+-\d+\b)/)) {
+    const id = ISSUE_ID_IN_TEXT.exec(entry)?.[0];
+    if (id) entries.set(id, entry.trim());
+  }
+  const inSprint = issues.filter((issue) => issue.sprint === sprint).sort((a, b) => compareIds(a.id, b.id));
+  const count = Math.max(0, ...inSprint.map((issue) => Number(issue.data.wave) || 0));
+  const next = [];
+  for (let wave = 1; wave <= count; wave++) {
+    const members = inSprint.filter((issue) => issue.data.wave === wave);
+    next.push(`- Wave ${wave}: ${members.map((issue) => entries.get(issue.id) ?? `${issue.id} (${issue.data.owner}, wt/${issue.id})`).join(', ')}`);
+  }
+  replace(waveLines[0], waveLines.at(-1) + 1, next, waveLines[0], `the orchestrator prompt of sprint ${sprint} lists other waves than ${DOCS.issues}`);
+  for (let i = start; i < waveLines[0]; i++) {
+    const has = /This sprint has (?:(\d+) issues in )?(\d+) waves?/.exec(lines[i]);
+    if (!has) continue;
+    const fixed = lines[i].replace(has[0], `This sprint has ${has[1] ? `${inSprint.length} issues in ` : ''}${count} wave${count === 1 ? '' : 's'}`);
+    replace(i, i + 1, [fixed], i, `the orchestrator prompt of sprint ${sprint} counts other issues or waves than ${DOCS.issues}`);
+  }
+}
+
+// ---------------------------------------------------------------- amend
+
+export const AMENDABLE = { file: 'files_touched', dep: 'depends_on', read: 'reads' };
+
+// Adds and removes entries of one issue's list fields, editing only that issue's frontmatter.
+// changes: [{ op: 'add'|'remove', key: 'files_touched'|'depends_on'|'reads', value }].
+// Returns { text, problems }; nothing is applied when there is a problem.
+export function amendIssue(text, id, changes) {
+  const lines = text.split('\n');
+  const { issues } = parseIssues(text);
+  const matching = issues.filter((issue) => issue.id === id);
+  if (matching.length !== 1) return { text, problems: [matching.length ? `${id} is defined ${matching.length} times in ${DOCS.issues}` : `${id} is not in ${DOCS.issues}`] };
+  const [issue] = matching;
+  if (!issue.frontmatterRange) return { text, problems: [`${id} has no readable frontmatter`] };
+  const [start, end] = issue.frontmatterRange;
+  const block = lines.slice(start, end);
+  const problems = [];
+  const norm = (key, value) => (key === 'files_touched' ? normalizePath(value) : String(value).trim());
+
+  for (const key of new Set(changes.map((change) => change.key))) {
+    let at = block.findIndex((line) => new RegExp(`^${key}:`).test(line));
+    if (at === -1) { block.push(`${key}:`); at = block.length - 1; }
+    const inline = /^[a-z_]+:\s*(\[.*\])\s*(#.*)?$/.exec(block[at]);
+    let items;
+    let itemEnd = at + 1;
+    if (inline) {
+      const inner = inline[1].slice(1, -1).trim();
+      items = inner ? inner.split(',').map((part) => ({ value: String(parseScalar(part)), raw: null })) : [];
+    } else if (/^[a-z_]+:\s*$/.test(stripComment(block[at]))) {
+      items = [];
+      while (itemEnd < block.length && (/^\s+-\s+/.test(block[itemEnd]) || !stripComment(block[itemEnd]).trim())) {
+        const item = /^\s+-\s+(.*)$/.exec(stripComment(block[itemEnd]));
+        if (item) items.push({ value: String(parseScalar(item[1])), raw: block[itemEnd] });
+        itemEnd++;
+      }
+      while (itemEnd > at + 1 && !block[itemEnd - 1].trim()) itemEnd--;
+    } else {
+      problems.push(`${id} ${key} is a single value; write it as a list first`);
+      continue;
+    }
+    for (const { op, value } of changes.filter((change) => change.key === key)) {
+      const index = items.findIndex((item) => norm(key, item.value) === norm(key, value));
+      if (op === 'remove') {
+        if (index === -1) problems.push(`${id} ${key} has no entry ${value}`);
+        else items.splice(index, 1);
+      } else if (index !== -1) problems.push(`${id} ${key} already has ${value}`);
+      else items.push({ value: norm(key, value), raw: null });
+    }
+    if (inline || items.length === 0) {
+      block.splice(at, itemEnd - at, `${key}: [${items.map((item) => item.value).join(', ')}]`);
+    } else {
+      const indent = /^\s+/.exec(items.find((item) => item.raw)?.raw ?? '')?.[0] ?? '  ';
+      block.splice(at, itemEnd - at, `${key}:`, ...items.map((item) => item.raw ?? `${indent}- ${item.value}`));
+    }
+  }
+  if (problems.length) return { text, problems };
+  lines.splice(start, end - start, ...block);
+  return { text: lines.join('\n'), problems };
+}
+
+// ---------------------------------------------------------------- commit subjects
+
+const REF = /^(?:D-\d{2,}|FR-(?:[A-Z][A-Z0-9]*-)*\d+)$/;
+
+// What is wrong with a commit subject's `[refs: ...]`: every id must be one of the issue's decision_refs or
+// requirement_refs. No brackets is fine; the issue id at the start is the trace key.
+export function refsProblems(issue, subject) {
+  const match = /\[refs:([^\]]*)\]/i.exec(subject);
+  if (!match) return [];
+  const ids = match[1].split(/[\s,]+/).filter(Boolean);
+  if (ids.length === 0) return ['`[refs: ]` is empty; drop the brackets when the issue cites nothing'];
+  const allowed = new Set(referencesOf(issue));
+  return ids.filter((ref) => !allowed.has(ref)).map((ref) => (REF.test(ref)
+    ? `${ref} is not in ${issue.id}'s decision_refs or requirement_refs (${[...allowed].join(', ') || 'none'})`
+    : `"${ref}" is not a decision or requirement id; drop the brackets when the issue cites nothing`));
 }

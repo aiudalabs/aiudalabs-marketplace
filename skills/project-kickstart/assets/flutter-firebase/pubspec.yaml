@@ -8,3 +8,8 @@ environment:
 
 # This is a Melos workspace root — actual deps live in
 # apps/*/pubspec.yaml and packages/*/pubspec.yaml.
+
+dev_dependencies:
+  # Melos 3+ refuses to run unless it is a dev dependency of the workspace root.
+  # melos.yaml is the Melos 6 format; Melos 7+ reads its config from this file instead.
+  melos: ^6.3.2

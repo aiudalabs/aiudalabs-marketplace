@@ -10,6 +10,18 @@ The script names below are the usual ones; use the ones the package's
 when the script is missing; `--filter <name>` exits 0 when nothing matched or
 the script does not exist, and such a run is not a pass.
 
+## Gates by deliverable kind
+
+Some deliverables are never exercised by the lane gate. When the issue has a
+`gate:` list, run it first; otherwise add the gate for each kind it delivers:
+
+| Deliverable | Gate | Evidence |
+|---|---|---|
+| Shell script | `bash -n`, `shellcheck`, a `--dry-run` snapshot, and a committed test that runs it against a fake CLI (a stub `gcloud` on `PATH`) | the test output |
+| CI workflow | `actionlint` on each changed workflow file | its output, plus the first CI run once it exists |
+| Docs only | `spec.mjs verify` and `git diff --check <base>...HEAD` | the document's location and the sources checked |
+| Static site | its check script against the emulator | the script's output |
+
 ## flutter-dev (profile `flutter-firebase`)
 
 **Implementation patterns**
@@ -25,6 +37,11 @@ the script does not exist, and such a run is not a pass.
   document maps.
 - A new dependency in `pubspec.yaml` carries a comment with the reason and the
   alternative rejected.
+- Side-effecting startup code (Firebase init, emulator wiring, crash
+  reporting) takes its plugin calls through an injectable seam and has
+  fake-driven tests.
+- Route groups are non-const `List<RouteBase>`, so later screen issues can
+  extend them without editing the router.
 
 **Tests**
 - Each branch of conditional rendering has a widget test.
@@ -40,7 +57,8 @@ melos run test
 melos exec --scope="<changed-packages>" -- flutter test --coverage
 melos exec -- flutter pub deps      # no unexplained new dependencies
 ```
-Global coverage does not go down.
+Global coverage does not go down, once a baseline exists; the first package
+of a sprint sets it.
 
 **SUMMARY extras:** screen ids implemented (from `docs/UI_SCREENS.md`).
 

@@ -187,14 +187,32 @@ reads:
 | `decision_refs` | `D-xx` ids this issue implements. May be empty for setup work |
 | `requirement_refs` | `FR-...` ids this issue implements. May be empty for setup work |
 | `commit_strategy` | `atomic` (default) or `squash` |
-| `autonomous` | `false` when a person must approve mid-way (migrations, money, deletes) |
-| `reads` | Documents the executor reads first, `path` or `path#anchor`. Optional; see below |
+| `autonomous` | `false` when a person must approve or act mid-way: migrations, money, deletes, permissions, creating or deploying cloud resources, a device or native build, credentials or a vendor account. Default `true` |
+| `reads` | Documents the executor reads first, `path` or `path#anchor`. Include every section a criterion cites. Optional; see below |
+| `gate` | Optional list of commands delivery and review run first, before the lane's commands: the checks that exercise this issue's deliverables. A list of non-empty strings; a command may not contain ` #` |
+| `merge_with` | Optional id of another issue merged at the same barrier, such as the lockfile refresh paired with an issue that changes a manifest. Must exist |
 
 The frontmatter is a small YAML subset: `key: value`, `key: [a, b]`, or `key:`
 followed by `  - item` lines. `#` starts a comment.
 
 After the frontmatter: a one-line `**Objetivo:**` (or `**Goal:**`) in plain
-language, then `### Acceptance criteria` with a numbered list.
+language, then `### Acceptance criteria` with a list numbered 1..n in order
+(otherwise a `criteria-order` warning).
+
+- A criterion a person performs (create a cloud project, approve a payment
+  account, test on a device) starts with `human:`: `3. human: A person creates
+  the three projects.` The issue must be `autonomous: false`, or `check` errors.
+- Every file a criterion names in backticks is covered by `files_touched`, or
+  `check` warns `criterion-path`. A name with a `/` is read from the root when
+  its first folder exists or is in a lane, otherwise as a suffix (`src/index.ts`).
+  Paths under `docs/`, packages, URLs and commands are not checked.
+- Every section a criterion cites (`ARCHITECTURE §3`, `IAM §2.1` naming a
+  `docs/` file by the start of its name, or `docs/X.md#anchor`) is in `reads`,
+  as that anchor or the whole document, or `check` warns `criterion-read`.
+
+Change an existing issue's `files_touched`, `depends_on` or `reads` with
+`spec.mjs amend`, never by hand: it edits only that issue, recomputes waves and
+syncs the prompts.
 
 ### `reads` anchors
 
@@ -233,11 +251,30 @@ in `/` matches everything under it, and any other path matches itself.
 Two issues in the same wave never touch the same file, so their worktrees merge
 without conflicts.
 
+## Sprint prompts: `docs/SPRINT_PROMPTS.md`
+
+Written by multi-agent-governance and execution-router; checked whenever it
+exists. Each prompt is a fenced block.
+
+- An executor prompt inlines its issue verbatim: the `## S3-07 — Title`
+  heading, the frontmatter and the body, ending before the `Commits:` line. Its
+  `Read these ...` line is followed by the issue's `reads`, one indented line
+  each. Without a `Commits:` line only the heading and frontmatter are checked.
+- An orchestrator prompt says `orchestrator role for Sprint N` and lists
+  `- Wave N: S3-01 (owner, wt/S3-01), ...` on consecutive lines, after
+  `This sprint has N issues in W waves`.
+- Any difference from `docs/ISSUES.md` is a `prompt-drift` error.
+  `spec.mjs prompts --write`, `waves --write` and `amend` rewrite those parts.
+- A `##` section with a `Stale:` line outside its fences is not checked.
+
 ## Commits and branches
 
 - Branch or worktree per issue, with the issue id in its name: `wt/S3-07`,
   `S3-07-create-booking`.
 - Commit subject: `S3-07 task-1: validate input [refs: D-03, FR-BOOKING-2]`.
-  The issue id first, the decisions and requirements it serves at the end.
-  This is what `impact` and `why` follow back from code to decisions.
+  The issue id first: it is the trace key `impact`, `why` and `status` follow.
+  `[refs: ...]` is optional and may list only the issue's own `decision_refs`
+  and `requirement_refs`; with none, omit it. The commit-msg hook enforces both.
+- An issue branch syncs with the base only by merging the base branch. The
+  pre-merge-commit hook refuses any other merge, and `verify` warns on one.
 - An issue counts as merged when a commit on the base branch starts with its id.

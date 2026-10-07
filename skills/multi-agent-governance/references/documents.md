@@ -67,15 +67,15 @@ Every path an issue will write sits in exactly one lane. These files are the one
 
 | File | Owner | How the other lanes get a change |
 |---|---|---|
-| CI workflows | A workflow that validates one lane belongs to it; one that spans lanes, and every deploy, belongs to the pipeline lane of the profile | The owning lane's issue edits it. The flutter-firebase scaffold already ships one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`) |
+| CI workflows | A workflow that validates one lane belongs to it; one that spans lanes, and every deploy, belongs to the pipeline lane of the profile | The owning lane's issue edits it. The flutter-firebase scaffold already ships one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`). A deploy workflow calls them (`uses: ./.github/workflows/firebase.yml`) instead of copying their jobs; a lane workflow without `on: workflow_call` gets it from its lane's issue, and the deploy issue depends on that issue |
 | `.github/workflows/spec-guard.yml` | The pipeline lane (`firebase-dev` for flutter-firebase). The installer writes it, and `install.mjs --ci` rewrites it while it keeps the spec-guard marker comment | An owner issue that customizes it removes the marker line, so a reinstall leaves it alone |
 | `tools/spec-guard/**`, `.githooks/**`, `.claude/**`, `.aiudalabs-marketplace.json`, `STATUS.md` | No lane: installers write the tooling, `sprint-runner` writes `STATUS.md` | Re-run the installer; no issue edits them |
-| Lockfiles (`pnpm-lock.yaml`, `pubspec.lock`, `uv.lock`, `poetry.lock`, `package-lock.json`) | The lane that owns the workspace manifest they belong to (root `package.json` and `pnpm-workspace.yaml`; `melos.yaml` and the root `pubspec.yaml`) | Put every dependency the plan already knows into the Sprint 0 setup issues of the lockfile owner. A later need: the requesting issue declares the dependency in its own package manifest, and an issue of the lockfile owner that depends on it refreshes the lockfile |
+| Lockfiles (`pnpm-lock.yaml`, `pubspec.lock`, `uv.lock`, `poetry.lock`, `package-lock.json`) | The lane that owns the workspace manifest they belong to (root `package.json` and `pnpm-workspace.yaml`; `melos.yaml` and the root `pubspec.yaml`) | Put every dependency the plan already knows into the first-wave Sprint 0 setup issues, and one refresh in the wave right after them. A later need: the requesting issue declares the dependency in its own package manifest and carries `merge_with: <refresh id>`; the lockfile owner's refresh depends on it, and both merge at the same barrier |
 | Aggregators: a functions barrel `src/index.ts`, a route or DI registry, a Dart library barrel | The lane that owns the folder | Make it generated at build time (a Sprint 0 issue writes the generator) or discovered by convention, so unit issues never list it. If it must be hand-edited, one wiring issue per sprint edits it after the units; never put it in every unit issue's `files_touched`, which turns the sprint into one serial chain of waves |
 | Generated code (`*.g.dart`, `*.freezed.dart`, generated API clients, the Dart mirror of shared types) | The lane that owns the source it is generated from, unless the consumer generates it in its own folder | The issue that changes the source lists the generated paths too, or a follow-up issue of the consuming lane regenerates them |
 | Root dotfiles (`.gitignore`, `.env.example`, `.tool-versions`, `.editorconfig`, root `README.md`) | Assign each one explicitly, usually to the pipeline lane | Asked for like any other file |
 
-An issue that needs two lanes is two issues, wired with `depends_on`. When an executor finds mid-issue that it needs a file outside its lane, it stops and asks the orchestrator; the orchestrator adds or amends an issue for the owner (`execution-router` between sprints), and the original issue waits for it.
+An issue that needs two lanes is two issues, wired with `depends_on`. When an executor finds mid-issue that it needs a file outside its lane, it stops and asks the orchestrator; the orchestrator adds or amends an issue for the owner (`execution-router` between sprints), and the original issue waits for it. An amendment to the running issue itself is committed on the base with `spec.mjs amend`, which syncs its executor prompt; the owner merges the base into `wt/<id>`.
 
 ## Orchestrator
 
@@ -122,7 +122,9 @@ code. When the sprint closes, the role passes on.
 - Creates one worktree per issue off the base branch.
 - Dispatches each issue to the agent named in its `owner`, with its executor prompt.
 - Sends every finished issue to `qa-tester`.
-- Merges approved issues at the wave barrier, in id order.
+- Gives each worktree its emulator port offset; stops what the wave left running before removing a worktree.
+- Merges approved issues at the wave barrier, in id order; a manifest issue with `merge_with` merges together with its lockfile refresh.
+- Commits approved amendments on the base with `spec.mjs amend` (never a hand edit of files, dependencies or reads; it syncs the prompts), and has the owner merge the base into `wt/<id>`.
 - Stops for a person on `autonomous: false` issues and before each wave.
 - Closes the sprint with a retro.
 
@@ -138,11 +140,11 @@ The owner posts: files changed, commits, deviations from the spec, how to run it
 ## Validation per lane
 | Lane | Commands |
 |---|---|
-| flutter-dev | `melos run analyze && melos run format-check && melos run test` |
-| firebase-dev | `pnpm --dir functions run typecheck && pnpm --dir functions run lint && pnpm --dir functions run test && pnpm rules:test` |
+| flutter-dev | `CI=true melos bootstrap && CI=true melos run deps-check && CI=true melos run analyze && CI=true melos run format-check && CI=true melos run tests-present && CI=true melos run test` |
+| firebase-dev | `pnpm --dir functions run typecheck && pnpm --dir functions run lint && pnpm --dir functions run test && pnpm run functions:stage && pnpm rules:test && pnpm emulators:test && pnpm emulators:check && pnpm --dir packages-ts/types run typecheck` |
 | react-dev | `pnpm --dir admin run lint && pnpm --dir admin run typecheck && pnpm --dir admin run test && pnpm --dir admin run build` |
 
-Use the scripts the packages actually define (read each `package.json` and `melos.yaml`); these are the flutter-firebase scaffold's. A command is green only when its output shows the script ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", which is why the commands use `--dir <folder> run`, which fails on a missing script, instead of `--filter <name>`. A test command that reports "No test files found" verified nothing: it is pending until the package's first test exists.
+Use the scripts the packages actually define (read each `package.json` and `melos.yaml`); these are the flutter-firebase scaffold's. Melos runs with `CI=true`: without a TTY its first-run prompt crashes it. `melos run test` skips a package without `test/`, so `tests-present` runs first. A command is green only when its output shows the script ran: pnpm exits 0 on "No projects matched the filters" and "None of the selected packages has a ... script", which is why the commands use `--dir <folder> run`, which fails on a missing script, instead of `--filter <name>`. A test command that reports "No test files found" verified nothing: it is pending until the package's first test exists. The functions suites go through `functions/scripts/vitest-suite.mjs`: a suite with no test file prints `NOT RUN (0 test files)` and exits 0, which is reported as not run, never as a pass; from its first test file on it runs strict by itself. The admin's `test` keeps `--passWithNoTests` until its first test: the issue that adds the admin's first test lists `admin/package.json` in `files_touched` and drops `--passWithNoTests` from its `test` script in the same issue.
 
 ## Anti-patterns
 - The orchestrator writing code instead of routing.
@@ -188,6 +190,23 @@ reads:
 
 No `wave:` line: `spec.mjs waves --write` adds it.
 
+An issue whose deliverable the lane gate never runs adds `gate:`, which the executor prompt puts ahead of the lane commands:
+
+```yaml
+gate:
+  - bash -n tools/bootstrap-iam.sh
+  - shellcheck tools/bootstrap-iam.sh
+  - tools/bootstrap-iam.sh --dry-run dev | diff - tools/test/bootstrap-iam.dev.txt
+```
+
+A manifest issue paired with its lockfile refresh:
+
+```yaml
+files_touched:
+  - admin/package.json
+merge_with: S0-09   # firebase-dev refreshes pnpm-lock.yaml; S0-09 depends_on this issue
+```
+
 A UI issue's `reads`, for one key screen (`1.2.1`, picked for mockups) and one screen without a mockup (`1.2.4`):
 
 ```yaml
@@ -197,6 +216,21 @@ reads:
   - docs/UI_SCREENS.md#s-1.2.4         # no mockup anchor: not a key screen
   - docs/FIREBASE_SCHEMA.md#bookings
 ```
+
+## Spike issue
+
+The criteria of a spike that compares options:
+
+```markdown
+### Acceptance criteria
+1. `functions/src/adapters/payments/SPIKE.md` scores each candidate on the table below. Each cell has a result and an evidence tag: `docs` (first-party docs), `sandbox` (run on a test account), `quote` (written vendor answer), `3p` (third-party source), `unverified`.
+2. A cell scores **pass** only on `docs`, `sandbox` or `quote`; `3p` caps it at **partial**, `unverified` at **unknown**.
+3. Gates (any fail or unknown rules the candidate out): split payments, sandbox available, settles in the brief's currency.
+4. Weighted (1-3 each): fees, SDK quality, payout delay. The winner passes every gate with the highest weighted total.
+5. The done SUMMARY names the winner and the spec change it feeds: "record the chosen gateway as decision D-13".
+```
+
+Merchant onboarding with the winner runs on the vendor's timeline: it is a separate issue for a person, so it never blocks the spike's barrier.
 
 ## Sprint prompts
 
@@ -210,7 +244,7 @@ docs/ISSUES.md (Sprint {N}), docs/WAVE_DAG.md (Sprint {N}).
 Run `node tools/spec-guard/spec.mjs status` and confirm the scope in one paragraph.
 
 Current state: Sprints 0..{N-1} are merged. {Key facts about the repo.}
-This sprint has {W} waves:
+This sprint has {M} issues in {W} waves:
 - Wave 1: S{N}-01 (owner, wt/S{N}-01), S{N}-02 (...), ...
 - Wave 2: ...
 Within each wave files_touched are disjoint (computed by spec.mjs waves).
@@ -219,6 +253,15 @@ For each wave: one worktree per issue off {base branch}; dispatch the owner
 with its executor prompt from docs/SPRINT_PROMPTS.md; send each finished issue
 to qa-tester, who runs `spec.mjs verify <id>`; merge approved issues at the
 barrier, in id order. A merge conflict stops the sprint.
+Give the k-th worktree of a wave emulator port offset k*100; its emulator
+gates run with FIREBASE_CONFIG="$(node tools/emulator-config.mjs <offset>)",
+a git-ignored firebase.emulators-<offset>.json in the worktree root, deleted
+after the gate. Every gate stops what it starts, and you stop what is left
+before removing a worktree.
+Merge a `merge_with` issue together with its lockfile refresh: {pairs or "none"}.
+An approved amendment: commit it on {base branch} with `spec.mjs amend`
+(it syncs the prompts), and have the owner merge {base branch} into wt/<id>;
+the hooks allow no other merge into an issue branch.
 
 Issues that need a person mid-way: {ids with autonomous: false}.
 
@@ -233,8 +276,9 @@ You are {owner}. You will deliver issue {S{N}-nn} in worktree wt/{S{N}-nn}.
 Your lane is docs/AGENT_ROSTER.md § {owner}. Refuse anything outside it.
 Follow the `issue-delivery` skill if it is installed.
 
-Read these files first, in order, and nothing else:
-{issue.reads}
+Read these first, in order:
+  {issue.reads, one per line}
+Then the decisions and requirements your issue cites, and nothing else.
 
 The issue:
 {full issue: heading, frontmatter, Objetivo, acceptance criteria — verbatim}
@@ -243,10 +287,21 @@ Commits: one task, one commit:
   {S{N}-nn} task-{k}: {summary} [refs: {decision_refs}, {requirement_refs}]
 Never commit with red tests. Touch only files_touched.
 
-Validate with: {lane commands from AGENTS.md}
+Validate with: {issue.gate, if any}, then {lane commands from AGENTS.md},
 and `node tools/spec-guard/spec.mjs verify {S{N}-nn}`.
+Emulator gates use port offset {offset}:
+  FIREBASE_CONFIG="$(node tools/emulator-config.mjs {offset})" pnpm rules:test
+(same for emulators:test and emulators:check). Delete the
+firebase.emulators-{offset}.json it writes and stop everything you start
+before you report.
 
 Done signal: post a SUMMARY with files changed, commits, deviations from the
 spec and how qa-tester should check it. Do not merge; the orchestrator merges
 at the wave barrier.
 ```
+
+Rendering notes:
+- Omit ` [refs: ...]` from the commit line when both `decision_refs` and `requirement_refs` are empty; never write `[refs: setup]`.
+- Omit the `{issue.gate}` part when the issue has no `gate:`.
+- Keep the parts `spec.mjs prompts --write` syncs in this shape: the `Read these ...` line with the reads indented under it, the issue copy followed by the `Commits:` line, and one `- Wave N:` line per wave after `This sprint has ...`.
+- `{offset}` is the worktree's emulator port offset (`sprint-runner`); omit the lines for a lane without emulators, and keep only the last sentence when the project has no `tools/emulator-config.mjs` (its emulator gates then run one worktree at a time). The config file sits in the worktree root, not outside it: firebase-tools treats the config's folder as the project directory.

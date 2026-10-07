@@ -5,8 +5,9 @@ _`product-discovery` replaces this line with the brief's tagline at the end of P
 ## Quick start
 
 ```bash
-melos bootstrap
+CI=true melos bootstrap
 pnpm install
+cp functions/.env.local.example functions/.env.local
 pnpm emulators
 ```
 

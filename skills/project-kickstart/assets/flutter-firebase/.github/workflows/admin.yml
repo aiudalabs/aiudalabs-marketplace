@@ -4,6 +4,8 @@
 name: admin
 
 on:
+  # Called by the deploy workflows, so they run these checks instead of copying the jobs.
+  workflow_call:
   pull_request:
     branches: [main, develop]
     paths: ['admin/**', 'packages-ts/**', 'pnpm-lock.yaml', '.github/workflows/admin.yml']

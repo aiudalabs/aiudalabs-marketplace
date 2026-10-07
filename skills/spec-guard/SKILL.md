@@ -4,7 +4,7 @@ description: "Checks a product spec and its sprint backlog with code instead of 
 license: MIT
 compatibility: Node.js 18 or later and git. No dependencies and no network access; the GitHub export writes a script for the gh CLI that a person runs.
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: aiudalabs
   requires-tools: "node git"
 ---
@@ -26,7 +26,9 @@ Run from the project root. Before installing, call the scripts in this skill's f
 | `node tools/spec-guard/spec.mjs status` | Spec phases done, issues merged per sprint, the next wave and which of its issues are ready | Resuming work, starting a wave |
 | `node tools/spec-guard/spec.mjs impact <D-03\|FR-ORDER-1\|S3-07>` | The issues, dependents, files and commits a decision, requirement or issue reaches | Before changing a decision or a requirement |
 | `node tools/spec-guard/spec.mjs why <path>` | The issues that planned a file, the decisions and requirements behind them, its commits, and commits that touched it unplanned | Before changing code you did not write |
-| `node tools/spec-guard/spec.mjs verify <S3-07> [--base develop]` | The branch's changes stay inside the issue's `files_touched` and the owner's lane | Before an executor says done; qa-tester runs it again |
+| `node tools/spec-guard/spec.mjs verify <S3-07> [--base develop] [--worktree]` | The branch's commits since the base stay inside the issue's `files_touched` and the owner's lane | Before an executor says done; qa-tester runs it again |
+| `node tools/spec-guard/spec.mjs amend <S3-07> --add-file <p> --remove-file <p> --add-dep <id> --remove-dep <id> --add-read <r> --remove-read <r>` | Edits only that issue's frontmatter, recomputes the waves, rewrites `docs/WAVE_DAG.md` and syncs `docs/SPRINT_PROMPTS.md`; refuses an amendment that adds errors | Every amendment to an issue's files, dependencies or reads; never edit them by hand |
+| `node tools/spec-guard/spec.mjs prompts [--write]` | Each executor prompt's copy of its issue and read list, and each orchestrator prompt's wave list, match `docs/ISSUES.md`; `--write` fixes them | After editing an issue's criteria; `check` reports the drift as `prompt-drift` |
 | `node tools/spec-guard/spec.mjs export github\|csv\|json` | Writes `docs/exports/`: a reviewable `gh` script, a CSV for Jira or Linear importers, or JSON | Moving the backlog to a tracker |
 
 Add `--json` to any command for machine-readable output, and `--root <dir>` to run it on another folder. `export` refuses a backlog with errors.
@@ -43,15 +45,18 @@ It copies the scripts to `tools/spec-guard/`, writes `.githooks/pre-commit` and 
 On a branch whose name carries an issue id (`wt/S3-07`, `S3-07-create-booking`):
 
 - **pre-commit** refuses staged files outside the issue's `files_touched` or the owner's lane.
-- **commit-msg** refuses a subject that does not start with the issue id. That id is what `impact` and `why` follow.
+- **commit-msg** refuses a subject that does not start with the issue id. That id is what `impact` and `why` follow. An optional `[refs: ...]` may list only ids from the issue's `decision_refs` and `requirement_refs`; with none, omit it.
+- **pre-merge-commit** refuses a merge into an issue branch of anything not already on the base branch (develop, main or master). An issue branch syncs only by merging the base.
 - **pre-tool** (`--claude`) refuses an `Edit` or `Write` outside the issue before it happens, and tells the agent why.
 - **CI** (`--ci`) runs `check --strict` on every push and `verify` on pull requests from issue branches.
 
 On any branch, a commit that changes `docs/ISSUES.md` must pass `check`. Existing hook or workflow files that spec-guard did not write are left alone; the installer says so.
 
-After the `spec-guard` skill is updated (`npx github:aiudalabs/aiudalabs-marketplace update`), run the installer again: it replaces `tools/spec-guard/` with the new scripts and keeps the hooks, the CI workflow and `.claude/settings.json` as they are. Until then the project keeps checking with the old copy.
+After the `spec-guard` skill is updated (`npx github:aiudalabs/aiudalabs-marketplace update`), run the installer again: it replaces `tools/spec-guard/` and the hooks it wrote with the new ones, adds any new hook, and keeps `.claude/settings.json` and files it did not write. Until then the project keeps checking with the old copy.
 
-`git commit --no-verify` skips the local hooks. That is deliberate, for emergencies; CI runs the same checks, so nothing skipped locally reaches the base branch unseen.
+Never `git commit --no-verify` to get past a hook. When a hook blocks a change the issue needs, the orchestrator amends the issue with `spec.mjs amend`. CI runs the same checks, so a skipped hook only moves the failure to the pull request.
+
+`verify` judges only what the branch committed since it left the base. Files a tool or a reviewer wrote locally (`pubspec_overrides.yaml`, a refreshed lockfile) are listed as `warning (uncommitted)` and do not change the exit code; `--worktree` counts them too, for an owner's pre-commit view. It also warns on a merge that brought in commits not on the base, on a `[refs: ...]` the issue does not cite, and on a `files_touched` path git ignores. `--base` takes any branch, such as `wt/S0-05` for a lockfile refresh paired with its manifest issue.
 
 ## How the other skills use it
 
@@ -70,6 +75,11 @@ Every message names the file, the line and the issue. The ones that need a decis
 - **dangling-ref** or **proposed-id**: a document cites a `D-xx` or `FR-...` id the decisions or PRD do not define. If the document proposes that id for an earlier document, it writes `(proposed)` after it and the error becomes a warning until the owning phase defines it; otherwise fix the id.
 - **unresolved-read**: an issue's `reads:` names a document under `docs/` that does not exist, or an anchor its file lacks. Copy the anchor from the heading's GitHub slug or add an `<a id>` before the heading; the slug rule is in [references/formats.md](references/formats.md#reads-anchors).
 - **wave-mismatch** or **no-wave**: never fix by hand; run `waves --write`.
+- **prompt-drift**: an executor or orchestrator prompt in `docs/SPRINT_PROMPTS.md` no longer matches its issue. Run `prompts --write`; what it cannot fix (a copy with no `Commits:` line after it, an issue that no longer exists) is regenerated with `execution-router`.
+- **criterion-path** (warning): a criterion names a file in backticks that no `files_touched` entry covers. Add it with `amend`, or, when it is outside the owner's lane, give it to an issue whose owner has it.
+- **criterion-read** (warning): a criterion cites `ARCHITECTURE §3` or `docs/X.md#anchor` and `reads` leaves it out. Add it with `amend --add-read`.
+- **human-criterion**: a criterion starts with `human:` (a person performs it) in an issue that is not `autonomous: false`.
+- **ignored-path** (warning): git ignores a `files_touched` path, so its new files cannot be committed. Fix `.gitignore` in the issue that owns it; never `git add -f`.
 - **dependency-cycle**: two issues wait for each other. One of them is really two issues.
 - **unknown-screen** or **mockup-missing-screen**: `docs/UI_SCREENS.md` (or a link into it or into a mockup) names a screen id that does not exist, or a mockup lacks a key screen. Renumbering a screen means updating every link to it; a stale mockup is refreshed with `navegable-mockups`. The screen checks are in [references/formats.md](references/formats.md).
 

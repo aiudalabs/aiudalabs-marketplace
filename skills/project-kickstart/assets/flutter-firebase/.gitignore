@@ -40,9 +40,15 @@ android/key.properties
 
 # Melos
 .melos_tool/
+# Written by `melos bootstrap` in every package; local paths, never committed.
+pubspec_overrides.yaml
 
 # Firebase
 .firebase/
+# Offset emulator configs written by tools/emulator-config.mjs
+/firebase.emulators-*.json
+# Written by links/scripts/stage-links.mjs from links/env/<alias>/ (Hosting predeploy)
+/links/public/.well-known/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log

@@ -3,7 +3,7 @@ name: system-architecture
 description: "Designs the technical architecture of a product as Phase 5 of the product-spec workflow: repo layout and package boundaries with one-way dependency rules, an inventory of every server-side unit (Cloud Functions, endpoints, workers, scheduled jobs), state-machine enforcement, transactional consistency, permissions and service identity, performance budgets per layer, local-first dev workflow, CI/CD, observability with alert thresholds, and the deferred-complexity list. Writes ARCHITECTURE.md, plus IAM_REQUIREMENTS.md when the stack profile is managed cloud. Use when the user says 'diseñemos la arquitectura', 'cómo estructuro el monorepo', 'qué Cloud Functions necesito', 'CI/CD', 'qué defiero para v1.1', or after the UI screens are approved. It needs the brief, the locked stack profile, the schema and UI_SCREENS.md. Entities, fields, state machines and indexes are schema-design; this skill takes them as given."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: aiudalabs
   requires: stack-profile-flutter-firebase stack-profile-fastapi-react
 ---
@@ -54,8 +54,8 @@ The size is guidance: completeness wins over the budget, and no unit block or re
 
 `ARCHITECTURE.md` sections:
 
-1. **Stack confirmation**: profile, versions, pinned tools, and the third-party providers (chosen, or selection criteria plus a spike, Step 4).
-2. **Repo layout**: folder tree with package boundaries.
+1. **Stack confirmation**: profile, versions, pinned tools, a table of the major version of every library a Sprint 0 issue installs with its required peers (`vitest ^3` with `@vitest/coverage-v8 ^3`, `@testing-library/react` with `@testing-library/dom`), and the third-party providers (chosen, or selection criteria plus a spike, Step 4). Governance criteria cite this table; an issue never picks a major version.
+2. **Repo layout**: folder tree with package boundaries, and the identifiers table (Step 1).
 3. **Dependency rules**: who depends on whom, one way, no cycles.
 4. **Workflow-engine decision**: the four questions of Step 2, answered, and the decision.
 5. **Execution-unit inventory**: every server-side unit, in the profile's block format.
@@ -80,6 +80,8 @@ Write it in English; the conversation stays in Spanish. Cite decisions (`D-04`) 
 ### Step 1: Repo layout and package boundaries
 
 Start from the profile's layout. Adapt only what the product demands: the apps named in the brief, domain packages. Every boundary exists for a reason; if the product does not need one, delete it rather than leave it empty. Keep the top-level paths of the layout aligned with the lanes in the profile's roster, so every file the build will create has exactly one owning agent.
+
+**Identifiers the build needs.** Write the profile's identifiers table: every name that locks in once code ships or that two issues must agree on (package names, app and bundle ids per flavor, hosting or ingress names per environment, every env parameter with its value per environment and base URLs with their scheme, the domain, client build variables). A code the system generates for people (a booking code, an invite code) gets its exact alphabet as a literal string and its length (`ABCDEFGHJKMNPQRSTUVWXYZ23456789`, 6), never a description like "no look-alikes"; when the schema states it, copy it, and when it does not, add a section 15 item. A build issue never guesses an identifier: a missing one is a gap in this table.
 
 ### Step 2: Durable-workflow guard
 
@@ -110,12 +112,12 @@ Be complete: every unit named in the schema (its state machines and its server-w
 
 - write the selection criteria in section 1, each traced to a decision or FR (methods the market uses, refunds API, webhooks with signatures, settlement time, a fee ceiling, a sandbox, an SDK for the stack);
 - keep the units' contracts vendor-neutral behind one adapter module, so the choice changes one file;
-- schedule a vendor spike as a Sprint 0 issue for `multi-agent-governance`: it scores the candidates against the criteria and records the choice as a new decision in `OPINIONATED_DEFAULTS.md`;
+- schedule a vendor spike as a Sprint 0 issue for `multi-agent-governance`, owned by the lane of the adapter: it scores the candidates against the criteria and writes the scorecard in its lane, never in `docs/`; the choice becomes a decision `D-xx (proposed)`, which `product-spec-orchestrator` records through the owning phase skill;
 - list the open choice in section 16.
 
 **Leaving the app and coming back.** When a flow hands the user to a hosted page (a payment page, an email link), name how they return to the app (the profile's link mechanism) and state that the outcome comes from the server (the webhook or a status check), never from the return URL.
 
-**App settings.** Ask where non-secret settings that change without a release live (an ops contact, the minimum app version, kill switches): the profile names the home. List each setting in section 9 with its default, who changes it and which units and screens read it. Secrets are Step 8, never settings.
+**App settings.** Ask where non-secret settings that change without a release live (an ops contact, the minimum app version, kill switches): the profile names the home. List the settings in section 9 as a table, one row per setting: key, type, default, who changes it, and the units and screens that read it. The apps bundle exactly these defaults, so a key or default missing from the table is one the build will invent. Secrets are Step 8, never settings.
 
 ### Step 5: State-machine enforcement
 
@@ -137,7 +139,7 @@ Rules on every stack: every privilege traces to a specific unit's need; secrets 
 
 ### Step 9: Performance budgets
 
-For each budget in `OPINIONATED_DEFAULTS.md` and each numeric non-functional requirement in the PRD, show how the architecture meets it, using the profile's implication table. When a budget is unreachable with this architecture, say so: either the budget changes (a Phase 1 revisit, with the user) or the architecture does. Never miss a budget silently.
+For each budget in `OPINIONATED_DEFAULTS.md` and each numeric non-functional requirement in the PRD, show how the architecture meets it, using the profile's implication table. Give each client budget (load time, bundle, cold start) a build-time proxy that CI can enforce, such as the gzip size of the first-load chunks or the release app size, with its threshold; a budget measured only on a device or in production also names where it is checked. When a budget is unreachable with this architecture, say so: either the budget changes (a Phase 1 revisit, with the user) or the architecture does. Never miss a budget silently.
 
 ### Step 10: Dev workflow, local-first
 
@@ -145,7 +147,7 @@ Document the commands every developer, human or agent, runs locally, from the pr
 
 ### Step 11: CI/CD
 
-Two environments at least, staging and production; a preview per pull request if the budget allows. Use the profile's pipeline shape. Pin tool versions identically in CI and dev. Secrets come from the CI provider's store. Production deploys only from a tagged main with manual approval, never from a feature branch.
+Two environments at least, staging and production; a preview per pull request if the budget allows. Use the profile's pipeline shape. Pin tool versions identically in CI and dev. Secrets come from the CI provider's store. Production deploys only from a tagged main with manual approval, never from a feature branch. Name the release tag format exactly (`vMAJOR.MINOR.PATCH`, as a regex) and where each half is enforced: the tag format in the CI identity's trust condition, "on main" in the deploy workflow and by tag protection, since a tag-based identity condition cannot see the branch. The trust condition pins the repository by id, the CI environment and the ref, because the workflow file runs from the tagged commit and anyone who can push a tag can edit it; the CI environments limit their refs, tags are protected, and every deploy job has a timeout.
 
 ### Step 12: Observability
 
@@ -172,7 +174,11 @@ Defer the technical complexity the MVP does not need, seeding from the profile's
 - Everything this architecture needs from an earlier document is an item in section 15.
 - Every unit block has every required field.
 - Profile-mandated outputs are complete and consistent: every secret a unit reads exists in the registry with at least one reader, no orphan secrets, every service identity referenced exists.
-- Every platform service a unit uses is in the enabled-services list, and nothing unused is enabled.
+- Every platform service a unit uses is in the enabled-services list, and nothing unused is enabled. Services the provisioning itself needs are listed apart, and services the platform enables by default are reviewed, not disabled.
+- The CI deploy identity's trust condition pins repository id, environment and ref, and section 12 names the environment ref rules, the tag protection and the deploy timeouts.
+- Every identifier the build needs is in the identifiers table, generated codes with an exact alphabet and length.
+- Every library a Sprint 0 issue installs has a major version in section 1.
+- Every client budget has a build-time proxy CI can enforce, or names where it is checked.
 
 When a check fails, show it and ask. A fix that belongs in an earlier document becomes a section 15 item, not an edit.
 

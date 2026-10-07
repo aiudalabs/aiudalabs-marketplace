@@ -11,6 +11,9 @@
 // adds a function touches only its own file and no two issues edit one barrel.
 // src/index.ts is generated, ignored by git, and never edited by hand.
 // Two files exporting the same name fail the typecheck (TS2308).
+//
+// The index imports ./init (Admin SDK and global options, the region) before any
+// function file, so every function deploys to the same region.
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

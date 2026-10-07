@@ -3,7 +3,7 @@ name: stack-profile-flutter-firebase
 description: "Stack profile for Flutter apps on Firebase with a React admin, the default profile of the product-spec workflow: Firestore and RTDB placement, TypeScript types as the contract mirrored to Dart, status transitions only through Cloud Functions with one owner per cause, custom claims or membership documents with security rules, least-privilege IAM and Secret Manager, Melos plus pnpm monorepo, emulator-first dev, and the agent roster with its lanes (flutter-dev, firebase-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is flutter-firebase. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Firestore en este stack?', 'qué va en RTDB y qué en Firestore', 'qué campos lleva el bloque de una Cloud Function' or 'quién es dueño de firestore.rules'. For a Python FastAPI and Postgres stack, use stack-profile-fastapi-react."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.1"
   author: aiudalabs
 ---
 
@@ -50,11 +50,12 @@ Cloud Functions (2nd gen) in four patterns: **callable** (client to server), **t
 ## 6. Tooling and gates
 
 - **Monorepo:** `melos.yaml` for Flutter packages, `pnpm-workspace.yaml` for TypeScript.
-- **Dev loop:** emulator-first: one `firebase emulators:start --import=./emulator-data --export-on-exit` (functions included) plus the functions package's `build:watch`, which recompiles while the emulator reloads. Never a second functions emulator, never production Firestore.
+- **Dev loop:** emulator-first: one `firebase emulators:start --import=./emulator-data --export-on-exit` (functions included) plus the functions package's `build:watch`, which rebundles and restages `functions/.deploy` while the emulator reloads. Emulators bind `127.0.0.1`. Never a second functions emulator, never production Firestore.
 - **Test gate:** `flutter analyze`, `melos run test`, `pnpm --dir functions run test`, `pnpm --dir admin run lint`, `typecheck`, `test` and `build` (`--dir … run` fails when a script is missing; `--filter` exits 0 when nothing matches). All green before a merge.
-- **CI:** GitHub Actions or Bitbucket Pipelines. Pull request: lint, types, tests, build, in one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`). Merge to `develop`: deploy to staging. Tag `v*` on `main`: manual approval, then production.
+- **CI:** GitHub Actions or Bitbucket Pipelines. Pull request: lint, types, tests, build, in one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`). Merge to `develop`: deploy to staging. Tag `vMAJOR.MINOR.PATCH` on `main`: manual approval, then production. The WIF condition pins repository id, GitHub environment and ref; environments limit refs and tags are protected.
+- **Functions build and config:** functions bundle the TypeScript `packages-ts/types` with esbuild and deploy from a staged `functions/.deploy` with no `workspace:` dependencies. The region is set once with `setGlobalOptions` in `init.ts`. Parameters: `.env` shared, `.env.<alias>` per project, `.env.local` emulator-only and never committed (a committed `.env.local.example`). Identifiers the build needs (package names, app ids per flavor, Hosting sites, env values, code alphabets) are decided in the architecture's identifiers table.
 - **App settings:** non-secret settings (ops contact, minimum app version, kill switches) live in Remote Config, defaults bundled in the apps; a single settings document only when Remote Config is not an option.
-- **Back to the app from a web page** (hosted payment page, email link): App Links and Universal Links served from Hosting under `/.well-known/`; Firebase Dynamic Links is shut down.
+- **Back to the app from a web page** (hosted payment page, email link): App Links and Universal Links served from Hosting under `/.well-known/`, one set of association files per environment; Firebase Dynamic Links is shut down.
 - **Extra Phase 5 output:** `docs/IAM_REQUIREMENTS.md` (service accounts, APIs, secrets, per-function IAM) is required for this profile because it runs on managed cloud.
 
 ## 7. Permissions model

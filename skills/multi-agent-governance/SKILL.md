@@ -3,7 +3,7 @@ name: multi-agent-governance
 description: "Turns a finished product spec into the governance of a multi-agent repository: the root AGENTS.md constitution (plus a CLAUDE.md that imports it), docs/AGENT_ROSTER.md with exclusive lanes, docs/ORCHESTRATOR.md, a sprint backlog in docs/ISSUES.md whose waves are computed by spec-guard, and paste-ready prompts for Sprint 0 and Sprint 1. Use when the spec documents (brief, defaults, PRD, schema, UI screens, architecture) exist and the user wants the repo ready for coding agents: \"preparemos esto para los agentes\", \"vamos al build\", \"backlog de issues\", \"sprint planning\", \"AGENTS.md\". Phase 6 of product-spec-orchestrator. Stops when inputs are missing. It plans the whole backlog once; preparing a later sprint from the repo's real state is execution-router, running a sprint with agents is sprint-runner, and bringing an existing codebase into the method is project-adopt."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.2"
   author: aiudalabs
   requires: spec-guard stack-profile-flutter-firebase stack-profile-fastapi-react
 ---
@@ -82,6 +82,7 @@ Then read the six documents and hold these lists for the rest of the skill:
 - **Execution units**: from ARCHITECTURE, the inventory of callables, endpoints, triggers, workers and scheduled jobs
 - **Containers**: collections or tables from the schema, with who writes each
 - **Screens per app**: numbered ids from UI_SCREENS with their tier (MVP / v1.1 / v2)
+- **Global navigation per app**: the shell UI_SCREENS specifies once per app (tabs, side nav, drawer, splash), its guarded areas (signed-in, role-gated) and the route groups behind it
 - **State machines**: every named machine and its transitions
 - **Performance budgets**: the numeric targets from ARCHITECTURE
 - **Deferred items**: everything explicitly pushed to v1.1, v2 or later, in any document
@@ -99,7 +100,7 @@ Rules that are not negotiable:
 
 - **Exclusive ownership.** No path is owned by two agents, and globs may not overlap (`.github/**` in one lane and `.github/workflows/flutter.yml` in another fails `check`). A file two lanes want (a root `package.json`) goes to one; the other asks for changes.
 - **No test agent, no docs agent.** Tests and docs belong to the agent that owns the code.
-- **DevOps is split.** Platform config sits in the backend agent's lane. Each CI workflow file belongs to one lane: a workflow that validates only one lane belongs to that lane; a workflow that spans lanes, and every deploy workflow, belongs to the lane the profile gives the pipeline (the one that owns `.github/**` in the profile). When you give any workflow to another lane, list the workflow files one by one instead of `.github/**`. Production deploys run from CI on tagged `main`, never as an agent action.
+- **DevOps is split.** Platform config sits in the backend agent's lane. Each CI workflow file belongs to one lane: a workflow that validates only one lane belongs to that lane; a workflow that spans lanes, and every deploy workflow, belongs to the lane the profile gives the pipeline (the one that owns `.github/**` in the profile). When you give any workflow to another lane, list the workflow files one by one instead of `.github/**`. Deploy workflows call the lane workflows (`on: workflow_call` in each lane workflow, `uses: ./.github/workflows/<lane>.yml` in the deploy) and never copy their jobs, which drift. When a lane workflow lacks the `workflow_call` trigger, its lane's issue adds it and the deploy issue depends on that issue. Production deploys run from CI on tagged `main`, never as an agent action.
 - **Shared and generated files have one owner.** Lockfiles go to the lane that owns their workspace manifest; an aggregator every issue of a lane would edit (a `functions/src/index.ts` barrel, a route registry) is generated at build time or wired by one issue per sprint, so it does not serialize the waves; generated code belongs to the lane that owns its source. The rules and the root dotfiles are in [references/documents.md](references/documents.md#shared-and-generated-files).
 - **Paths outside every lane.** The spec workflow's files: `docs/**`, `mockups/**`, the root `AGENTS.md` and `CLAUDE.md`. Installed tooling, rewritten by its installer: `tools/spec-guard/**`, `.githooks/**`, `.claude/**` (installed agents, skills, settings), `.aiudalabs-marketplace.json`. `STATUS.md`, written by `sprint-runner` when a sprint closes. List them under a closing `## Paths outside every lane` heading in the roster. No issue lists them in `files_touched`.
 - **`.github/workflows/spec-guard.yml` is a lane's file.** It belongs to the pipeline lane the profile names (`firebase-dev` for flutter-firebase). The `spec-guard` installer writes it and `install.mjs --ci` rewrites it while it keeps the spec-guard marker comment; an issue that customizes it removes that line, and the installer then leaves it alone.
@@ -142,14 +143,16 @@ Write the root `AGENTS.md`, at most 200 lines, and a root `CLAUDE.md` containing
    - Never commit if tests are red.
    - Never bypass the authorization layer (security rules, endpoint permissions).
    - Every state machine transition runs on the server, never in the client.
-   - Atomic commits, one task per commit: `S3-07 task-1: <summary> [refs: D-03, FR-BOOKING-2]`.
+   - Atomic commits, one task per commit, the issue id first: `S3-07 task-1: <summary> [refs: D-03, FR-BOOKING-2]`. `[refs: ...]` is optional and lists only the issue's own refs.
    - Stay inside your issue's `files_touched` and your lane; the spec-guard hooks block the rest.
-   - One worktree per issue (`wt/<issue-id>`); merges happen at the wave barrier, never mid-wave.
+   - One worktree per issue (`wt/<issue-id>`), synced only by merging the base; merges into the base happen at the wave barrier, never mid-wave.
    - Every deliverable goes through `qa-tester` before merge.
    - A change in another agent's lane is requested from its owner (through the orchestrator), never made.
 8. **What this repo does NOT do**: explicit boundaries
 
 Project rules may be added ("amounts are integers in cents, never floats"). Code style is not the constitution's job; linters do that.
+
+`AGENTS.md` is outside every lane, so no issue edits it. For a command a later issue creates (a new script, a new test target), write its line now, marked `(from S0-05)`; the orchestrator removes the mark, or adds a line no one planned, on the base branch at the barrier that merges the issue. Never write a criterion "adds the command to AGENTS.md".
 
 ### Step 5: Decompose into sprints and issues
 
@@ -183,23 +186,43 @@ Field rules beyond the format:
 
 - **`**Objetivo:**`**: one plain-language sentence, in the user's language, saying what the issue achieves for the product or its users. No jargon, no file names. It is what a person reads on the board.
 - **`owner`**: the agent's file name from the roster (`flutter-dev`, `firebase-dev`, `react-dev`, `python-dev`), never a conceptual role. The harness loads the persona by that name. One owner per issue. Never `qa-tester`.
-- **`files_touched`**: every path or glob the issue writes, all inside the owner's lane. This list is what keeps parallel work conflict-free; be complete, including tests. Put each test where the package's test runner looks (read its config: the flutter-firebase scaffold's functions unit tests go in `functions/test/unit/` or next to the source, rules tests in `functions/test/rules/`, integration tests in `functions/test/integration/`); a test outside those globs never runs and its command still passes.
+- **`files_touched`**: every path or glob the issue writes, all inside the owner's lane. This list is what keeps parallel work conflict-free; be complete, including tests. Every path, folder or config file a criterion names, or needs in order to be met, is in it: the file that holds the setting (`firebase.json` for an emulator port, `init.ts` for a global region), a file the issue deletes, the test file of every criterion a test proves, the CI workflow whose path filter names a moved or deleted file, the workspace manifest a new package must join (the root `pubspec.yaml`, `pnpm-workspace.yaml`), generated templates and build config (`vite.config.ts`). Walk the criteria one by one against the list before moving on. A criterion never names a path outside every lane. Put each test where the package's test runner looks (read its config: the flutter-firebase scaffold's functions unit tests go in `functions/test/unit/` or next to the source, rules tests in `functions/test/rules/`, integration tests in `functions/test/integration/`); a test outside those globs never runs and its command still passes.
 - **`depends_on`**: issues that must be merged first, same or earlier sprint.
 - **`decision_refs`** and **`requirement_refs`**: the `D-xx` and `FR-...` ids the issue implements. Empty only for pure setup work.
-- **`autonomous: false`** for destructive migrations, anything that moves money, deletes user data or changes permissions.
+- **`autonomous: false`** for destructive migrations, anything that moves money, deletes user data or changes permissions, and anything that creates or deploys cloud resources or needs a device, a native SDK build (Android, iOS), credentials or a vendor account. A criterion a person performs carries the `human:` prefix and makes its issue `autonomous: false`. To keep the code autonomous, split those checks into a separate issue for a person, or a criterion proven by a CI run that a non-autonomous issue owns.
 - **`commit_strategy: squash`** only for lockstep refactors (a rename across 30 files); atomic is the default because it keeps waves debuggable with `git bisect`.
-- **`reads`**: the documents the executor opens first, as `path` or `path#anchor`. An anchor is the heading's GitHub slug or an explicit `<a id>`; the slug rule is in `formats.md`, and `check` reports each `reads` entry that does not resolve. Every UI issue lists `docs/UI_SCREENS.md#s-<screen-id>` for each screen it builds (the `<a id="s-<screen-id>"></a>` that precedes each screen heading). A **key screen** (one of the screens UI_SCREENS picks for mockups, with its mockup back-link) also lists `mockups/<app-id>.html#s-<screen-id>`, copied from that back-link, where `<app-id>` is the app id exactly as the brief names it (`player-app`, `admin-dashboard`). Other screens have no mockup anchor; they may list the app's mockup file without an anchor for its visual language. Criteria cite the screen id ("renders screen 1.2.1 per UI_SCREENS"). If UI_SCREENS has no `<a id="s-...">` anchors, add them before each screen heading as a mechanical fix and tell the user.
+- **`reads`**: the documents the executor opens first, as `path` or `path#anchor`. An anchor is the heading's GitHub slug or an explicit `<a id>`; the slug rule is in `formats.md`, and `check` reports each `reads` entry that does not resolve. Every UI issue lists `docs/UI_SCREENS.md#s-<screen-id>` for each screen it builds (the `<a id="s-<screen-id>"></a>` that precedes each screen heading). A **key screen** (one of the screens UI_SCREENS picks for mockups, with its mockup back-link) also lists `mockups/<app-id>.html#s-<screen-id>`, copied from that back-link, where `<app-id>` is the app id exactly as the brief names it (`player-app`, `admin-dashboard`). Other screens have no mockup anchor; they may list the app's mockup file without an anchor for its visual language. Criteria cite the screen id ("renders screen 1.2.1 per UI_SCREENS"). If UI_SCREENS has no `<a id="s-...">` anchors, add them before each screen heading as a mechanical fix and tell the user. Beyond screens, `reads` lists every section a criterion cites or depends on: the permissions section for any auth, role or guard code; observability for log fields; the dependency rules for package or manifest changes; the schema shapes the code writes; and the existing source files the issue must reason about (Gradle files, a script it extends). The executor reads nothing else, so a missing section becomes a guess.
+- **`gate`** (optional): the commands that prove deliverables the lane's test gate never runs, which go ahead of the lane gate in the executor prompt. Shell scripts: `bash -n`, `shellcheck`, a `--dry-run` snapshot, a committed fake-CLI test. Workflows: `actionlint`, and the first CI run as evidence. Docs only: `spec.mjs verify` and `git diff --check`. A static site: its check script against the emulator.
+- **`merge_with`** (optional): on an issue that changes a workspace manifest, the id of the lockfile refresh it is paired with (see "Dependencies and lockfiles").
+
+Criterion rules:
+
+- A criterion exercises only units merged before this issue or built in it. A check on a later sprint's unit belongs to that unit's issue.
+- Its check runs inside `files_touched`: a committed fixture or test, never temporary edits elsewhere.
+- A long-running command gets a non-interactive check: "`firebase emulators:exec --only auth,firestore 'true'` exits 0", never "`pnpm emulators` starts".
+- A check only a person, a device or a cloud project can run follows the `autonomous` rule above.
+
+**Global navigation.** Each app's shell (Step 1) gets its own issue, ahead of the screen issues. When the shell owns the router and says "no issue edits the router", its criteria name the extension points the later issues plug into: which route group exports the protected layout or guard, that each group exports a non-const `List<RouteBase>` (or the stack's equivalent), and every group the later issues' `files_touched` imply, splash included. The screen issues depend on it.
+
+**Dependencies and lockfiles.** A manifest change and its lockfile refresh reach the base at the same barrier, so CI and `--frozen-lockfile` never see one without the other:
+
+- When the lockfile's owner also owns the manifest, one issue changes both.
+- Otherwise the manifest issue carries `merge_with: <refresh id>`, the refresh issue (lockfile owner) `depends_on` it, and `sprint-runner` merges the pair together. Every issue that installs the new dependencies depends on the refresh.
+- In Sprint 0, plan every manifest addition the spec already implies, the admin's workspace dependencies included, into the first-wave setup issues, and schedule one refresh in the wave right after them, before any issue that installs from the lockfile.
+- A later need for a dependency (Maps in a screen issue): the issue that needs it lists the app's manifest (`apps/<app>/pubspec.yaml`, `admin/package.json`) in its `files_touched` and is paired with a refresh the same way. Say in the shell issue that later issues extend the manifest.
+
+**Spike issues.** A spike that compares vendors or options (a payment gateway, a maps provider) has a scoring table in its criteria: one row per criterion, marked as a gate (must pass) or weighted; each cell carries an evidence tag: `docs` (first-party documentation), `sandbox` (run against a test account), `quote` (a written answer from the vendor), `3p` (third-party source) or `unverified`. A cell scores pass only on `docs`, `sandbox` or `quote`; `3p` caps it at partial and `unverified` at unknown. Steps on an external timeline (merchant onboarding, a bank's approval) go to a separate issue for a person, never a criterion that blocks the barrier. The template is in [references/documents.md](references/documents.md#spike-issue).
 
 ### Step 6: Install guardrails and compute waves
 
-1. **Install or refresh the guardrails.** Ask the user to run the `spec-guard` installer from the project root (it needs a git repository). Run it even when `tools/spec-guard/` already exists (the kickstart installs it): it is safe to run again, replaces `tools/spec-guard/` with the scripts of the installed `spec-guard` skill and keeps the hooks and settings, so an updated `spec-guard` reaches the project only this way. Run it again after every `spec-guard` update.
+1. **Install or refresh the guardrails.** Ask the user to run the `spec-guard` installer from the project root (it needs a git repository). Run it even when `tools/spec-guard/` already exists (the kickstart installs it): it is safe to run again, replaces `tools/spec-guard/` and the hooks it wrote with those of the installed `spec-guard` skill, adds new hooks and keeps settings, so an updated `spec-guard` reaches the project only this way. Run it again after every `spec-guard` update.
 
    ```bash
    node <spec-guard skill folder>/scripts/install.mjs --ci           # every harness
    node <spec-guard skill folder>/scripts/install.mjs --ci --claude  # when they use Claude Code
    ```
 
-   It copies the tools into `tools/spec-guard/`, sets the pre-commit and commit-msg hooks, adds the CI check, and with `--claude` a hook that blocks edits outside the lane. If there is no repository yet, say that `project-kickstart` creates it and run the checks from the skill's folder meanwhile.
+   It copies the tools into `tools/spec-guard/`, sets the pre-commit, commit-msg and pre-merge-commit hooks, adds the CI check, and with `--claude` a hook that blocks edits outside the lane. If there is no repository yet, say that `project-kickstart` creates it and run the checks from the skill's folder meanwhile.
 
 2. **Compute waves.** Run `spec.mjs waves --write`. It writes `wave:` into each issue and `docs/WAVE_DAG.md`. Never edit a wave by hand; change `depends_on` or `files_touched` and re-run.
 
@@ -207,6 +230,7 @@ Field rules beyond the format:
    - A sprint with more than 7 waves is over-decomposed: merge issues or split the sprint.
    - A late single-issue wave usually hides an implicit dependency or a bottleneck issue to split.
    - A wave of more than 7 issues is more than one orchestrator can follow: add the real dependencies.
+   - A lockfile refresh sits in the wave right after its manifest issues and before every issue that installs from it. A refresh later than that leaves the base and every worktree red in between.
 
    After any change, run `waves --write` again.
 
@@ -216,7 +240,7 @@ Field rules beyond the format:
 2. Then do the checks code cannot do, and surface anything you find to the user instead of fixing it silently:
    - `AGENTS.md` (and `CLAUDE.md`) contradict nothing in `docs/`.
    - Deferred items in `ISSUES.md` match the deferred list in `ARCHITECTURE.md`.
-   - The commands in `AGENTS.md` actually work: run them if the repo is scaffolded; otherwise check each one against the profile's tooling. A command passes only when it ran something: the script exists in the package's `package.json` (or `melos.yaml`, `pyproject.toml`) and the output shows it ran. pnpm exits 0 for `pnpm --filter <name> <script>` when no package matches the name ("No projects matched the filters") and when the package lacks the script ("None of the selected packages has a ... script"), so write per-package commands as `pnpm --dir <package folder> run <script>`, which fails on a missing script, and count those two messages as a failure. A command that cannot run yet because a Sprint 0 issue creates its script is listed to the user as pending, not as passing. So is a test command that found no tests ("No test files found", "No tests found", `--passWithNoTests`): it verifies nothing until the first test exists. The scaffold keeps `--passWithNoTests` only so its empty packages pass CI; the Sprint 0 issue that adds a package's first test removes the flag in the same issue.
+   - The commands in `AGENTS.md` actually work: run them if the repo is scaffolded; otherwise check each one against the profile's tooling. A command passes only when it ran something: the script exists in the package's `package.json` (or `melos.yaml`, `pyproject.toml`) and the output shows it ran. pnpm exits 0 for `pnpm --filter <name> <script>` when no package matches the name ("No projects matched the filters") and when the package lacks the script ("None of the selected packages has a ... script"), so write per-package commands as `pnpm --dir <package folder> run <script>`, which fails on a missing script, and count those two messages as a failure. A command that cannot run yet because a Sprint 0 issue creates its script is listed to the user as pending, not as passing. So is a test command that found no tests ("No test files found", "No tests found", `NOT RUN (0 test files)`, `--passWithNoTests`): it verifies nothing until the first test exists. The flutter-firebase functions suites print `NOT RUN (0 test files)` until their first test file and turn strict by themselves after it. A package that keeps `--passWithNoTests` (the admin's `test`) loses it in the issue that adds its first test, which lists that `package.json` (`admin/package.json`) in `files_touched`.
    - Every build agent in the roster owns at least one issue; a build agent with no issue leaves the roster. `qa-tester` owns none by design. A consultant such as `product-advisor` was never in the roster (Step 2), so it is not affected.
 
 ### Step 8: Write the Sprint 0 and Sprint 1 prompts
@@ -224,11 +248,11 @@ Field rules beyond the format:
 `docs/SPRINT_PROMPTS.md` holds one **orchestrator prompt** per sprint and one **executor prompt** per issue, for Sprint 0 and Sprint 1 only. Templates are in [references/documents.md](references/documents.md#sprint-prompts).
 
 - **Orchestrator prompt** (typically 60-90 lines): context anchor (read `AGENTS.md`, the roster, `ORCHESTRATOR.md`, the sprint in `ISSUES.md` and `WAVE_DAG.md`); current state; the wave-by-wave plan with owners and worktrees; an approval gate ("output the wave plan first, spawn nothing until I approve").
-- **Executor prompt** (typically 25-40 lines around the inlined issue): identity and worktree; the `reads` list, in order, and nothing else; the issue inlined verbatim; commit discipline; the done signal (summary, commits, deviations, handoff to `qa-tester`, no self-merge). When the `issue-delivery` skill is installed, the prompt tells the executor to follow it.
+- **Executor prompt** (typically 25-40 lines around the inlined issue): identity and worktree; the `reads` list, in order, then the decisions and requirements the issue cites, and nothing else; the issue inlined verbatim, followed by the `Commits:` line; commit discipline; the done signal (summary, commits, deviations, handoff to `qa-tester`, no self-merge). When the `issue-delivery` skill is installed, the prompt tells the executor to follow it.
 
 End the file with a note: "Prompts for Sprint 2 onward are generated by `execution-router` when the previous sprint closes."
 
-Last check: every executor prompt matches its issue's frontmatter exactly. A prompt that drifts from its issue is fixed in the prompt, never in the issue.
+Last check: run `spec.mjs prompts --write`, then `spec.mjs check`. `prompts --write` syncs each executor prompt's copy of its issue and `Read these ...` list, and each orchestrator prompt's `- Wave N:` lines, with `docs/ISSUES.md`; keep those parts in the templates' shape, or `check` reports `prompt-drift`. A prompt that drifts is fixed in the prompt, never in the issue. The orchestrator amends an issue's files, dependencies or reads only with `spec.mjs amend`, which syncs the prompts too.
 
 ## Anti-patterns
 

@@ -3,5 +3,25 @@
     "default": "{{project_name}}-dev",
     "staging": "{{project_name}}-staging",
     "prod": "{{project_name}}-prod"
+  },
+  "targets": {
+    "{{project_name}}-dev": {
+      "hosting": {
+        "admin": ["{{project_name}}-dev"],
+        "links": ["{{project_name}}-dev-links"]
+      }
+    },
+    "{{project_name}}-staging": {
+      "hosting": {
+        "admin": ["{{project_name}}-staging"],
+        "links": ["{{project_name}}-staging-links"]
+      }
+    },
+    "{{project_name}}-prod": {
+      "hosting": {
+        "admin": ["{{project_name}}-prod"],
+        "links": ["{{project_name}}-prod-links"]
+      }
+    }
   }
 }
