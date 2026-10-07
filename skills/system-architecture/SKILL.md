@@ -62,7 +62,7 @@ The size is guidance: completeness wins over the budget, and no unit block or re
 6. **State-machine enforcement**: every transition pinned to its unit.
 7. **Transactional consistency**: when transactions, when batches, when neither.
 8. **Permissions model**: Phase 3's philosophy turned into the profile's mechanism.
-9. **Service identity and secrets.**
+9. **Service identity, secrets and app settings.**
 10. **Performance budgets**: reconciled with the architecture, per layer.
 11. **Dev workflow**: concrete local-first commands.
 12. **CI/CD**: environments and gates per trigger.
@@ -90,6 +90,8 @@ Before adding any workflow orchestration engine (Temporal, Inngest, Trigger.dev,
 3. Does any process need durable retries across days, not minutes?
 4. Does any process span several external services with compensating actions?
 
+A wait held as a status in the primary store plus a queue screen where a person acts (a venue awaiting review, a refund awaiting approval) is a state machine, not a workflow: it answers question 2 with no, even when the person acts days later. Question 2 counts only for a multi-step process that must resume mid-flight with its context, timers and compensations.
+
 If all four are no, do not introduce an engine: the profile's default units plus a state machine in the primary store are enough. Write the decision in section 4 of `ARCHITECTURE.md`. If at least one is yes, justify the engine: which workflow (cite the schema), estimated cost (the profile carries reference numbers), and why the profile's default chaining falls short. This guard stops overengineering by reflex.
 
 ### Step 3: Dependency rules
@@ -100,6 +102,8 @@ Write the dependency graph, starting from the profile's. **No cycles, ever.** If
 
 For every server-side unit (client-invoked function or endpoint, trigger, worker task, scheduled job, webhook; the patterns come from the profile), write one block in the profile's format. Required fields on every stack: pattern, owner (an agent from the roster), trigger or fires-when, validates, side effects, **idempotency**, performance budget, failure modes, tests, plus the profile's extra fields (service account, IAM permissions and secrets for managed cloud; auth and secrets for self-hosted). A field with nothing to say reads `(none)`; a missing field is an error.
 
+Idempotency covers every unit that can run twice, not only client-invoked ones: callables and endpoints dedupe on a client request id, webhooks on the provider's event id, and event triggers and queue consumers, which are delivered at least once, either write deterministically (say so) or dedupe on the event id in the profile's dedup store. Scheduled jobs re-read state, so a re-run finds nothing to do.
+
 Be complete: every unit named in the schema (its state machines and its server-writes table), the screens or anywhere in the spec has its block. A unit a screen needs that the schema does not list (the writes `ui-screens-spec` flagged for Phase 5) gets its block here and an item in section 15 so the schema lists it too.
 
 **Third-party providers.** When a unit depends on a vendor the documents have not chosen (payment gateway, email, SMS, maps), choose it when the documents give enough to choose (market, methods the decisions require, the stack's SDKs), and write the reason. When the choice cannot be made from the documents, because it needs sandbox access, a contract or a price quote, do not guess and do not block the phase:
@@ -109,9 +113,13 @@ Be complete: every unit named in the schema (its state machines and its server-w
 - schedule a vendor spike as a Sprint 0 issue for `multi-agent-governance`: it scores the candidates against the criteria and records the choice as a new decision in `OPINIONATED_DEFAULTS.md`;
 - list the open choice in section 16.
 
+**Leaving the app and coming back.** When a flow hands the user to a hosted page (a payment page, an email link), name how they return to the app (the profile's link mechanism) and state that the outcome comes from the server (the webhook or a status check), never from the return URL.
+
+**App settings.** Ask where non-secret settings that change without a release live (an ops contact, the minimum app version, kill switches): the profile names the home. List each setting in section 9 with its default, who changes it and which units and screens read it. Secrets are Step 8, never settings.
+
 ### Step 5: State-machine enforcement
 
-Pin every transition from the schema to its unit from Step 4, in a table: transition → cause → unit → who may call it. One unit per cause: when the same transition has several causes (the customer releases a hold; a scheduled job expires it), each has its unit, and the row keeps the schema's line on why they cannot race (each re-reads the status in a transaction and moves it only from the expected state). Two units for the same cause are a design error. No client-side transitions. The profile defines the denial mechanism (security rules; endpoint auth plus DB constraints).
+Pin every transition from the schema to its unit from Step 4, in a table: transition → cause → unit → who may call it. One unit per cause: when the same transition has several causes (the customer releases a hold; a scheduled job expires it), each has its unit, and the row keeps the schema's line on why they cannot race (each re-reads the status in a transaction and moves it only from the expected state). Two units for the same cause are a design error. One cause that arrives by two routes (the provider's webhook pushes a payment result; a scheduled poll or the return-page check pulls it) is still one cause: both routes call one shared handler, keyed by the provider's id, so whichever arrives first applies and the other is a no-op; the table names the owner and the second route. No client-side transitions. The profile defines the denial mechanism (security rules; endpoint auth plus DB constraints).
 
 ### Step 6: Transactional consistency
 
@@ -150,7 +158,9 @@ Defer the technical complexity the MVP does not need, seeding from the profile's
 ### Step 14: Cross-check before closing
 
 - Every unit mentioned in the schema or the screens has a block.
-- Every transition has one owning unit per cause, with a no-race line when there are several.
+- Every transition has one owning unit per cause, with a no-race line when there are several; a cause with two routes shares one handler.
+- Every trigger and queue consumer has an idempotency line (deterministic write or event-id dedup).
+- Every non-secret setting has its home, default and readers.
 - Every unit's owner is an agent in the profile's roster with a write lane.
 - Every performance budget is reconciled.
 - No dependency cycle.
@@ -170,7 +180,8 @@ When a check fails, show it and ask. A fix that belongs in an earlier document b
 
 - Client-side state transitions.
 - Optimistic UI without rollback.
-- No idempotency on client-invoked units: networks fail, retries happen.
+- No idempotency on client-invoked units: networks fail, retries happen. Triggers and consumers that assume exactly-once delivery.
+- Two implementations of one cause (a webhook and a poll each applying the same provider result).
 - One unit doing everything (a 500-line handler covering six actions).
 - No deferred-complexity section.
 - Deploying to production from a feature branch.
@@ -190,7 +201,7 @@ Spanish in the conversation, English in the documents. Be specific, not aspirati
 
 Run the `spec-guard` check from the project root: `node tools/spec-guard/spec.mjs check`, or the same `scripts/spec.mjs` from the `spec-guard` skill's folder when the project has no `tools/spec-guard/` yet. It works before a backlog exists and checks the decisions, the PRD and the roster on disk; fix any error before closing. If it stops with "no backlog at docs/ISSUES.md", the project's copy is older than the `spec-guard` skill: re-run its installer (`node <spec-guard skill folder>/scripts/install.mjs`, safe to repeat) and check again.
 
-Overwrite the whole of `docs/SESSION.md` with the shape every phase skill writes:
+Overwrite the whole of `docs/SESSION.md` with the shape every phase skill writes, unless `product-spec-orchestrator` runs this phase in parallel with Phase 7: then do not write `docs/SESSION.md` (the orchestrator rebuilds it after both finish); return the closing counts and the decisions worth checking instead.
 
 ```markdown
 # Session — {project title}

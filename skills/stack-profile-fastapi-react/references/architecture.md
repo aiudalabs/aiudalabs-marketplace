@@ -51,7 +51,7 @@ No service imports another service's internals; services talk over HTTP or throu
 
 ## Workflow-engine guard: defaults for this stack
 
-Default: **no workflow engine** (Temporal, Celery with Redis, RabbitMQ). A Postgres queue (`FOR UPDATE SKIP LOCKED`), plain worker processes and the state machine in the database cost no extra infrastructure and are debuggable with SQL. Justify an engine only with the skill's four questions. Reference costs: Temporal Cloud from $200/month; a self-hosted broker is one more stateful service to operate. Known call: multi-step pipelines with human gates are modeled first as task types and states in the same queue, before reaching for an engine.
+Default: **no workflow engine** (Temporal, Celery with Redis, RabbitMQ). A Postgres queue (`FOR UPDATE SKIP LOCKED`), plain worker processes and the state machine in the database cost no extra infrastructure and are debuggable with SQL. Justify an engine only with the skill's four questions. Reference costs: Temporal Cloud from $200/month; a self-hosted broker is one more stateful service to operate. Known call: multi-step pipelines with human gates are modeled first as task types and states in the same queue, before reaching for an engine. A wait held as a status plus an admin queue screen (a review, an approval) is not a workflow-engine case, even when a person acts days later: question 2 reads no.
 
 ## Execution-unit block
 
@@ -83,7 +83,7 @@ POST /bookings/{id}/accept
 
 Required fields: pattern, owner, trigger or fires-when, validates, side effects, idempotency, performance, failure modes, tests, **auth**, **secrets accessed**. Worker tasks add claim semantics, the retry and zombie policy (stale timeout and maximum attempts) and cost reporting when the task spends money (LLM calls).
 
-The side effects copy each transition's single owner from the schema (`data-layer.md` in this folder); a unit that would transition a status the schema gives to another unit is raised for the coherence check instead of becoming a second owner. `Idempotency` names where the key lives, as the schema records it (a UNIQUE column or the `idempotency_keys` table); if the schema has no place for it, raise it for the coherence check.
+The side effects copy each transition's single owner from the schema (`data-layer.md` in this folder); a unit that would transition a status the schema gives to another unit is raised for the coherence check instead of becoming a second owner. One cause that arrives by two routes (the provider's webhook and a scheduled status poll) is one cause: both routes call one shared handler keyed by the provider's id, and the conditional update makes the later one a no-op. `Idempotency` names where the key lives, as the schema records it (a UNIQUE column or the `idempotency_keys` table); if the schema has no place for it, raise it for the coherence check.
 
 ## Transactional consistency menu
 
@@ -112,6 +112,11 @@ If the database can express the invariant, the database enforces it. Python vali
 - **Secrets:** runtime secrets come from `deploy/.env` (gitignored; `.env.example` committed with empty values); Compose checks presence with `${VAR:?}`. Never in code, never committed, never logged.
 - **Ingress:** a reverse proxy (Traefik or Caddy) terminates TLS. Internal services (Postgres, workers) are not exposed: no port mappings for them in Compose.
 - **Containers:** non-root user, multi-stage build, chained healthchecks (db → api → workers). Migrations run before the new code starts.
+
+## App settings and returning from hosted pages
+
+- **Settings:** non-secret settings that change without a release (an ops contact, kill switches, limits) live in an `app_settings` table edited through the admin, read through one cached accessor; never in env files (those need a redeploy) and never secrets.
+- **Return URL:** a hosted payment page returns to a route of the web app; the page shows the status the webhook wrote (or triggers the poll route), never trusting the return URL's parameters.
 
 ## Performance budget implications
 
@@ -172,6 +177,7 @@ P0 alerts: API error rate above 1% over 5 min; a worker with zero claims for N m
 - Two store implementations, one per database backend.
 - Inline HTML and JavaScript frontends inside FastAPI route files; they grow without limit. Move them to the React app or static files.
 - Check-then-act for invariants the database can express.
+- A webhook and a poll each applying the same provider result instead of sharing one handler.
 - Schema changes without an Alembic migration; deploying code before migrating.
 - Long transactions or open sessions across network calls.
 - Secrets in code or committed env files; development defaults that boot in production.

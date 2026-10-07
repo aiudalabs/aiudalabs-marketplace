@@ -41,7 +41,7 @@ Pydantic v2 models are the API contract, SQLAlchemy 2 declarative models are the
 
 ## 4. State-machine enforcement
 
-Legal transitions live in one shared module (`shared/contracts.py: LEGAL_TRANSITIONS`) and are validated in the store layer on every status write. Clients never PATCH `status`: every transition is a dedicated endpoint or worker action that validates before writing, and each transition has exactly one owning unit; other units only read the status. Database constraints back the invariants (CHECK on valid statuses, partial UNIQUE indexes for "only one active X").
+Legal transitions live in one shared module (`shared/contracts.py: LEGAL_TRANSITIONS`) and are validated in the store layer on every status write. Clients never PATCH `status`: every transition is a dedicated endpoint or worker action that validates before writing, and each cause of a transition has exactly one owning unit (one owner per cause); one cause that arrives by two routes (a payment webhook and a status poll) goes through one shared handler; other units only read the status. Database constraints back the invariants (CHECK on valid statuses, partial UNIQUE indexes for "only one active X").
 
 ## 5. Execution units
 

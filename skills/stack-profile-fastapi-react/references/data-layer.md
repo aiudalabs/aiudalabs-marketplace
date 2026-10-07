@@ -9,7 +9,7 @@ Phase 3 writes `docs/DATA_SCHEMA.md` (typically 400-700 lines; completeness wins
 1. **Stack confirmation**: Python and Postgres versions, SQLAlchemy 2.x, Alembic.
 2. **Tables**: one-line purpose each, one heading per table so issues can link to `docs/DATA_SCHEMA.md#bookings`. Include where idempotency keys live (see below).
 3. **Shapes**: SQLAlchemy models plus the Pydantic Create, Update and Read schemas per entity.
-4. **State machines**: states, transitions and the one endpoint or worker task that owns each.
+4. **State machines and server writes**: states, transitions and the one endpoint or worker task that owns each, one owner per cause (see below); then the table of every endpoint or task that writes. Clients write only through endpoints, so `### Direct client writes` says "None".
 5. **Placement decisions**: Postgres vs object storage vs a justified Redis.
 6. **Permissions philosophy**: auth model, roles, server-only fields per schema.
 7. **Query-cost anticipation**: index per query, N+1 risks, pagination strategy.
@@ -65,13 +65,13 @@ class BookingRead(BaseModel):     # what clients receive
 
 - Legal transitions in one shared module (`LEGAL_TRANSITIONS` dict), validated in the store layer on every status write. An illegal transition raises, whichever endpoint attempted it.
 - Each transition is a dedicated endpoint or worker action. Clients never PATCH `status`.
-- **One owner per transition.** A transition is identified by from-state, to-state and cause; each has exactly one owning unit, and every other unit only reads `status`. When two causes lead to the same states (a user cancels a hold, a job expires it), list them as separate transitions with their own owners. Each owner writes with a conditional update (`UPDATE ... SET status=:to WHERE id=:id AND status=:from`, checking the row count) or under `SELECT ... FOR UPDATE`, so two owners can never both apply a change to the same row.
+- **One owner per cause.** A transition is identified by from-state, to-state and cause; each has exactly one owning unit, and every other unit only reads `status`. When two causes lead to the same states (a user cancels a hold, a job expires it), list them as separate transitions with their own owners. Each owner writes with a conditional update (`UPDATE ... SET status=:to WHERE id=:id AND status=:from`, checking the row count) or under `SELECT ... FOR UPDATE`, so two owners can never both apply a change to the same row. One cause that reaches the server by two routes (the payment provider's webhook and a status poll) stays one transition with one owner: the other route calls the owner's shared handler, never a second implementation.
 - The database backs the invariants: CHECK constraints for valid statuses, partial UNIQUE indexes for "only one active booking per slot". Check-then-act in Python is a race; the constraint is the truth.
 - Terminal states have no outgoing transitions in the shared dict.
 
 ## Idempotency
 
-Endpoints with side effects take a `client_request_id`; webhooks use the provider's event id. The schema says where the key is stored, so Phase 5 does not have to invent it:
+Endpoints with side effects take a `client_request_id`; webhooks use the provider's event id. Worker tasks can run twice (a zombie requeued after its stale timeout), so a task with an external effect (an email, a provider call) records its task id in the same place before reporting done, or makes the effect deterministic. The schema says where the key is stored, so Phase 5 does not have to invent it:
 
 - **On the row the call creates**, when the call creates exactly one row: a `client_request_id` column with a UNIQUE index on `(caller_id, client_request_id)`; a retry hits the constraint and returns the existing row.
 - **In an `idempotency_keys` table** otherwise (transitions, calls that touch several rows): `(caller_id, key)` primary key, `endpoint`, `outcome`, `result_ref`, `created_at`, written in the same transaction as the change. A scheduled job deletes rows older than the dedup window (at least 1 h, typically 24 h).

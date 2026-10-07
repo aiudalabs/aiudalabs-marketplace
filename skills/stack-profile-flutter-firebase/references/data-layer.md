@@ -7,9 +7,9 @@ Read by the `schema-design` skill (Phase 3). This file carries the Firebase know
 Phase 3 writes `docs/FIREBASE_SCHEMA.md` (typically 400-700 lines; completeness wins over the budget). Profile-specific section names:
 
 1. **Stack confirmation**: Firebase services in use (Firestore, RTDB, Auth, Storage, Functions, Cloud Messaging) and versions.
-2. **Top-level collections**: one-line purpose each, one heading per collection so issues can link to `docs/FIREBASE_SCHEMA.md#bookings`. Include the `idempotencyKeys` container (see below).
+2. **Collections and subcollections**: one-line purpose each, one heading per collection and per subcollection so issues can link to `docs/FIREBASE_SCHEMA.md#bookings`. Include the `idempotencyKeys` container (see below).
 3. **Document shapes**: TypeScript types for every collection and subcollection.
-4. **State machines**: states, transitions and the one Cloud Function that owns each.
+4. **State machines and server writes**: states, transitions and the one Cloud Function that owns each, one owner per cause (see below); then the table of every function that writes, and the `### Direct client writes` table (device tokens, `readAt`, a user's own listing fields) with the security rule that bounds each.
 5. **RTDB usage**: what lives in RTDB and why it is not in Firestore.
 6. **Security rules philosophy**: tenancy, owner model, role model, custom claims approach. Not literal rules.
 7. **Composite indexes**: every where-plus-orderBy-on-different-fields combination, with the query that needs it.
@@ -17,7 +17,7 @@ Phase 3 writes `docs/FIREBASE_SCHEMA.md` (typically 400-700 lines; completeness 
 9. **Denormalization decisions**: every duplicated field with rationale.
 10. **Migration story**: versioning, backfills, breaking changes.
 
-**Container headings appear once.** The heading named after a container (`### bookings`) exists only in section 2; that is the anchor issues link to. Sections 3 and 4 use different heading text for the same container (`### Booking shape`, `### Booking states`) or link back to it (`[bookings](#bookings)`). Two headings with the same text give the second the anchor `#bookings-1`, and links go to the wrong one.
+**Container headings appear once.** The heading named after a container (`### bookings`) exists only in section 2; that is the anchor issues link to. Every collection and subcollection gets that heading in section 2. Sections 3 and 4 use different heading text for the same container (`### Booking shape`, `### Booking states`) or link back to it (`[bookings](#bookings)`). Two headings with the same text give the second the anchor `#bookings-1`, and links go to the wrong one.
 
 ## Placement heuristic
 
@@ -78,7 +78,7 @@ Clients never write `status`; security rules deny it regardless of role. Every t
 Forbidden: completed → anything (terminal); any client write to status
 ```
 
-**One owner per transition.** A transition is identified by from-state, to-state and cause. Each has exactly one owning function; every other function only reads `status`. When two causes lead to the same states (the customer cancels a hold, a job expires it), list them as separate transitions, each with its owner, as above. Each owner applies its transition in a transaction that re-reads the document and aborts when the status is no longer the from-state, so two owners can never both apply a change to the same document; the schema says this once for all of them.
+**One owner per cause.** A transition is identified by from-state, to-state and cause. Each has exactly one owning function; every other function only reads `status`. When two causes lead to the same states (the customer cancels a hold, a job expires it), list them as separate transitions, each with its owner, as above. Each owner applies its transition in a transaction that re-reads the document and aborts when the status is no longer the from-state, so two owners can never both apply a change to the same document; the schema says this once for all of them. One cause that reaches the server by two routes (the payment provider's webhook and a status poll) stays one transition with one owner: the other route calls the owner's shared handler, never a second implementation.
 
 ### Offline state changes
 
@@ -91,13 +91,13 @@ Firestore's offline write queue cannot carry a transition, because clients never
 
 ### Idempotency container
 
-Callable and https functions with side effects require a `clientRequestId` (or the provider's event id for a webhook). The schema includes the container where the dedup record lives, so Phase 5 does not have to invent one:
+Callable and https functions with side effects require a `clientRequestId` (or the provider's event id for a webhook). Triggers are delivered at least once, so a trigger whose effect is not deterministic (an increment, a push, a call out) records its event id here too; a trigger that only sets values derived from the event needs no record. The schema includes the container where the dedup record lives, so Phase 5 does not have to invent one:
 
 ```typescript
-// Collection: idempotencyKeys, doc id `${callerUid}_${clientRequestId}` (or `${provider}_${eventId}`)
+// Collection: idempotencyKeys, doc id `${callerUid}_${clientRequestId}` (or `${provider}_${eventId}`, or `trigger_${eventId}`)
 type IdempotencyKey = {
   functionName: string
-  callerUid: string | null      // null for webhooks
+  callerUid: string | null      // null for webhooks and triggers
   outcome: 'applied' | 'rejected'
   resultPath: string | null    // the document the call created or changed; a retry returns it
   errorCode?: string           // the error a rejected call returned, replayed on retry

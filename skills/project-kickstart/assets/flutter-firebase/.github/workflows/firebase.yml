@@ -26,7 +26,14 @@ jobs:
       - run: pnpm --dir functions run lint
       - run: pnpm --dir functions run test
       - run: pnpm --dir functions run build
-      - run: pnpm --filter "./packages-ts/*" --if-present typecheck
+      # Each shared types package that exists must have a typecheck script:
+      # `--dir ... run` fails when it is missing, where `--filter` passes checking nothing.
+      - name: Type-check shared TypeScript packages
+        run: |
+          for pkg in packages-ts/*/; do
+            [ -f "${pkg}package.json" ] || continue
+            pnpm --dir "$pkg" run typecheck
+          done
 
   rules:
     name: Security rules tests
