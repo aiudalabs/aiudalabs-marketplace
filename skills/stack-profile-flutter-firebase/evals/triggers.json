@@ -1,0 +1,10 @@
+[
+  { "query": "¿Cómo modelamos estados en Firestore en este stack? ¿El cliente puede escribir el campo status o va siempre por una Cloud Function?", "should_trigger": true },
+  { "query": "En nuestro stack Flutter + Firebase, ¿la presencia y el typing van en RTDB o en Firestore?", "should_trigger": true },
+  { "query": "What fields does a Cloud Function block need in our architecture doc for the flutter-firebase profile? Service account, IAM, secrets?", "should_trigger": true },
+  { "query": "¿Quién es dueño de firestore.rules y de packages-ts/types en el roster de agentes del stack Firebase?", "should_trigger": true },
+  { "query": "In the Flutter/Firebase stack, how do we keep the Dart and TypeScript types in sync, and do we use Timestamp or Date?", "should_trigger": true },
+  { "query": "En el stack de FastAPI, ¿cómo evitamos que el cliente mande status y dónde viven las transiciones legales?", "should_trigger": false, "use_instead": "stack-profile-fastapi-react" },
+  { "query": "Diseña el FIREBASE_SCHEMA.md completo del marketplace de canchas a partir del PRD aprobado.", "should_trigger": false, "use_instead": "schema-design" },
+  { "query": "Crea el repositorio nuevo con el monorepo Melos + pnpm, firebase.json y la estructura de docs.", "should_trigger": false, "use_instead": "project-kickstart" }
+]

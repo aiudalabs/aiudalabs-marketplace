@@ -141,6 +141,8 @@ test('check: uncovered decisions warn, and fail with --strict', (t) => {
   const project = readProject(dir);
   assert.deepEqual(codes(checkProject(project), 'warning'), ['uncovered-decision']);
   assert.deepEqual(codes(checkProject(project, { strict: true })), ['uncovered-decision']);
+  edit(dir, 'OPINIONATED_DEFAULTS.md', '## D-04 — Loyalty points', '## D-04 — Loyalty points (existing)');
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'a decision the code already implements needs no issue');
 });
 
 test('progress: merged issues come from commit subjects, and the next wave waits for dependencies', () => {

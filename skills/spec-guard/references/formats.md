@@ -19,6 +19,9 @@ One heading per decision, numbered `D-01`, `D-02`, ... in order:
   documents written before this format. New documents use `D-03`.
 - A decision deferred out of this release carries `(deferred)` in its heading:
   `## D-11 — Loyalty points (deferred)`. Deferred decisions need no issue.
+- A decision the code already implements, recorded when an existing repository
+  is adopted, carries `(existing)`: `## D-05 — Money is integer cents (existing)`.
+  It needs no issue either, and an issue may still cite it when it applies it.
 - The stack profile is locked by a line anywhere in the file:
   `**Stack profile:** flutter-firebase` (or `fastapi-react`). The older ids
   `aiuda-flutter-firebase` and `python-fastapi-react` are accepted.
@@ -37,7 +40,8 @@ One heading per functional requirement:
 
 - The id is `FR-`, an uppercase area, `-`, a number: `FR-ORDER-1`. `FR-12`
   (no area) is also accepted.
-- `(deferred)` in the heading takes the requirement out of this release.
+- `(deferred)` in the heading takes the requirement out of this release;
+  `(existing)` marks one the code already meets.
 
 ## Agent roster: `docs/AGENT_ROSTER.md`
 

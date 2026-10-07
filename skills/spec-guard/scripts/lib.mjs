@@ -44,7 +44,7 @@ export function parseDecisions(text) {
     const id = `D-${String(match[1] ?? match[2]).padStart(2, '0')}`;
     const title = match[3].trim();
     if (decisions.has(id)) problems.push(error('duplicate-decision', `${DOCS.decisions}:${lineOf(text, match.index)}`, `${id} is defined twice`));
-    decisions.set(id, { id, title, deferred: /\(deferred\)/i.test(title) });
+    decisions.set(id, { id, title, deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
   }
   const profile = /\*\*Stack profile:\*\*\s*`?([a-z0-9-]+)`?/i.exec(text)?.[1]?.toLowerCase();
   return { decisions, profile: profile ? (PROFILE_ALIASES[profile] ?? profile) : null, problems };
@@ -58,7 +58,7 @@ export function parseRequirements(text) {
   for (const match of text.matchAll(pattern)) {
     const [, id, title] = match;
     if (requirements.has(id)) problems.push(error('duplicate-requirement', `${DOCS.requirements}:${lineOf(text, match.index)}`, `${id} is defined twice`));
-    requirements.set(id, { id, title: title.trim(), deferred: /\(deferred\)/i.test(title) });
+    requirements.set(id, { id, title: title.trim(), deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
   }
   return { requirements, problems };
 }
@@ -423,13 +423,13 @@ export function checkProject(project, { strict = false } = {}) {
   if (decisions) {
     const used = cited('decision_refs');
     for (const decision of decisions.values()) {
-      if (!decision.deferred && !used.has(decision.id)) found.push(gap('uncovered-decision', DOCS.decisions, `${decision.id} (${decision.title}) is implemented by no issue: scope dropped silently, or mark it (deferred)`));
+      if (!decision.deferred && !decision.existing && !used.has(decision.id)) found.push(gap('uncovered-decision', DOCS.decisions, `${decision.id} (${decision.title}) is implemented by no issue: scope dropped silently, or mark it (deferred) or, if the code already does it, (existing)`));
     }
   }
   if (requirements) {
     const used = cited('requirement_refs');
     for (const requirement of requirements.values()) {
-      if (!requirement.deferred && !used.has(requirement.id)) found.push(gap('uncovered-requirement', DOCS.requirements, `${requirement.id} (${requirement.title}) is implemented by no issue, or mark it (deferred)`));
+      if (!requirement.deferred && !requirement.existing && !used.has(requirement.id)) found.push(gap('uncovered-requirement', DOCS.requirements, `${requirement.id} (${requirement.title}) is implemented by no issue, or mark it (deferred) or (existing)`));
     }
   }
   return found;

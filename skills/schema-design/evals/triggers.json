@@ -1,0 +1,10 @@
+[
+  { "query": "PRD aprobado. Diseñemos el schema de Firestore para el marketplace de canchas: colecciones, tipos TypeScript, quién cambia el estado de una reserva.", "should_trigger": true },
+  { "query": "Our profile is fastapi-react. Design the Postgres tables, the Pydantic Create/Read schemas and the booking state machine with the endpoint that owns each transition.", "should_trigger": true },
+  { "query": "¿Qué va en Firestore y qué en RTDB para el chat y la presencia de los repartidores? Necesito el modelo de datos completo con índices.", "should_trigger": true },
+  { "query": "modelo de datos para la app de pedidos por QR: entidades, relaciones, qué campos solo escribe el servidor, índices que vamos a necesitar y riesgos de documentos calientes", "should_trigger": true },
+  { "query": "Write the DATA_SCHEMA.md: tables, indexes per query, denormalized columns with who keeps them consistent, and the Alembic migration story.", "should_trigger": true },
+  { "query": "Ya está el FIREBASE_SCHEMA.md. Ahora define el monorepo, el inventario de Cloud Functions con su service account, el CI/CD y las alertas.", "should_trigger": false, "use_instead": "system-architecture" },
+  { "query": "Escribe los requisitos funcionales con criterios de aceptación para el módulo de reservas.", "should_trigger": false, "use_instead": "product-requirements" },
+  { "query": "¿Cuáles son las convenciones de este stack para timestamps y ids en Firestore? Solo quiero la regla, no diseñar nada.", "should_trigger": false, "use_instead": "stack-profile-flutter-firebase" }
+]

@@ -1,0 +1,25 @@
+{
+  "name": "{{project_name}}",
+  "version": "0.1.0",
+  "private": true,
+  "description": "{{project_title}}",
+  "engines": {
+    "node": ">={{node_version}}",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "emulators": "firebase emulators:start --import=./emulator-data --export-on-exit",
+    "emulators:test": "firebase emulators:exec --only firestore,functions,auth 'pnpm -r test:integration'",
+    "rules:test": "firebase emulators:exec --only firestore 'pnpm --filter functions test:rules'",
+    "deploy:staging": "firebase use staging && firebase deploy",
+    "deploy:prod": "firebase use prod && firebase deploy"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0",
+    "typescript": "^5.5.0"
+  }
+}

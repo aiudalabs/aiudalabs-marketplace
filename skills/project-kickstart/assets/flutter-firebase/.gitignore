@@ -1,0 +1,92 @@
+# Node / TypeScript
+node_modules/
+*.log
+.npm
+.pnpm-debug.log*
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.turbo/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+android/.gradle/
+android/local.properties
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/key.properties
+*.iml
+.idea/
+.vscode/
+# Lock files are ignored except pubspec.lock
+*.lock
+!pubspec.lock
+!**/pubspec.lock
+
+# Melos
+.melos_tool/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*.local
+.runtimeconfig.json
+serviceAccountKey.json
+**/firebase-config.json
+
+# Firebase emulator data — opt in to commit seeded data, ignore the rest
+emulator-data/.cache/
+emulator-data/auth_export/.*
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE / OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Testing & coverage
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+
+# Flutter web build outputs
+lib/generated_plugin_registrant.dart
+
+# IntelliJ / Android Studio
+*.iws
+out/
+
+# CI / temp
+tmp/
+temp/

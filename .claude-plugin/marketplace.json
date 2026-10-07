@@ -34,6 +34,75 @@
       ]
     },
     {
+      "name": "aiuda-stack",
+      "description": "Idea to shipped product on Flutter + Firebase + a React admin: the seven-phase spec, a scaffolded monorepo, a backlog in waves whose consistency is checked by code, developer agents that each own a lane, a QA reviewer, sprints run in parallel worktrees, and guardrails (git hooks, CI and an editor hook) that refuse changes outside the active issue. Also brings existing repositories into the method.",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/product-discovery",
+        "./skills/stack-profile-flutter-firebase",
+        "./skills/stack-profile-fastapi-react",
+        "./skills/product-requirements",
+        "./skills/spec-guard",
+        "./skills/issue-delivery",
+        "./skills/issue-review",
+        "./skills/project-kickstart",
+        "./skills/project-adopt",
+        "./skills/operational-readiness",
+        "./skills/html-spec-generator",
+        "./skills/system-architecture",
+        "./workflows/product-spec-orchestrator",
+        "./skills/schema-design",
+        "./skills/ui-screens-spec",
+        "./skills/multi-agent-governance",
+        "./skills/navegable-mockups",
+        "./workflows/sprint-runner",
+        "./skills/execution-router"
+      ],
+      "agents": [
+        "./agents/product/product-advisor.md",
+        "./agents/engineering/flutter-dev.md",
+        "./agents/engineering/firebase-dev.md",
+        "./agents/engineering/react-dev.md",
+        "./agents/engineering/qa-tester.md"
+      ]
+    },
+    {
+      "name": "aiuda-stack-fastapi",
+      "description": "The aiuda-stack method on Python (FastAPI + SQLAlchemy + Alembic + Postgres) with a React frontend: the seven-phase spec, a scaffolded repo, a backlog in waves checked by code, python-dev and react-dev agents with lanes, a QA reviewer, sprints in parallel worktrees, and guardrails that refuse changes outside the active issue.",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/product-discovery",
+        "./skills/stack-profile-flutter-firebase",
+        "./skills/stack-profile-fastapi-react",
+        "./skills/product-requirements",
+        "./skills/spec-guard",
+        "./skills/issue-delivery",
+        "./skills/issue-review",
+        "./skills/project-kickstart",
+        "./skills/project-adopt",
+        "./skills/operational-readiness",
+        "./skills/html-spec-generator",
+        "./skills/system-architecture",
+        "./workflows/product-spec-orchestrator",
+        "./skills/schema-design",
+        "./skills/ui-screens-spec",
+        "./skills/multi-agent-governance",
+        "./skills/navegable-mockups",
+        "./workflows/sprint-runner",
+        "./skills/execution-router"
+      ],
+      "agents": [
+        "./agents/product/product-advisor.md",
+        "./agents/engineering/python-dev.md",
+        "./agents/engineering/react-dev.md",
+        "./agents/engineering/qa-tester.md"
+      ]
+    },
+    {
       "name": "brand-identity",
       "description": "Build and maintain a visual identity: the Brand Guardian persona plus skills for the strategy brief, visual directions, color system, typography system, logo, design tokens, asset kit, brand guidelines, brand review and the full end-to-end process.",
       "version": "0.3.0",
@@ -93,6 +162,31 @@
       ],
       "agents": [
         "./agents/strategy/positioning-red-team.md"
+      ]
+    },
+    {
+      "name": "product-spec",
+      "description": "Take a product idea to a buildable spec in seven gated phases: discovery with locked decisions, a PRD with Given/When/Then requirements, the data schema, UI screens, architecture, an agent roster with a sprint backlog checked by code, and navigable mockups. Includes the operational readiness track (legal, banking, app stores) and the product advisor. Stack-agnostic: Flutter + Firebase or FastAPI + React.",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/product-discovery",
+        "./skills/stack-profile-flutter-firebase",
+        "./skills/stack-profile-fastapi-react",
+        "./skills/product-requirements",
+        "./skills/spec-guard",
+        "./skills/operational-readiness",
+        "./skills/html-spec-generator",
+        "./skills/system-architecture",
+        "./workflows/product-spec-orchestrator",
+        "./skills/schema-design",
+        "./skills/ui-screens-spec",
+        "./skills/multi-agent-governance",
+        "./skills/navegable-mockups"
+      ],
+      "agents": [
+        "./agents/product/product-advisor.md"
       ]
     },
     {

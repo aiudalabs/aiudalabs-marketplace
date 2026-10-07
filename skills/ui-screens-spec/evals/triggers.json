@@ -1,0 +1,10 @@
+[
+  { "query": "El schema ya está aprobado. Diseñemos las pantallas de la app del cliente y la del proveedor, con navegación y estados vacío/cargando/error.", "should_trigger": true },
+  { "query": "qué pantallas necesito para la app de pedidos por QR y el display de cocina? los cocineros usan guantes, ojo con los tap targets", "should_trigger": true },
+  { "query": "Write the screen spec for our booking app: numbered screen ids, header/body/CTA/navigation/data/permissions per screen, design tokens and the component inventory.", "should_trigger": true },
+  { "query": "Necesito wireframes en texto de todas las pantallas del dashboard admin, con los datos que lee cada una y qué requisitos FR cubre.", "should_trigger": true },
+  { "query": "Pick the five key screens per app we should validate visually later, and lock the reusable components and tokens before the UI sprints.", "should_trigger": true },
+  { "query": "Con el UI_SCREENS.md listo, genera los mockups HTML navegables de las 5 pantallas clave para mostrárselos al inversionista.", "should_trigger": false, "use_instead": "navegable-mockups" },
+  { "query": "Build me a full color palette with dark mode from our brand teal #0f766e and check the contrast.", "should_trigger": false, "use_instead": "color-system" },
+  { "query": "Define el inventario de endpoints y workers, el pipeline de CI y la observabilidad del sistema.", "should_trigger": false, "use_instead": "system-architecture" }
+]
