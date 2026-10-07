@@ -75,6 +75,23 @@ export function parseRequirements(text) {
   return { requirements, problems };
 }
 
+// ---------------------------------------------------------------- citations
+
+// Documents that cite decisions and requirements without defining them.
+const DEFINING = new Set(['OPINIONATED_DEFAULTS.md', 'PRD.md', 'ISSUES.md', 'TRIAL_LOG.md', 'SESSION.md', 'WAVE_DAG.md']);
+
+// Every D-xx and FR-... id a document cites, with its line. Fenced code is skipped.
+export function citations(text) {
+  const found = [];
+  let fenced = false;
+  text.split('\n').forEach((line, index) => {
+    if (/^\s*```/.test(line)) fenced = !fenced;
+    if (fenced) return;
+    for (const match of line.matchAll(/\b(D-\d{2,}|FR-(?:[A-Z][A-Z0-9]*-)*\d+)\b/g)) found.push({ id: match[1], line: index + 1 });
+  });
+  return found;
+}
+
 // ---------------------------------------------------------------- brief
 
 export const BRIEF_HEADINGS = ['Tagline', 'Apps', 'Market', 'User groups', 'Core value loop', 'Personas and jobs', 'Adversarial analysis', 'Do-not-build list'];
@@ -403,6 +420,13 @@ export function checkProject(project, { strict = false } = {}) {
     }
   }
 
+  for (const { file, cites } of project.citing ?? []) {
+    for (const { id, line } of cites) {
+      const known = id.startsWith('D-') ? decisions : requirements;
+      if (known && !known.has(id)) found.push(error('dangling-ref', `docs/${file}:${line}`, `cites ${id}, which is not in ${id.startsWith('D-') ? DOCS.decisions : DOCS.requirements}`));
+    }
+  }
+
   // Before Phase 6 there is no backlog yet: the documents that exist are checked, and that is all.
   if (!issues) return found;
   if (!roster) found.push(warning('no-roster', DOCS.roster, 'no agent roster found, so owners and lanes are not checked'));
@@ -549,6 +573,7 @@ export function readProject(root) {
     issuesText,
     rosterFile,
     brief: briefText && briefText.trim() ? parseBrief(briefText) : null,
+    citing: existsSync(join(root, 'docs')) ? readdirSync(join(root, 'docs')).filter((name) => name.endsWith('.md') && !DEFINING.has(name)).map((file) => ({ file, cites: citations(read(root, `docs/${file}`)) })) : [],
     // Before Phase 1 the scaffold's AGENTS.md is the only place the profile is written.
     profile: decisions?.profile ?? (parseDecisions(read(root, 'AGENTS.md') ?? '').profile),
     decisions: decisions && decisions.decisions.size ? decisions.decisions : null,

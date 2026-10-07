@@ -210,6 +210,15 @@ test('check: the brief headings and the jobs the PRD traces', (t) => {
   assert.deepEqual(codes(checkProject(readProject(dir)), 'warning'), ['brief-format'], 'an old brief only warns');
 });
 
+test('check: other documents may only cite decisions and requirements that exist', (t) => {
+  const dir = copyExample(t);
+  writeFileSync(join(dir, 'docs/FIREBASE_SCHEMA.md'), '# Schema\n\nBookings serve FR-BOOKING-1 and D-03.\n\n```\nexample D-99\n```\n');
+  assert.deepEqual(checkProject(readProject(dir)), []);
+  writeFileSync(join(dir, 'docs/UI_SCREENS.md'), '# Screens\n\nServes FR-BOOKING-7 under D-42.\n');
+  const found = checkProject(readProject(dir));
+  assert.deepEqual(found.map((p) => [p.code, p.where]), [['dangling-ref', 'docs/UI_SCREENS.md:3'], ['dangling-ref', 'docs/UI_SCREENS.md:3']]);
+});
+
 test('install and hooks: commits and agent edits stay inside the active issue', { skip: !hasGit && 'git is not installed' }, (t) => {
   const dir = copyExample(t);
   const git = (...args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8' });
