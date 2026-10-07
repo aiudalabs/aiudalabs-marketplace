@@ -125,7 +125,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Backlog is consistent
         run: node ${TOOLS}/spec.mjs check --strict
       - name: Pull request stays inside its issue

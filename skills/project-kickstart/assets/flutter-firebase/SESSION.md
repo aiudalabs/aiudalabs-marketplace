@@ -1,33 +1,29 @@
-# Session State — {{project_title}}
-_Written by the spec skills at the end of each phase. `node tools/spec-guard/spec.mjs status` reports the same progress from the files on disk; when they disagree, the files win._
+# Session — {{project_title}}
 
-## Workflow progress
-| Phase | Skill | Status |
-|---|---|---|
-| 1 | product-discovery | ⏳ Pending |
-| 2 | product-requirements | ⏳ Pending |
-| 3 | schema-design | ⏳ Pending |
-| 4 | ui-screens-spec | ⏳ Pending |
-| 5 | system-architecture | ⏳ Pending |
-| 6 | multi-agent-governance | ⏳ Pending |
-| 7 | navegable-mockups | ⏳ Pending (optional) |
+_Narrative for the next session. What is done is decided by `node tools/spec-guard/spec.mjs status`, which reads the documents; when they disagree, status wins._
 
-## Last completed
-_None — start the product-spec workflow to begin._
+## Phases
 
-## Key decisions locked
-_None yet._
+| Phase | Skill | State |
+| --- | --- | --- |
+| 1 | product-discovery | pending |
+| 2 | product-requirements | pending |
+| 3 | schema-design | pending |
+| 4 | ui-screens-spec | pending |
+| 5 | system-architecture | pending |
+| 6 | multi-agent-governance | pending |
+| 7 | navegable-mockups | pending |
+
+## Last phase: 0 — project-kickstart
+
+- Repository scaffolded with the {{profile}} profile; apps: {{apps_included}}.
+- Agents and skills installed for the {{harness}} harness; spec-guard tools, hooks and CI installed.
+- Aiuda Labs look for HTML deliverables: {{aiuda_look}}.
 
 ## Open questions
-_None._
 
-## Sprint execution state
-_Not in build phase._
+- None.
 
-## Next recommended action
+## Next
 
-To start the full design workflow:
-> "Quiero diseñar un producto nuevo. [Describe tu idea en una frase.]"
-
-Or run a single phase directly:
-> "Diseñemos el schema de datos" (Phase 3, needs the Phase 1 and 2 docs)
+Phase 1 — `product-discovery`, through `product-spec-orchestrator`: "Quiero diseñar un producto nuevo. Es {descripción}."

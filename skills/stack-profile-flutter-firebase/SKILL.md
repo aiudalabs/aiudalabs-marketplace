@@ -51,7 +51,7 @@ Cloud Functions (2nd gen) in four patterns: **callable** (client to server), **t
 
 - **Monorepo:** `melos.yaml` for Flutter packages, `pnpm-workspace.yaml` for TypeScript.
 - **Dev loop:** emulator-first: one `firebase emulators:start --import=./emulator-data --export-on-exit` (functions included) plus the functions package's `build:watch`, which recompiles while the emulator reloads. Never a second functions emulator, never production Firestore.
-- **Test gate:** `flutter analyze`, `melos run test`, `pnpm --filter functions test`, `pnpm --filter admin lint` and `pnpm --filter admin typecheck`. All green before a merge.
+- **Test gate:** `flutter analyze`, `melos run test`, `pnpm --dir functions run test`, `pnpm --dir admin run lint` and `pnpm --dir admin run build` (`--dir … run` fails when a script is missing; `--filter` exits 0 when nothing matches). All green before a merge.
 - **CI:** GitHub Actions or Bitbucket Pipelines. Pull request: lint, types, tests, build, in one workflow per lane (`flutter.yml`, `firebase.yml`, `admin.yml`). Merge to `develop`: deploy to staging. Tag `v*` on `main`: manual approval, then production.
 - **Extra Phase 5 output:** `docs/IAM_REQUIREMENTS.md` (service accounts, APIs, secrets, per-function IAM) is required for this profile because it runs on managed cloud.
 

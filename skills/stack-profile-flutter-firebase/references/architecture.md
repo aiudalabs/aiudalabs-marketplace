@@ -210,9 +210,9 @@ deploy-sa           CI deploys through OIDC; a JSON key only as a last resort
 ```bash
 melos bootstrap && pnpm install && firebase use {project-id}
 firebase emulators:start --import=./emulator-data --export-on-exit   # the one emulator suite, functions included
-pnpm --filter <functions-package> build:watch   # tsc --watch; the functions emulator reloads the compiled output
+pnpm --dir functions run build:watch   # tsc --watch; the functions emulator reloads the compiled output
 cd apps/{app} && flutter run      # connects to the emulator through env
-pnpm --filter <admin-package> dev # Vite dev server
+pnpm --dir admin run dev           # Vite dev server
 ```
 
 Only one command starts emulators. The functions package has `build` and `build:watch` scripts and no script that starts a second functions emulator (two of them clash on port 5001).

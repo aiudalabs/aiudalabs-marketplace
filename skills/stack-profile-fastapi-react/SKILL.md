@@ -50,7 +50,7 @@ Four patterns: **endpoint** (FastAPI route, client to server), **webhook** (HMAC
 ## 6. Tooling and gates
 
 - **Package:** src-layout, `pyproject.toml`, pinned dependencies, console-script entry points; pnpm for the React apps. No `PYTHONPATH` or `sys.path` hacks, ever.
-- **Test gate:** `python -m pytest -q`, plus `pnpm --filter <app> lint` and `pnpm --filter <app> typecheck` for each frontend.
+- **Test gate:** `python -m pytest -q`, plus `pnpm --dir frontend/<app> run lint` and `pnpm --dir frontend/<app> run build` for each frontend (`--dir … run` fails when a script is missing).
 - **Dev loop:** editable install, SQLite by default (zero infrastructure), Compose for the full stack; end-to-end Compose tests opt-in through an environment variable.
 - **CI:** pull request runs lint, typecheck, pytest on SQLite and a pytest job against a Postgres service; a tag on main builds the image and deploys.
 - **No `IAM_REQUIREMENTS.md`:** deploy identity, secrets and ingress are a section of `ARCHITECTURE.md` for this self-hosted profile.
