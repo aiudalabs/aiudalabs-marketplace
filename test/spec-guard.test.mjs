@@ -179,6 +179,18 @@ test('spec.mjs: check exit codes, and export refuses a backlog with errors', (t)
   assert.match(exported.stderr, /error/);
 });
 
+test('check runs before there is a backlog, on the documents that exist', (t) => {
+  const dir = copyExample(t);
+  rmSync(join(dir, 'docs/ISSUES.md'));
+  assert.deepEqual(checkProject(readProject(dir), { strict: true }), [], 'decisions, PRD and roster alone are fine');
+  const ok = run([join(SCRIPTS, 'spec.mjs'), 'check', '--strict', '--root', dir]);
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.match(ok.stdout, /No backlog yet/);
+  edit(dir, 'PRD.md', '- Given a free slot', '- Serves D-09. Given a free slot');
+  assert.deepEqual(codes(checkProject(readProject(dir))), ['unknown-decision'], 'a PRD citing a decision that does not exist');
+  assert.equal(run([join(SCRIPTS, 'spec.mjs'), 'impact', 'D-01', '--root', dir]).status, 2, 'impact still needs a backlog');
+});
+
 test('install and hooks: commits and agent edits stay inside the active issue', { skip: !hasGit && 'git is not installed' }, (t) => {
   const dir = copyExample(t);
   const git = (...args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8' });

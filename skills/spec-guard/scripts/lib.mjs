@@ -55,11 +55,16 @@ export function parseRequirements(text) {
   const requirements = new Map();
   const problems = [];
   const pattern = new RegExp(`^#{1,6}\\s+(FR-[A-Z0-9]+(?:-\\d+)?)${DASH}(.+)$`, 'gm');
-  for (const match of text.matchAll(pattern)) {
+  const matchesFound = [...text.matchAll(pattern)];
+  matchesFound.forEach((match, index) => {
     const [, id, title] = match;
-    if (requirements.has(id)) problems.push(error('duplicate-requirement', `${DOCS.requirements}:${lineOf(text, match.index)}`, `${id} is defined twice`));
-    requirements.set(id, { id, title: title.trim(), deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
-  }
+    const line = lineOf(text, match.index);
+    if (requirements.has(id)) problems.push(error('duplicate-requirement', `${DOCS.requirements}:${line}`, `${id} is defined twice`));
+    // The decisions a requirement cites, in its section, so a dangling D-xx is caught before any backlog exists.
+    const section = text.slice(match.index + match[0].length, matchesFound[index + 1]?.index ?? text.length).split(/^#{1,3}\s/m)[0];
+    const cites = [...new Set([...section.matchAll(/\bD-(\d{2,})\b/g)].map((m) => `D-${m[1]}`))];
+    requirements.set(id, { id, title: title.trim(), line, cites, deferred: /\(deferred\)/i.test(title), existing: /\(existing\)/i.test(title) });
+  });
   return { requirements, problems };
 }
 
@@ -343,11 +348,12 @@ export function checkProject(project, { strict = false } = {}) {
   const at = (issue) => `${DOCS.issues}:${issue.line}`;
   const gap = strict ? error : warning;
 
-  if (!issues) return [...found, error('no-issues', DOCS.issues, 'no backlog found; multi-agent-governance writes it')];
-  if (!roster) found.push(warning('no-roster', DOCS.roster, 'no agent roster found, so owners and lanes are not checked'));
-  if (!decisions) found.push(warning('no-decisions', DOCS.decisions, 'no decisions document found, so decision_refs are not checked'));
-  if (!requirements) found.push(warning('no-requirements', DOCS.requirements, 'no PRD found, so requirement_refs are not checked'));
   if (decisions && !project.profile) found.push(warning('no-profile', DOCS.decisions, 'no `**Stack profile:**` line; the stack is not locked'));
+  if (decisions && requirements) {
+    for (const requirement of requirements.values()) {
+      for (const ref of requirement.cites) if (!decisions.has(ref)) found.push(error('unknown-decision', `${DOCS.requirements}:${requirement.line}`, `${requirement.id} cites ${ref}, which is not in ${DOCS.decisions}`));
+    }
+  }
 
   if (roster) {
     const lanes = [...roster.agents.values()].filter((agent) => agent.owns?.length);
@@ -358,6 +364,12 @@ export function checkProject(project, { strict = false } = {}) {
       }
     }
   }
+
+  // Before Phase 6 there is no backlog yet: the documents that exist are checked, and that is all.
+  if (!issues) return found;
+  if (!roster) found.push(warning('no-roster', DOCS.roster, 'no agent roster found, so owners and lanes are not checked'));
+  if (!decisions) found.push(warning('no-decisions', DOCS.decisions, 'no decisions document found, so decision_refs are not checked'));
+  if (!requirements) found.push(warning('no-requirements', DOCS.requirements, 'no PRD found, so requirement_refs are not checked'));
 
   const ids = new Map();
   for (const issue of issues) {

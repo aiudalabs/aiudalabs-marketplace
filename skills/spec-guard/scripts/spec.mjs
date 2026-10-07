@@ -59,7 +59,7 @@ const subjects = (ref, extra = []) => (git(['log', '--format=%s', ...extra, ref]
 
 function load() {
   const project = readProject(root);
-  if (!project.issues && command !== 'status') fail(`no backlog at ${DOCS.issues}; run the multi-agent-governance skill first`);
+  if (!project.issues && !['status', 'check'].includes(command)) fail(`no backlog at ${DOCS.issues}; run the multi-agent-governance skill first`);
   return project;
 }
 
@@ -79,7 +79,10 @@ function check() {
   } else {
     const errors = print(problems);
     const warnings = problems.length - errors;
-    console.log(`\n${project.issues.length} issues checked: ${errors} error(s), ${warnings} warning(s).${errors ? '' : ' The backlog is consistent.'}`);
+    const checked = [project.decisions && `${project.decisions.size} decisions`, project.requirements && `${project.requirements.size} requirements`, project.roster && `${project.roster.agents.size} agents`, project.issues && `${project.issues.length} issues`].filter(Boolean);
+    const scope = checked.length ? checked.join(', ') : 'no spec documents yet';
+    const verdict = errors ? '' : project.issues ? ' The backlog is consistent.' : ' No backlog yet: multi-agent-governance writes it in Phase 6.';
+    console.log(`\nChecked ${scope}: ${errors} error(s), ${warnings} warning(s).${verdict}`);
   }
   process.exitCode = problems.some((problem) => problem.level === 'error') ? 1 : 0;
 }
