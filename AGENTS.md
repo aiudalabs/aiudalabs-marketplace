@@ -94,6 +94,8 @@ CI runs the last two and fails when generated files are stale.
 
 Start any new component with `node bin/cli.mjs new <kind> <name>` (agents also take `--category`). It writes the skeleton in the right place and marks what to fill in with `TODO`.
 
+When the `component-author` workflow is installed in your harness, follow it to create a component, and have `component-reviewer` read the result before the pull request. Both live in this repository (`workflows/component-author`, `agents/marketplace/component-reviewer.md`).
+
 **Add a skill**: create `skills/<name>/SKILL.md`, keep the body under 500 lines, move detail to `references/`, then run the three commands above.
 
 **Add an agent**: create `agents/<category>/<name>.md`, list its skills in `requires` and name them in the body's "Skills" section, keep the body a persona.

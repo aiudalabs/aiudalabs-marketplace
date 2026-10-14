@@ -241,6 +241,22 @@
       "path": "agents/latex/latex-layout-auditor.md"
     },
     {
+      "name": "component-reviewer",
+      "description": "Independent reviewer of components for the aiudalabs marketplace. Reads a new or changed skill, agent, workflow, stack or external cold, without having seen how it was written, and reports what would make a maintainer send it back: a verdict, ready or needs changes, then findings by severity with the file, the line and the fix. Never edits files. Use when someone asks to review a component, to check a new agent or skill, or whether a component is ready for a pull request, and above all when the session that would otherwise review it is the one that wrote it. Only works inside a clone of the marketplace repository.",
+      "version": "0.1.0",
+      "category": "marketplace",
+      "requires": [
+        "component-review"
+      ],
+      "tags": [
+        "marketplace",
+        "review",
+        "contributing",
+        "quality"
+      ],
+      "path": "agents/marketplace/component-reviewer.md"
+    },
+    {
       "name": "product-advisor",
       "description": "Product critic who reviews a product spec across its design phases and reports contradictions, scope creep, unverified assumptions, missing pieces and decisions that never reach the schema, screens or architecture, without editing any document. Use when the user wants an adversarial review of the spec before building, asks what they are missing, or wants to know whether the phases are coherent (\"revisa el diseño\", \"qué se nos escapa\", \"challenge the spec\").",
       "version": "1.0.0",
@@ -546,6 +562,7 @@
       "tools": [],
       "path": "skills/brand-guidelines",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/brand-guidelines-template.md",
@@ -582,6 +599,7 @@
       "tools": [],
       "path": "skills/brand-strategy-brief",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/brand-brief-template.md",
         "evals/triggers.json",
@@ -632,6 +650,7 @@
       "tools": [],
       "path": "skills/color-system",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/palette.template.json",
         "evals/triggers.json",
@@ -653,11 +672,27 @@
       "tools": [],
       "path": "skills/competitor-research",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/competitor-research-brief.md",
         "evals/triggers.json",
         "references/competitor-analysis-framework.md",
         "scripts/perplexity_research.py"
+      ]
+    },
+    {
+      "name": "component-review",
+      "description": "Reviews a new or changed component of the aiudalabs marketplace, a skill, agent, workflow, stack or external, for what the validator cannot catch: the wrong kind, such as a procedure hiding in an agent or a persona in a skill, a description that will not trigger or that collides with a neighboring component, steps that cannot be followed without guessing, missing gates in a workflow, and license or attribution problems. Gives a short report with a verdict, ready or needs changes, then findings by severity with file, line and fix. It reports and never edits files. Use when the user asks to review a component, to check a new skill, agent or workflow, or whether a component is ready for a pull request. It checks a component that already exists; writing one is the component-author workflow. For a read by a reviewer that did not see the component being written, delegate to the component-reviewer agent, which follows this skill. Only works inside a clone of the marketplace repository.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [
+        "node"
+      ],
+      "path": "skills/component-review",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -683,6 +718,7 @@
       "tools": [],
       "path": "skills/design-tokens",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/example.tokens.json",
@@ -740,6 +776,7 @@
       "tools": [],
       "path": "skills/homepage-copy-audit",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/homepage-rewrite-template.md",
         "evals/triggers.json",
@@ -1255,6 +1292,7 @@
       "tools": [],
       "path": "skills/startup-positioning-audit",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/audit-report-template.md",
         "assets/executive-summary-template.md",
@@ -1311,6 +1349,7 @@
       "tools": [],
       "path": "skills/typography-system",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "evals/triggers.json",
@@ -1502,6 +1541,27 @@
         "section-writer",
         "source-reformulator",
         "spec-auditor"
+      ]
+    },
+    {
+      "name": "component-author",
+      "description": "Creates a new component for the aiudalabs marketplace, a skill, an agent, a workflow, a stack or an external, through a short interview: checks the catalog for duplicates, decides which kind the idea is, writes it from the repository's template, validates it, tries it in a harness, has it reviewed by an independent reviewer and prepares the pull request. Use when the user wants to add, create, write or port a skill, agent, workflow, stack or external to this marketplace, or asks which kind of component an idea should be. It writes a component; checking one that already exists is the component-review skill. Only works inside a clone of the marketplace repository.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [
+        "component-review"
+      ],
+      "tools": [
+        "node",
+        "git"
+      ],
+      "path": "workflows/component-author",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
+      ],
+      "agents": [
+        "component-reviewer"
       ]
     },
     {
@@ -1767,6 +1827,17 @@
       ],
       "workflows": [],
       "path": "stacks/brand-identity/stack.json"
+    },
+    {
+      "name": "contribute",
+      "description": "Add to this marketplace from inside your AI coding tool: a guided interview that turns an idea into a skill, agent, workflow, stack or external, validates it, tries it and has it read by an independent reviewer before the pull request. For people working in a clone of the marketplace repository.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [],
+      "workflows": [
+        "component-author"
+      ],
+      "path": "stacks/contribute/stack.json"
     },
     {
       "name": "edit-book",

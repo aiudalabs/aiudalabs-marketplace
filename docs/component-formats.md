@@ -60,9 +60,11 @@ The installer adds required skills automatically, and the validator fails on nam
 
 Use this sparingly. A skill should still say what to do when a required skill is missing.
 
+A skill cannot depend on an agent. It may point to one as an optional hand-off, "if it is installed", but a component that has to dispatch an agent is a [workflow](#workflows).
+
 ### Third-party content
 
-When a skill includes content adapted from another project, add a `THIRD_PARTY_NOTICES.md` file inside the skill folder with the source, what was adapted and the full license text. It must live in the skill folder, because skills are installed one folder at a time. Port only content whose license allows it, and note the origin at the top of each adapted file.
+When a skill includes content adapted from another project, add a `THIRD_PARTY_NOTICES.md` file inside the skill folder with the source, what was adapted and the full license text. It must live in the skill folder, because skills are installed one folder at a time. Port only content whose license allows it, and note the origin at the top of each adapted file. In a file with frontmatter, the `metadata.source` field is that note.
 
 ### Evals
 

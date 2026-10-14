@@ -50,10 +50,20 @@ node bin/cli.mjs new external <name>
 
 It refuses a name that breaks the naming rule or is already in use. Every part you have to write is marked `TODO`, and `npm run validate` fails until the description and, for a skill or workflow, the trigger evals in `evals/triggers.json` are written. The sections below say what goes in each one.
 
+## Or let your AI tool guide you
+
+The `contribute` stack does the same work as a conversation inside your harness. Install it into your clone:
+
+```bash
+node bin/cli.mjs add contribute --harness claude-code --dir .
+```
+
+Then say what you want to add. The [`component-author`](workflows/component-author/SKILL.md) workflow asks what it needs, checks the catalog, decides the kind with you, writes the component from the template, validates it and tries it. Before the pull request, the [`component-reviewer`](agents/marketplace/component-reviewer.md) agent reads it cold. To have an existing component checked, ask for a review of it.
+
 ## Add a skill
 
 1. Run `node bin/cli.mjs new skill <name>`, or create `skills/<name>/SKILL.md` yourself. The folder name and the `name` field must match.
-2. Write a `description` that says what the skill does and when to use it, in the third person. A harness sees only the name and this text until the skill is triggered.
+2. Write a `description` that says what the skill does and when to use it, in the third person. A harness sees only the name and this text until the skill is triggered. When another component could answer the same request, say what sets this one apart.
 3. Set `metadata.version` to `"0.1.0"`.
 4. Keep `SKILL.md` under 500 lines. Put long material in `references/`, templates in `assets/` and runnable code in `scripts/`, and link to them with relative paths.
 5. If the skill hands work to another skill, list it in `metadata.requires` and refer to it by name in the instructions. Never link to a file inside another skill's folder: each skill is installed as its own folder.
@@ -88,7 +98,7 @@ No other top-level field is allowed. Extras go under `metadata`.
 
 ## Add an agent
 
-1. Run `node bin/cli.mjs new agent <name> --category <category>`, or create `agents/<category>/<name>.md` yourself. Reuse an existing category when one fits: `book`, `design`, `latex`, `research`, `strategy`, `writing`. The name is unique across all categories.
+1. Run `node bin/cli.mjs new agent <name> --category <category>`, or create `agents/<category>/<name>.md` yourself. Reuse an existing category when one fits: `book`, `design`, `latex`, `marketplace`, `research`, `strategy`, `writing`. When none fits, use a new one-word category and add it to this list. The name is unique across all categories.
 2. Fill in `name`, `description` (who the agent is and when to delegate to it) and `version`.
 3. If the agent uses skills, list them in `requires`, and name each one in the body's "Skills" section with when to load it. The frontmatter list is for the installer; the body is what the agent reads. Use `requires`, never `skills`: Claude Code reads a `skills` field as "load these in full at startup".
 4. Write the persona using the sections in [docs/component-formats.md](docs/component-formats.md#body-1): identity, expertise, how you work, communication style, preferred tools, skills, success metrics, boundaries.
@@ -122,7 +132,7 @@ A workflow has the skill format and installs like a skill. What makes it a workf
 1. Run `node bin/cli.mjs new workflow <name>`, or create `workflows/<name>/SKILL.md` yourself, with the same rules as a skill.
 2. List the skills, workflows or externals it uses in `metadata.requires`, and the agents it dispatches in `metadata.agents`, both space-delimited. At least one of the two is required.
 3. Name each agent in the body in backticks, at the step where it is dispatched. The validator fails when a declared agent is not named.
-4. Write the process as phases. Mark each gate, the point where it stops for the person's approval, and say what is presented there.
+4. Write the process as phases. Mark each gate, the point where it stops for the person's approval, and say what is presented there and what happens on yes and on no. Put a gate before anything that is hard to undo or seen outside, such as publishing, committing or writing over existing work, and before a long phase built on a choice the model made.
 5. If it dispatches agents, say in `compatibility` that it needs a harness with subagents.
 6. Keep identities out of it. How a reviewer thinks belongs in the agent; when the reviewer is called and what happens with the result belongs here.
 
@@ -256,6 +266,7 @@ Bump the version of every component you change, including a stack whose list cha
 ## Quality bar
 
 - Your own work, or work whose license allows it to be here, with the attribution described above
+- Instructions that someone with no context can follow: every input, output and file is named
 - No secrets, private data or references to internal systems
 - Facts you can back up: do not invent tool names, API fields or paths
 - No new dependencies: the tooling and the skills' scripts run on the standard library

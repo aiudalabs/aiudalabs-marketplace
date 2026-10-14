@@ -1,0 +1,7 @@
+[
+  { "query": "Review the new agent I added in agents/operations before I open the pull request", "should_trigger": true },
+  { "query": "Is skills/meeting-notes ready for a PR? Check it against the repo's rules.", "should_trigger": true },
+  { "query": "check my new workflow in this marketplace, I think the gates might be missing", "should_trigger": true },
+  { "query": "I want to add a skill to this marketplace for writing release notes", "should_trigger": false, "use_instead": "component-author" },
+  { "query": "Review my manuscript on soil carbon like a journal referee would", "should_trigger": false, "use_instead": "paper-review" }
+]

@@ -4,7 +4,7 @@ An open-source marketplace of AI agents, skills, workflows and stacks that insta
 
 **Browse the catalog: [aiudalabs.github.io/aiudalabs-marketplace](https://aiudalabs.github.io/aiudalabs-marketplace/)**
 
-> Status: v0.1.0, not yet released. Eleven stacks are available. MCP definitions are a reserved folder with no installer support yet.
+> Status: v0.1.0, not yet released. Twelve stacks are available. MCP definitions are a reserved folder with no installer support yet.
 
 ## The idea: agents are the "who", skills are the "how"
 
@@ -48,6 +48,7 @@ Install a whole stack, or any single piece in it. Run `npx github:aiudalabs/aiud
 | [`write-book`](stacks/write-book/stack.json) | A technical or scientific nonfiction book, from idea to review-ready manuscript | Workflows `book-author`, `bookwright-writer`, `bookwright-iterator`; drafting and audit agents |
 | [`edit-book`](stacks/edit-book/stack.json) | Editorial and scientific review of a finished manuscript | Workflow `scientific-book-editor`; a panel of review agents; skills `citation-audit`, `manuscript-checks`, `line-and-copy-editor` |
 | [`publish-book`](stacks/publish-book/stack.json) | Print interiors, a Kindle EPUB, a cover and the KDP listing | Workflow `production-book-publisher`; skills `book-typesetting`, `kindle-book`, `ebook-publishing`, `kdp-audit`, `kdp-listing`; external `kindle-cover` |
+| [`contribute`](stacks/contribute/stack.json) | Adding a component to this marketplace from inside your AI tool | Workflow `component-author`; agent `component-reviewer`; skill `component-review` |
 
 The writing and research pieces come from [aimprenta](https://github.com/aiudalabs/aimprenta), which bundles open-source work from several authors. Each adapted skill carries a `THIRD_PARTY_NOTICES.md`, and each adapted agent names its source and license.
 
