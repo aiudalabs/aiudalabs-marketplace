@@ -1,0 +1,8 @@
+[
+  { "query": "I want to add a skill to the marketplace that turns meeting transcripts into decisions and owners. Walk me through it.", "should_trigger": true },
+  { "query": "Port the changelog-writer skill from github.com/some-org/agent-tools into this marketplace", "should_trigger": true },
+  { "query": "I have an idea for a reviewer persona that checks SQL migrations. Should that be an agent or a skill here? Then create it.", "should_trigger": true },
+  { "query": "Create a stack in this repo that bundles the brand skills with a new launch checklist workflow", "should_trigger": true },
+  { "query": "Is the skill I just added in skills/meeting-notes ready for a pull request?", "should_trigger": false, "use_instead": "component-review" },
+  { "query": "Write a LinkedIn article announcing our new skills marketplace", "should_trigger": false, "use_instead": "article-author" }
+]

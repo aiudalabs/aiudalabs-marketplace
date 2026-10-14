@@ -125,6 +125,20 @@
       ]
     },
     {
+      "name": "contribute",
+      "description": "Add to this marketplace from inside your AI coding tool: a guided interview that turns an idea into a skill, agent, workflow, stack or external, validates it, tries it and has it read by an independent reviewer before the pull request. For people working in a clone of the marketplace repository.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./workflows/component-author",
+        "./skills/component-review"
+      ],
+      "agents": [
+        "./agents/marketplace/component-reviewer.md"
+      ]
+    },
+    {
       "name": "edit-book",
       "description": "Editorial and scientific review of a finished book manuscript: a publishability verdict, a panel of review agents, a citation audit, a writing-clarity pass, revision and a final line and copy edit.",
       "version": "0.1.0",

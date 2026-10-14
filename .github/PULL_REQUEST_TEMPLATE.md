@@ -6,7 +6,9 @@
 
 - [ ] Agent
 - [ ] Skill
+- [ ] Workflow
 - [ ] Stack
+- [ ] External
 - [ ] Adapter
 - [ ] Tooling or docs
 

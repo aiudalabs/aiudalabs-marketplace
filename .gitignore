@@ -6,3 +6,5 @@ __pycache__/
 
 # Local harness settings for people working on this repo
 .claude/
+# Install record left by `add` when a contributor installs a stack into this clone
+.aiudalabs-marketplace.json
