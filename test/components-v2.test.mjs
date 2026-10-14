@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { getAdapter } from '../adapters/index.mjs';
-import { loadAll } from '../lib/components.mjs';
+import { listSkillFiles, loadAll } from '../lib/components.mjs';
 import { parseFrontmatter } from '../lib/frontmatter.mjs';
 import { applyInstall, expand, missingTools, planInstall, resolveReference } from '../lib/install.mjs';
 import { validateAll } from '../lib/validate.mjs';
@@ -173,4 +173,21 @@ test('missingTools reports each missing tool once, with the skills that need it'
   const { components } = fixture(t);
   const missing = missingTools(components.skills, (tool) => tool === 'python3');
   assert.deepEqual(missing, [{ tool: 'definitely-not-a-real-tool', neededBy: ['humanizer'] }]);
+});
+
+test('files an operating system leaves in a folder are not part of a component', (t) => {
+  const { root } = fixture(t, { 'skills/humanizer/.DS_Store': 'junk', 'skills/humanizer/references/Thumbs.db': 'junk', 'skills/humanizer/references/guide.md': 'A guide.' });
+  const components = loadAll(root);
+  const skill = components.skills.find((item) => item.id === 'humanizer');
+  const files = listSkillFiles(skill.dir);
+  assert.ok(files.includes('references/guide.md'));
+  assert.deepEqual(files.filter((file) => /(\.DS_Store|Thumbs\.db)$/.test(file)), []);
+
+  const target = mkdtempSync(join(tmpdir(), 'marketplace-os-files-'));
+  t.after(() => rmSync(target, { recursive: true, force: true }));
+  const plan = planInstall(expand([skill], components), getAdapter('claude-code'), { scope: 'project', baseDir: target });
+  applyInstall(plan.operations.filter((operation) => operation.id === 'humanizer'));
+  assert.ok(existsSync(join(target, '.claude/skills/humanizer/references/guide.md')));
+  assert.ok(!existsSync(join(target, '.claude/skills/humanizer/.DS_Store')));
+  assert.ok(!existsSync(join(target, '.claude/skills/humanizer/references/Thumbs.db')));
 });

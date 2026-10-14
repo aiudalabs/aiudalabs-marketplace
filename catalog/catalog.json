@@ -562,7 +562,6 @@
       "tools": [],
       "path": "skills/brand-guidelines",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/brand-guidelines-template.md",
@@ -599,7 +598,6 @@
       "tools": [],
       "path": "skills/brand-strategy-brief",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "assets/brand-brief-template.md",
         "evals/triggers.json",
@@ -650,7 +648,6 @@
       "tools": [],
       "path": "skills/color-system",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "assets/palette.template.json",
         "evals/triggers.json",
@@ -672,7 +669,6 @@
       "tools": [],
       "path": "skills/competitor-research",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "assets/competitor-research-brief.md",
         "evals/triggers.json",
@@ -718,7 +714,6 @@
       "tools": [],
       "path": "skills/design-tokens",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/example.tokens.json",
@@ -776,7 +771,6 @@
       "tools": [],
       "path": "skills/homepage-copy-audit",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "assets/homepage-rewrite-template.md",
         "evals/triggers.json",
@@ -1292,7 +1286,6 @@
       "tools": [],
       "path": "skills/startup-positioning-audit",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "assets/audit-report-template.md",
         "assets/executive-summary-template.md",
@@ -1349,7 +1342,6 @@
       "tools": [],
       "path": "skills/typography-system",
       "files": [
-        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "evals/triggers.json",
