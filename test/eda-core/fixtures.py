@@ -35,3 +35,5 @@ def make(planted=(), seed=0, n=500):
 
 META = {"target": "churned", "time_column": "t", "group_columns": ["region"], "measured_after_outcome": ["refund_issued"]}
 VOCAB = {"duplicates", "missing_by_group", "sentinel", "leakage", "simpson", "nonlinear", "changepoint", "seasonality", "join_fanout"}
+
+NEW_TYPES = {"constant_column", "near_constant_column", "all_missing_column", "label_variants", "rule_violation", "class_imbalance", "multimodal", "type_mismatch"}

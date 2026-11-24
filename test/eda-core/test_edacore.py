@@ -5,7 +5,7 @@ HERE = Path(__file__).resolve().parent
 SCRIPTS = HERE.parent.parent / "skills" / "eda-core" / "scripts"
 sys.path.insert(0, str(SCRIPTS)); sys.path.insert(0, str(HERE))
 import numpy as np, pandas as pd
-from fixtures import META, VOCAB, make
+from fixtures import META, NEW_TYPES, VOCAB, make
 from edacore.io_safe import EdaInputError, load_table, safe_name
 from edacore.scan import scan_df
 from edacore.validate import bh
@@ -89,6 +89,98 @@ class Numbers(unittest.TestCase):
         for p in ([0.001, 0.008, 0.039, 0.041, 0.042, 0.06, 0.074, 0.205, 0.212, 0.216], list(rng.random(50)), [0.5]):
             adj, _ = bh(p)
             np.testing.assert_allclose(adj, false_discovery_control(p, method="bh"), atol=1e-12)
+
+
+def one(rep, type_, col=None):
+    hits = [f for f in rep["findings"] if f["type"] == type_ and (col is None or col in f["columns"])]
+    return hits[0] if hits else None
+
+
+def small(**cols):
+    return pd.DataFrame(cols)
+
+
+class Univariate(unittest.TestCase):
+    """Phase 1: types, distributions, labels, rules, target balance. Each number is checked against pandas/scipy."""
+    def setUp(self):
+        r = np.random.default_rng(1); n = 600
+        self.df = small(age=np.r_[r.integers(18, 80, n - 3), -5, -1, 200], plan=r.choice(["basic", "Basic ", "pro", "free"], n), const=1,
+                        y=(r.random(n) < .04).astype(int), bim=np.r_[r.normal(-4, .5, n // 2), r.normal(4, .5, n - n // 2)],
+                        skewed=r.lognormal(0, .8, n), num_txt=r.integers(0, 99, n).astype(str), blank=np.nan)
+        self.rep = scan_df(self.df, {"name": "t", "rows": n}, {"target": "y", "rules": {"age": {"min": 0, "max": 120}, "plan": {"allowed": ["basic", "pro", "free"]}}})
+
+    def test_numeric_distribution_matches_scipy(self):
+        from scipy import stats
+        d = self.rep["profile"]["numeric_distribution"]["skewed"]; x = self.df.skewed.to_numpy()
+        self.assertAlmostEqual(d["median"], float(np.median(x)), places=6)
+        self.assertAlmostEqual(d["q25"], float(np.percentile(x, 25)), places=6)
+        self.assertAlmostEqual(d["skew"], float(stats.skew(x, bias=False)), places=6)
+        self.assertAlmostEqual(d["excess_kurtosis"], float(stats.kurtosis(x, bias=False)), places=6)
+
+    def test_label_variants_match_pandas(self):
+        f = one(self.rep, "label_variants", "plan")
+        norm = self.df.plan.str.strip().str.lower()
+        want = {k: sorted(set(self.df.plan[norm == k])) for k in norm.unique() if self.df.plan[norm == k].nunique() > 1}
+        self.assertEqual(f["detail"]["groups_total"], len(want))
+        from edacore.io_safe import safe_name
+        self.assertEqual(sorted(f["detail"]["groups"][0]), sorted(safe_name(x, 40) for x in want["basic"]))
+
+    def test_rule_violations_match_pandas_and_have_distinct_ids(self):
+        got = {(f["columns"][0], f["detail"]["rule"]): f for f in self.rep["findings"] if f["type"] == "rule_violation"}
+        self.assertEqual(got[("age", "min")]["estimate"], int((self.df.age < 0).sum()))
+        self.assertEqual(got[("age", "max")]["estimate"], int((self.df.age > 120).sum()))
+        self.assertEqual(got[("plan", "allowed")]["estimate"], int((~self.df.plan.isin(["basic", "pro", "free"])).sum()))
+        ids = [f["id"] for f in self.rep["findings"]]; self.assertEqual(len(ids), len(set(ids)))
+        self.assertEqual(got[("age", "min")]["detail"]["example_rows"], [int(i) for i in np.flatnonzero(self.df.age < 0)[:5]])
+
+    def test_not_null_and_unique_rules(self):
+        d = small(a=[1, 2, 2, np.nan, 5] * 10, b=[1, 2, 3, 4, 5] * 10)
+        rep = scan_df(d, {"name": "t", "rows": 50}, {"rules": {"a": {"not_null": True, "unique": True}}})
+        got = {f["detail"]["rule"]: f["estimate"] for f in rep["findings"] if f["type"] == "rule_violation"}
+        self.assertEqual(got, {"not_null": 10, "unique": int((d.a.notna() & d.a.duplicated(keep=False)).sum())})
+
+    def test_rules_in_metadata_are_data_not_code(self):
+        from edacore.scan import _check_rules
+        for bad in ({"a": {"regex": ".*"}}, {"a": {"min": "0"}}, {"a": {"allowed": "x"}}, ["a"]):
+            with self.subTest(bad=bad), self.assertRaises(EdaInputError) as cm:
+                _check_rules(bad)
+            self.assertEqual(cm.exception.code, "bad_metadata")
+
+    def test_target_balance_matches_value_counts(self):
+        f = one(self.rep, "class_imbalance", "y"); vc = self.df.y.value_counts(normalize=True)
+        self.assertAlmostEqual(f["estimate"], float(vc.min()), places=8)
+        self.assertAlmostEqual(self.rep["profile"]["target"]["majority_share"], float(vc.max()), places=8)
+
+    def test_constant_all_missing_and_type_mismatch(self):
+        self.assertIsNotNone(one(self.rep, "constant_column", "const")); self.assertIsNotNone(one(self.rep, "all_missing_column", "blank"))
+        f = one(self.rep, "type_mismatch", "num_txt"); self.assertTrue(f["detail"]["numbers_as_text"]); self.assertEqual(f["status"], "exploratory")
+        self.assertIsNone(one(self.rep, "type_mismatch", "plan"))
+
+    def test_near_constant(self):
+        d = small(x=[0] * 297 + [1, 2, 3], y=np.arange(300) % 7)
+        self.assertAlmostEqual(one(scan_df(d, {"name": "t", "rows": 300}, {}), "near_constant_column", "x")["estimate"], 0.99)
+
+    def test_multimodal_only_when_the_shape_really_has_two_modes(self):
+        self.assertIsNotNone(one(self.rep, "multimodal", "bim"))
+        r = np.random.default_rng(9)
+        for name, gen in {"normal": lambda: r.normal(size=600), "lognormal": lambda: r.lognormal(0, 1, 600), "uniform": lambda: r.random(600),
+                          "exponential": lambda: r.exponential(size=600), "t3": lambda: r.standard_t(3, 600)}.items():
+            for rep_i in range(4):
+                with self.subTest(dist=name, rep=rep_i):
+                    self.assertIsNone(one(scan_df(small(x=gen()), {"name": "t", "rows": 600}, {}), "multimodal"))
+
+    def test_new_finding_types_stay_silent_on_noise(self):
+        for seed in range(8):
+            with self.subTest(seed=seed):
+                df, _, _ = make([], seed=300 + seed)
+                got = {f["type"] for f in run_scan(df)["findings"]}
+                self.assertEqual(got & (NEW_TYPES | VOCAB), set())
+
+    def test_descriptive_output_stays_out_of_findings(self):
+        df, _, _ = make([], seed=3); rep = run_scan(df)
+        for key in ("types", "numeric_distribution", "categorical"):
+            self.assertIn(key, rep["profile"])
+        self.assertTrue(all(f["type"] in {"outlier_sensitivity"} for f in rep["findings"]))
 
 
 class Determinism(unittest.TestCase):

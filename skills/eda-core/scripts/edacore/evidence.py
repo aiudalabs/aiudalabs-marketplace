@@ -7,7 +7,10 @@ STATUSES = ("validated", "exploratory")
 
 def _clean(v):
     if isinstance(v, float):
-        return None if (math.isnan(v) or math.isinf(v)) else round(v, 8)
+        if not math.isfinite(v):
+            return None
+        v = float(v)
+        return v if abs(v) >= 1e15 else round(v, 8)  # round() overflows to inf near the float limit
     if isinstance(v, dict):
         return {str(k): _clean(x) for k, x in sorted(v.items(), key=lambda kv: str(kv[0]))}
     if isinstance(v, (list, tuple)):

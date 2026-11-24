@@ -26,6 +26,9 @@ def main(argv=None):
     except EdaInputError as exc:
         print(json.dumps({"tool": "eda-core", "error": {"code": exc.code, "message": exc.message}}, indent=1))
         return 2
+    except json.JSONDecodeError as exc:
+        print(json.dumps({"tool": "eda-core", "error": {"code": "bad_metadata", "message": f"metadata is not valid JSON: {exc.msg}"}}, indent=1))
+        return 2
     except ModuleNotFoundError as exc:
         print(json.dumps({"tool": "eda-core", "error": {"code": "missing_dependency", "message": str(exc)}}, indent=1))
         return 3
