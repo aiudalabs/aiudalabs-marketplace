@@ -1,0 +1,10 @@
+{
+  "name": "eda",
+  "description": "Exploratory data analysis with a deterministic core: one scan over every column and pair writes evidence with stable ids, corrects for multiple comparisons, and the agent reports only what the evidence shows.",
+  "version": "0.1.0",
+  "agents": [],
+  "skills": [
+    "eda-core"
+  ],
+  "workflows": []
+}

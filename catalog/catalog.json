@@ -546,6 +546,7 @@
       "tools": [],
       "path": "skills/brand-guidelines",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/brand-guidelines-template.md",
@@ -582,6 +583,7 @@
       "tools": [],
       "path": "skills/brand-strategy-brief",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/brand-brief-template.md",
         "evals/triggers.json",
@@ -632,6 +634,7 @@
       "tools": [],
       "path": "skills/color-system",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/palette.template.json",
         "evals/triggers.json",
@@ -653,6 +656,7 @@
       "tools": [],
       "path": "skills/competitor-research",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/competitor-research-brief.md",
         "evals/triggers.json",
@@ -683,6 +687,7 @@
       "tools": [],
       "path": "skills/design-tokens",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/example.tokens.json",
@@ -716,6 +721,38 @@
       ]
     },
     {
+      "name": "eda-core",
+      "description": "Use when asked to explore a tabular dataset (CSV or TSV) and report verified findings. Runs a deterministic scan over every column and pair, returns evidence with stable ids, and says how to read it and what never to claim.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/eda-core",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/benchmark-evidence.md",
+        "references/checks.md",
+        "references/evidence-schema.md",
+        "scripts/eda_probe.py",
+        "scripts/eda_scan.py",
+        "scripts/edacore/__init__.py",
+        "scripts/edacore/checks/__init__.py",
+        "scripts/edacore/checks/association.py",
+        "scripts/edacore/checks/leakage.py",
+        "scripts/edacore/checks/missing_by_group.py",
+        "scripts/edacore/checks/quality.py",
+        "scripts/edacore/checks/relational.py",
+        "scripts/edacore/checks/stratified.py",
+        "scripts/edacore/checks/time_checks.py",
+        "scripts/edacore/evidence.py",
+        "scripts/edacore/io_safe.py",
+        "scripts/edacore/roles.py",
+        "scripts/edacore/scan.py",
+        "scripts/edacore/validate.py"
+      ]
+    },
+    {
       "name": "execution-router",
       "description": "Prepares the next sprint just in time, from the repository's real state: reads spec-guard status, the previous sprint's retro and the code that actually got merged, corrects the sprint's issues when reality moved, classifies each issue by size, scope and risk to choose its execution mode (parallel worktree or sequential, autonomous or with a human checkpoint) and its validation rigor, and rewrites that sprint's orchestrator and executor prompts in docs/SPRINT_PROMPTS.md. Use between sprints: \"prepara el sprint 3\", \"cerramos el sprint, ¿qué sigue?\", \"regenera los prompts del próximo sprint\", \"route the next sprint\". It does not plan the whole backlog (multi-agent-governance) and does not run the sprint (sprint-runner).",
       "version": "1.2.2",
@@ -740,6 +777,7 @@
       "tools": [],
       "path": "skills/homepage-copy-audit",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/homepage-rewrite-template.md",
         "evals/triggers.json",
@@ -1255,6 +1293,7 @@
       "tools": [],
       "path": "skills/startup-positioning-audit",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "assets/audit-report-template.md",
         "assets/executive-summary-template.md",
@@ -1311,6 +1350,7 @@
       "tools": [],
       "path": "skills/typography-system",
       "files": [
+        ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "evals/triggers.json",
@@ -1767,6 +1807,17 @@
       ],
       "workflows": [],
       "path": "stacks/brand-identity/stack.json"
+    },
+    {
+      "name": "eda",
+      "description": "Exploratory data analysis with a deterministic core: one scan over every column and pair writes evidence with stable ids, corrects for multiple comparisons, and the agent reports only what the evidence shows.",
+      "version": "0.1.0",
+      "agents": [],
+      "skills": [
+        "eda-core"
+      ],
+      "workflows": [],
+      "path": "stacks/eda/stack.json"
     },
     {
       "name": "edit-book",
