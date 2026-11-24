@@ -2,7 +2,9 @@
 
 Two separate things were measured. Only the first describes the code that ships.
 
-## 1. The deterministic scan (the shipped code)
+## 1. The deterministic scan (version 0.1.0 checks)
+
+The numbers in this section were measured on version 0.1.0 and cover its nine planted kinds of finding. Version 0.2.0 adds the per-column checks listed in `checks.md`. Each new finding type has a unit test that it stays silent on several noise datasets, and the multimodality check was tightened after it fired on uniform data. The noise calibration below was **not** repeated for 0.2.0, so the false-claim rate with the new checks is not measured at the same scale.
 
 Synthetic datasets with planted findings and a hidden ground truth, scored without any model. Each dataset has the same 13 columns, so column presence gives nothing away. Nine kinds of finding were planted (duplicates, missingness that depends on a group, a sentinel value, leakage, Simpson's reversal, a non-linear relation, a changepoint, seasonality, a join that multiplies rows).
 

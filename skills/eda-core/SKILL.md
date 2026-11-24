@@ -4,16 +4,20 @@ description: Use when asked to explore a tabular dataset (CSV or TSV) and report
 license: MIT
 compatibility: Python 3.12+ with numpy, pandas, scipy and agent-eda==0.1.0 (pip install numpy pandas scipy agent-eda==0.1.0). Scripts need no network access and never modify the input file.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # eda-core
 
 The scan does the counting. You read its evidence, decide what to look at next, and report. Every number in your answer must come from a finding in the evidence file.
 
+## Ask first
+
+The scan cannot know these. Ask the user, or say you are assuming them, before you interpret anything: what question the analysis serves, what one row represents, what the columns mean and their units, and what ranges or allowed values are valid. Put the last one in `rules` below.
+
 ## Run the scan
 
-1. Write `meta.json` from what the user told you. Include only what you know: `target`, `time_column`, `group_columns`, `measured_after_outcome` (columns recorded after the outcome). Leave out unknowns; the scan reports the checks it could not apply.
+1. Write `meta.json` from what the user told you. Include only what you know: `target`, `time_column`, `group_columns`, `measured_after_outcome` (columns recorded after the outcome), and `rules`, for example `{"age": {"min": 0, "max": 120}, "plan": {"allowed": ["basic", "pro"]}, "id": {"unique": true, "not_null": true}}`. Rules are data: only `min`, `max`, `allowed`, `not_null` and `unique` are read. Leave out unknowns; the scan reports the checks it could not apply.
 2. Run, from this skill's folder:
    `python scripts/eda_scan.py DATA.csv --metadata meta.json --out evidence.json`
    Add `--join OTHER.csv:KEY` for each extra table that shares a key. Add `--tokenize --map-out map.json` when column names must not appear in your context.
@@ -25,8 +29,9 @@ Each finding has `id`, `type`, `columns`, `estimate`, `p_adj`, `status`, `detail
 
 - `validated`: an exact fact (duplicates, join fan-out) or a result that survived the stated correction (Benjamini-Hochberg, or confirmation on held-out rows).
 - `exploratory`: flagged but not confirmed. Say so in the report.
-- Types: `duplicates`, `sentinel`, `missing_by_group`, `linear_association`, `nonlinear`, `simpson`, `changepoint`, `seasonality`, `join_fanout`, `leakage`, `outlier_sensitivity`. Details of each check and its thresholds: [references/checks.md](references/checks.md). The JSON layout: [references/evidence-schema.md](references/evidence-schema.md).
-- An empty findings list means nothing passed the thresholds over the coverage shown. It does not prove the data is clean.
+- Types: `duplicates`, `sentinel`, `missing_by_group`, `linear_association`, `nonlinear`, `simpson`, `changepoint`, `seasonality`, `join_fanout`, `leakage`, `outlier_sensitivity`, `rule_violation`, `label_variants`, `type_mismatch`, `constant_column`, `near_constant_column`, `all_missing_column`, `class_imbalance`, `multimodal`.
+- `profile` holds the descriptive part: types, quantiles, skew, kurtosis, top levels, target balance. It is not a list of problems; use it to explain and to choose follow-ups. Details of each check and its thresholds: [references/checks.md](references/checks.md). The JSON layout: [references/evidence-schema.md](references/evidence-schema.md).
+- An empty findings list means nothing passed the thresholds over the coverage shown. It does not prove the data is clean. The scan does not draw figures, compare groups on a numeric outcome, relate categorical columns, or run multivariate, trend, drift or train/test checks: say so when the question needs them.
 
 ## Follow up
 
