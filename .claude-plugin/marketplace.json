@@ -56,6 +56,17 @@
       ]
     },
     {
+      "name": "eda",
+      "description": "Exploratory data analysis with a deterministic core: one scan over every column and pair writes evidence with stable ids, corrects for multiple comparisons, and the agent reports only what the evidence shows.",
+      "version": "0.1.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/eda-core"
+      ],
+      "agents": []
+    },
+    {
       "name": "edit-book",
       "description": "Editorial and scientific review of a finished book manuscript: a publishability verdict, a panel of review agents, a citation audit, a writing-clarity pass, revision and a final line and copy edit.",
       "version": "0.1.0",

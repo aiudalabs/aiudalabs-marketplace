@@ -1,0 +1,10 @@
+[
+  { "query": "I have a 5,000-row customer CSV with a churn column and a timestamp. Explore it and tell me what is off or notable before we model anything", "should_trigger": true },
+  { "query": "Here is orders.csv and a customers.csv keyed by customer_id. Profile the data and report the problems you can verify with numbers", "should_trigger": true },
+  { "query": "Do an exploratory analysis of this survey export: missingness, duplicates, odd values and any strong relationships between columns", "should_trigger": true },
+  { "query": "Check this sensor log for a level shift or a repeating cycle and tell me which columns show it", "should_trigger": true },
+  { "query": "Write a SQL query that returns monthly active users from the events table", "should_trigger": false },
+  { "query": "Draw a bar chart of revenue by region for the board deck", "should_trigger": false },
+  { "query": "Fit a gradient boosting model to predict churn and tune its hyperparameters", "should_trigger": false },
+  { "query": "Review the statistics section of my paper for wording and clarity", "should_trigger": false, "use_instead": "sciwrite" }
+]
