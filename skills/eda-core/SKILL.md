@@ -4,7 +4,7 @@ description: Use when asked to explore a tabular dataset (CSV or TSV) and report
 license: MIT
 compatibility: Python 3.12+ with numpy, pandas, scipy and agent-eda==0.1.0 (pip install numpy pandas scipy agent-eda==0.1.0). Scripts need no network access and never modify the input file.
 metadata:
-  version: "0.2.0"
+  version: "0.1.0"
 ---
 
 # eda-core

@@ -606,7 +606,7 @@
     {
       "name": "eda-core",
       "description": "Use when asked to explore a tabular dataset (CSV or TSV) and report verified findings. Runs a deterministic scan over every column and pair, returns evidence with stable ids, and says how to read it and what never to claim.",
-      "version": "0.2.0",
+      "version": "0.1.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
