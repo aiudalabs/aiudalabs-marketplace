@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{{project_title}}: open the app</title>
+  <!--
+    Fallback page of the links site. Owner: firebase-dev.
+    firebase.json rewrites /r/** here: an App Link or Universal Link the app did not
+    open (app not installed, desktop browser) lands on this page with status 200.
+    It is its own file on purpose: Hosting answers a rewrite to 404.html with 404.
+    The association files live per environment in links/env/<alias>/.well-known/;
+    links/scripts/stage-links.mjs copies the deployed project's set into .well-known/.
+    Translate this copy to the product's language.
+  -->
+  <style>
+    :root { color-scheme: light dark; --bg: #ffffff; --fg: #1a1a1a; --muted: #5c5c5c; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #121212; --fg: #f2f2f2; --muted: #b0b0b0; } }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 28rem; margin: 0 auto; padding: 48px 16px; }
+    h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 12px; }
+    p { margin: 0 0 12px; }
+    .muted { color: var(--muted); font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Open the {{project_title}} app</h1>
+    <p>This link opens in the {{project_title}} app. Open the app on this phone to continue.</p>
+    <p class="muted">If the app is not installed, install it from your app store and open the link again.</p>
+  </main>
+</body>
+</html>

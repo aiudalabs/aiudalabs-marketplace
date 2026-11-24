@@ -1,0 +1,10 @@
+[
+  { "query": "Vamos a lanzar una app de reservas de canchas en Panamá que cobra con Yappy. ¿Qué necesito legalmente y en banca, cuánto tarda y cuánto cuesta?", "should_trigger": true },
+  { "query": "We're a B2B SaaS for clinics in Colombia and México. Our first mid-market prospect asked for SOC2 and a DPA. Build the launch checklist with timelines and costs.", "should_trigger": true },
+  { "query": "checklist operacional para la app interna de inventario de la empresa: SSO con Entra ID, distribución por Intune, logs de auditoría y retención de datos", "should_trigger": true },
+  { "query": "Mientras corre el Sprint 0, arma el track operacional: S.A., RUC, Aviso de Operaciones, cuenta bancaria, App Store, con la ruta crítica.", "should_trigger": true },
+  { "query": "What do we need to set up before we can legally take payments from consumers in Panamá, and what can wait until after launch?", "should_trigger": true },
+  { "query": "Red-team our positioning: is our ICP clear, are our claims credible, and are we ready to launch the offer to B2B buyers?", "should_trigger": false, "use_instead": "startup-positioning-audit" },
+  { "query": "Analiza a los competidores de nuestra app de delivery en Panamá: precios, propuesta de valor y huecos de mercado.", "should_trigger": false, "use_instead": "competitor-research" },
+  { "query": "Define la arquitectura del backend y el plan de despliegue con ambientes dev, staging y prod.", "should_trigger": false, "use_instead": "system-architecture" }
+]

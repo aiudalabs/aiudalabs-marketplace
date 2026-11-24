@@ -1,0 +1,37 @@
+[
+  {
+    "query": "My nonfiction book on the neuroscience of sleep is finished. Run the whole editorial and scientific QA on it before I publish.",
+    "should_trigger": true
+  },
+  {
+    "query": "Is my 300-page physics textbook publishable? I want peer review, a citation check, a clarity pass and a final copy edit, then a verdict.",
+    "should_trigger": true
+  },
+  {
+    "query": "/scientific-book-editor ~/books/ocean-acidification",
+    "should_trigger": true
+  },
+  {
+    "query": "Edit my book: assess it globally, check the science and the references, and propose revisions, but don't change anything until I approve.",
+    "should_trigger": true
+  },
+  {
+    "query": "Take my completed manuscript on machine learning in healthcare through the full editorial pipeline, including a whole-book coherence read.",
+    "should_trigger": true
+  },
+  {
+    "query": "I only need a line and copy edit on chapters 4 to 6, with Word tracked changes and a style sheet.",
+    "should_trigger": false,
+    "use_instead": "line-and-copy-editor"
+  },
+  {
+    "query": "The edited manuscript is approved. Produce the print interiors, EPUB and full-wrap cover.",
+    "should_trigger": false,
+    "use_instead": "production-book-publisher"
+  },
+  {
+    "query": "Run the stub, readability and claim-ledger scripts on book/chapters and paste me the output.",
+    "should_trigger": false,
+    "use_instead": "manuscript-checks"
+  }
+]

@@ -3,7 +3,7 @@ name: "kdp-audit"
 description: "Audit a book manuscript against Amazon KDP requirements: interior formatting, cover specs, metadata, and genre-specific checks. Handles technical books (LaTeX, math), fiction, and nonfiction. Produces a structured gap report with Critical and Warnings sections plus automation suggestions."
 license: "MIT"
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
   author: "Alexander Towell"
   source: "https://github.com/queelius/claude-anvil"
 ---

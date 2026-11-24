@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Act as a reviewer for Nature Communications and review my manuscript on CRISPR off-target effects. Give me Critical, Major and Minor issues.",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you check whether my methods and stats hold up? It's a mixed-effects model on 14 classrooms and I'm not sure the design supports the claims.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run a panel review of my preprint on climate tipping points: one reviewer on methods, one on statistics, one on reproducibility.",
+    "should_trigger": true
+  },
+  {
+    "query": "Before I submit to ICML, critique the paper like reviewer 2 would. Are the baselines fair and can someone reproduce the experiments?",
+    "should_trigger": true
+  },
+  {
+    "query": "Check that the references in my manuscript exist and actually support what I cite them for.",
+    "should_trigger": false,
+    "use_instead": "citation-audit"
+  },
+  {
+    "query": "Review my writing for clarity: passive voice, clutter, keyword consistency. Not the science.",
+    "should_trigger": false,
+    "use_instead": "sciwrite"
+  },
+  {
+    "query": "I want an editorial review of my whole 12-chapter book on quantum computing with a publishability verdict.",
+    "should_trigger": false,
+    "use_instead": "scientific-book-editor"
+  }
+]

@@ -1,0 +1,15 @@
+rules_version = '2';
+
+// Default deny-all baseline. Expanded by firebase-dev in Sprint 1 per
+// docs/FIREBASE_SCHEMA.md §security-rules-philosophy and per agent lane.
+//
+// Until rules are properly written, NO collection is readable or writable
+// from the client. Use the emulator for local testing.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

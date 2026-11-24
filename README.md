@@ -4,7 +4,7 @@ An open-source marketplace of AI agents, skills, workflows and stacks that insta
 
 **Browse the catalog: [aiudalabs.github.io/aiudalabs-marketplace](https://aiudalabs.github.io/aiudalabs-marketplace/)**
 
-> Status: v0.1.0, not yet released. Eight stacks are available. MCP definitions are a reserved folder with no installer support yet.
+> Status: v0.1.0, not yet released. Eleven stacks are available. MCP definitions are a reserved folder with no installer support yet.
 
 ## The idea: agents are the "who", skills are the "how"
 
@@ -37,6 +37,9 @@ Install a whole stack, or any single piece in it. Run `npx github:aiudalabs/aiud
 
 | Stack | For | Main pieces |
 | --- | --- | --- |
+| [`aiuda-stack`](stacks/aiuda-stack/stack.json) | Idea to shipped product on Flutter + Firebase + a React admin, built by agents that each own a lane | Workflows `product-spec-orchestrator`, `sprint-runner`; skills `spec-guard`, `project-kickstart`, `project-adopt`; agents `flutter-dev`, `firebase-dev`, `react-dev`, `qa-tester`, `product-advisor` |
+| [`aiuda-stack-fastapi`](stacks/aiuda-stack-fastapi/stack.json) | The same method on FastAPI + Postgres with a React frontend | Same workflows and skills; agents `python-dev`, `react-dev`, `qa-tester`, `product-advisor` |
+| [`product-spec`](stacks/product-spec/stack.json) | A buildable spec without the build: idea, PRD, schema, screens, architecture, backlog, mockups | Workflow `product-spec-orchestrator`; skills `product-discovery` to `navegable-mockups`, `spec-guard`, `operational-readiness`; agent `product-advisor` |
 | [`brand-identity`](stacks/brand-identity/stack.json) | Building a visual identity, from brief to guidelines | Agent `brand-guardian`; skills `visual-identity`, `visual-directions`, `color-system`, `typography-system`, `logo-direction`, `design-tokens`, `brand-asset-kit`, `brand-guidelines`, `brand-review` |
 | [`launch-readiness`](stacks/launch-readiness/stack.json) | Pressure-testing a startup's positioning before launch | Agent `positioning-red-team`; skills `startup-positioning-audit`, `homepage-copy-audit`, `competitor-research` |
 | [`research-and-citations`](stacks/research-and-citations/stack.json) | Literature reviews and checking that every reference is real and correctly used | Agents `bibliography-auditor`, `paper-crawler`, `research-analyst`; skills `lit-review`, `citation-audit` |
@@ -65,7 +68,31 @@ npx github:aiudalabs/aiudalabs-marketplace add brand-identity --harness claude-c
 
 `list` takes a kind (`agents`, `skills`, `workflows`, `externals`, `stacks`), `--search <text>` to filter and `--full` for whole descriptions. Output is colored in a terminal; `--plain` or `NO_COLOR` turns colors off, and `--json` prints it for scripts.
 
-Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` overwrites components that are already installed. Installing an agent also installs the skills it uses, installing a workflow also installs its skills and agents, and installing a skill also installs the skills it requires.
+Useful flags for `add`: `--global` installs for your user instead of the project, `--dry-run` prints what would be written, `--force` replaces components that are already installed. Installing an agent also installs the skills it uses, installing a workflow also installs its skills and agents, and installing a skill also installs the skills it requires.
+
+### Pin the version you run
+
+`npx github:aiudalabs/aiudalabs-marketplace` runs whatever is on the default branch at that moment, including the installer itself. When you depend on the result, or run it in CI, pin a commit (or a release tag, once there are tags):
+
+```bash
+npx github:aiudalabs/aiudalabs-marketplace#<commit-or-tag> add brand-identity --harness claude-code
+```
+
+### Update and remove
+
+`add` records what it installed, with versions and a fingerprint of each file, in `.aiudalabs-marketplace.json` at the root of the project (in your home directory with `--global`). Commit it if your team shares the installed components. The other commands read it and only touch what it lists:
+
+```bash
+npx github:aiudalabs/aiudalabs-marketplace outdated                                   # what has a newer version
+npx github:aiudalabs/aiudalabs-marketplace update --harness claude-code               # upgrade everything you added
+npx github:aiudalabs/aiudalabs-marketplace remove brand-identity --harness claude-code
+```
+
+`update` leaves a component you edited after installing it alone, and says so; `--force` replaces your edits. `remove` deletes what you added and the dependencies nothing else you added still needs; it keeps files you edited, and never deletes files it did not install.
+
+### Externals without a license
+
+An external is cloned from its own repository at a pinned commit. When that repository has no license, nothing grants you the right to copy or use the code, so `add` asks before installing it. Outside a terminal it skips it, unless you pass `--allow-unlicensed`.
 
 ### Claude Code
 

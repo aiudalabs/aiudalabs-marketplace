@@ -27,9 +27,9 @@ test('the name shown in the install command is one `add` accepts', () => {
     const resolved = resolveReference(item.ref, components);
     assert.equal(`${resolved.type}/${resolved.id}`, `${item.kind}/${item.name}`);
   }
-  // An agent and a workflow share this name, so the bare name would be ambiguous.
-  assert.equal(find('workflow', 'paper-review').ref, 'workflow/paper-review');
-  assert.equal(find('agent', 'paper-review').ref, 'agent/paper-review');
+  // The validator keeps agent and skill names apart, so bare names are enough.
+  assert.equal(find('workflow', 'paper-review').ref, 'paper-review');
+  assert.equal(find('agent', 'paper-reviewer').ref, 'paper-reviewer');
   assert.equal(find('skill', 'color-system').ref, 'color-system');
 });
 
@@ -42,7 +42,7 @@ test('what a component installs and who uses it follow the real dependencies', (
 
   const usedBy = find('skill', 'citation-audit').usedBy.map((ref) => `${ref.kind}/${ref.name}`);
   assert.ok(usedBy.includes('workflow/article-author'));
-  assert.ok(find('agent', 'paper-review').usedBy.some((ref) => ref.kind === 'workflow' && ref.name === 'paper-review'));
+  assert.ok(find('agent', 'paper-reviewer').usedBy.some((ref) => ref.kind === 'workflow' && ref.name === 'paper-review'));
   assert.ok(find('external', 'kindle-cover').usedBy.some((ref) => ref.name === 'production-book-publisher'));
 
   for (const item of data.items) {

@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Can you turn our brand colors and spacing scale into a tokens file our design system can consume?",
+    "should_trigger": true
+  },
+  {
+    "query": "Validate this brand.tokens.json for me. Our build keeps choking on it and I can't see why.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need CSS custom properties for our light and dark theme, generated from one single source of truth.",
+    "should_trigger": true
+  },
+  {
+    "query": "How should we name our tokens? We have color.blue.500 hard-wired everywhere and want semantic names like action and surface.",
+    "should_trigger": true
+  },
+  {
+    "query": "Generate tints and shades of our brand blue #1d4ed8 and check them for contrast.",
+    "should_trigger": false,
+    "use_instead": "color-system"
+  },
+  {
+    "query": "Pick a modular type scale and weights for our marketing site's headings and body.",
+    "should_trigger": false,
+    "use_instead": "typography-system"
+  },
+  {
+    "query": "Find every hard-coded color in our CSS that isn't part of the brand palette.",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  }
+]

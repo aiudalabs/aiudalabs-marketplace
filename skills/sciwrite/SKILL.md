@@ -1,9 +1,9 @@
 ---
 name: "sciwrite"
-description: "Use this skill when asked to review, edit, or improve the writing quality of a scientific or engineering manuscript. Triggers include: \"review my writing,\" \"check my manuscript,\" \"improve clarity,\" \"clean up the prose,\" \"edit for journal submission,\" \"writing review,\" or any request to evaluate sentence-level quality, eliminate clutter, fix passive voice, or enforce keyword consistency in a research paper draft. Also triggers when asked to prepare a manuscript for submission to a specific journal. Do NOT use for content/technical review of methods or results, statistical analysis, or citation formatting."
+description: "Audits the writing quality of a scientific or engineering manuscript in five passes (clutter, voice and verbs, sentence architecture, terminology, numbers and citations) and reports prioritized fixes. Use for \"review my writing\", \"improve clarity\", \"clean up the prose\", \"fix passive voice\", \"keyword consistency\" or \"edit for journal submission\" in a research paper. Not for methods, results or statistics (use paper-review), not for rewriting the text in place (use manuscript-revision), and not for a book-length line and copy edit with tracked changes (use line-and-copy-editor)."
 license: "CC-BY-4.0"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "Lorena A. Barba"
   source: "https://github.com/labarba/sciwrite"
 ---

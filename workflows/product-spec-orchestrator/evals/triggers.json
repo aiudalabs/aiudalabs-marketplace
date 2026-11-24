@@ -1,0 +1,9 @@
+[
+  { "query": "Quiero diseñar de cero una app para reservar canchas de fútbol en Panamá: clientes, dueños de canchas y un admin. Llévala hasta que sea construible.", "should_trigger": true },
+  { "query": "Full product spec for a restaurant ordering app: discovery, PRD, schema, screens, architecture and the backlog, with approval between phases.", "should_trigger": true },
+  { "query": "Retomemos el spec del marketplace de tutores, creo que nos quedamos en la fase de UI.", "should_trigger": true },
+  { "query": "tengo una idea de producto B2B para inspecciones de campo y quiero todo el proceso, espec completa con mockups", "should_trigger": true },
+  { "query": "Solo quiero aterrizar la idea: el brief y las decisiones opinadas, nada de schema todavía.", "should_trigger": false, "use_instead": "product-discovery" },
+  { "query": "Ayúdame a diseñar solo el modelo de datos de Firestore para el app de pedidos; el PRD ya existe.", "should_trigger": false, "use_instead": "schema-design" },
+  { "query": "Our existing Next.js app needs a loyalty feature built by agents; set the method up in the repo.", "should_trigger": false, "use_instead": "project-adopt" }
+]

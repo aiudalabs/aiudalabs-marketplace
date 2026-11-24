@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Red team our startup's positioning. We sell AI-powered onboarding for HR teams at 200 to 1000 person companies. Be brutal.",
+    "should_trigger": true
+  },
+  {
+    "query": "We're launching next month. Are we actually ready? Here's our site, our pricing and who we think our ICP is.",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm not convinced our value prop, offer and target customer hang together for our data engineering consultancy. Tear it apart and give me a score.",
+    "should_trigger": true
+  },
+  {
+    "query": "Give my B2B SaaS a full positioning audit: category, ICP, claims, buyer objections, competition and traction.",
+    "should_trigger": true
+  },
+  {
+    "query": "Just look at our homepage hero and CTA and tell me why nobody signs up.",
+    "should_trigger": false,
+    "use_instead": "homepage-copy-audit"
+  },
+  {
+    "query": "Who else is selling AI bookkeeping to dental practices, and what do they charge?",
+    "should_trigger": false,
+    "use_instead": "competitor-research"
+  },
+  {
+    "query": "We need a brand brief with audience, positioning and brand attributes before we design our logo.",
+    "should_trigger": false,
+    "use_instead": "brand-strategy-brief"
+  }
+]

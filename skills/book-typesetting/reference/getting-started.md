@@ -6,7 +6,7 @@ discovering each item mid-flow.
 Check the machine first:
 
 ```bash
-~/.claude/skills/book-typesetting/scripts/doctor.sh
+<book-typesetting skill folder>/scripts/doctor.sh
 ```
 
 It reports what is present, what is missing, and the exact install command for
@@ -16,7 +16,7 @@ Once it passes, you can have a rendering book project in one command — you do 
 need any of the layout files yourself:
 
 ```bash
-~/.claude/skills/book-typesetting/scripts/init-book.sh \
+<book-typesetting skill folder>/scripts/init-book.sh \
     --title "My Book" --author "A. Writer" --trim 6x9 --columns 1 ./my-book
 cd my-book/typesetting && quarto render book-print.qmd --to pdf
 ```
@@ -94,7 +94,7 @@ Have answers ready; changing any of these later means redoing work.
 Word `.docx` imports directly:
 
 ```bash
-~/.claude/skills/book-typesetting/scripts/import-docx.py \
+<book-typesetting skill folder>/scripts/import-docx.py \
     manuscript.docx --target ./my-book --dry-run
 ```
 

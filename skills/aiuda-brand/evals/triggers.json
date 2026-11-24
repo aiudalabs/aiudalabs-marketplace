@@ -1,0 +1,10 @@
+[
+  { "query": "Hazme una propuesta de capacitación en IA generativa para el equipo de 20 personas de Banistmo, 4 módulos de 3 horas, con la marca de Aiuda Labs, en PDF.", "should_trigger": true },
+  { "query": "I need a one-pager for Aiuda Labs' AI automation offer to hand out at the Panamá fintech meetup, branded like our website.", "should_trigger": true },
+  { "query": "Cotización para Farmacias Arrocha: desarrollo de app de pedidos, 3 fases, B/. 18,500. Dámela branded con la identidad de aiudalabs.", "should_trigger": true },
+  { "query": "Write up the case study of the restaurant ordering app we built: challenge, solution, results with the numbers I'll paste, in Aiuda Labs style.", "should_trigger": true },
+  { "query": "statement of work para el cliente de la plataforma de reservas, con supuestos y exclusiones, con el logo y la marca de Aiuda Labs", "should_trigger": true },
+  { "query": "Document our brand rules in a guidelines doc: colors, typography, logo usage, do's and don'ts, so the new designers stop asking.", "should_trigger": false, "use_instead": "brand-guidelines" },
+  { "query": "Revisa esta landing que hizo el freelancer y dime qué no cumple con nuestra guía de marca, colores fuera de paleta y contraste.", "should_trigger": false, "use_instead": "brand-review" },
+  { "query": "Generate the architecture HTML doc from ARCHITECTURE.md with Mermaid diagrams for the dev team.", "should_trigger": false, "use_instead": "html-spec-generator" }
+]

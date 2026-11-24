@@ -1,0 +1,9 @@
+[
+  { "query": "Ya tengo brief, PRD, schema, UI_SCREENS y ARCHITECTURE de la app de reservas de canchas. Vamos al build: arma el backlog por sprints y los carriles de los agentes.", "should_trigger": true },
+  { "query": "Set up the repo for multi-agent development: AGENTS.md constitution, roster with flutter-dev and firebase-dev lanes, and an ISSUES.md for the whole MVP.", "should_trigger": true },
+  { "query": "preparemos esto para los agentes de código, el spec del restaurant ordering app ya está aprobado hasta arquitectura", "should_trigger": true },
+  { "query": "Phase 5 is approved. Now write the sprint plan, issues with files_touched and decision refs, and the prompts for Sprint 0.", "should_trigger": true },
+  { "query": "Cerramos el sprint 2 y el retro dice que el módulo de pagos se atrasó. Prepara el sprint 3 con prompts actualizados.", "should_trigger": false, "use_instead": "execution-router" },
+  { "query": "El backlog ya está listo, corre la ola 1 del sprint 0 con los agentes en worktrees.", "should_trigger": false, "use_instead": "sprint-runner" },
+  { "query": "We have a two-year-old Django app and want to start using your agents and lanes for the next feature.", "should_trigger": false, "use_instead": "project-adopt" }
+]

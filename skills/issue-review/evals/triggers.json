@@ -1,0 +1,10 @@
+[
+  { "query": "firebase-dev ya posteó el SUMMARY de S3-07, haz el QA: corre el gate, verifica el lane y dame veredicto", "should_trigger": true },
+  { "query": "Review PR #41 (S4-02 results screen) against its acceptance criteria. I want file:line for each one, not a vibe check", "should_trigger": true },
+  { "query": "¿Está S2-04 listo para merge? Valida contra los criterios de aceptación y las reglas del AGENTS.md", "should_trigger": true },
+  { "query": "Cerrar sprint 3: dime si el usuario ya puede reservar una cancha de punta a punta y escribe el retro", "should_trigger": true },
+  { "query": "Implement the changes qa-tester asked for on S3-07 and push them to the same branch", "should_trigger": false, "use_instead": "issue-delivery" },
+  { "query": "Review my manuscript on groundwater recharge like a journal referee before I submit it", "should_trigger": false, "use_instead": "paper-review" },
+  { "query": "Is this new trade-show banner on-brand? Check it against our guidelines", "should_trigger": false, "use_instead": "brand-review" },
+  { "query": "Lanza el sprint 4 completo con los agentes en paralelo por waves", "should_trigger": false, "use_instead": "sprint-runner" }
+]

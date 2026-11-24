@@ -75,7 +75,7 @@ you can see.
 ## Render + press-convert
 
 ```bash
-~/.claude/skills/book-typesetting/scripts/cover-render.sh \
+<book-typesetting skill folder>/scripts/cover-render.sh \
     --title "Your Book Title" \
     --expect 23x14.5 \
     covers/hardcover_8x10.svg

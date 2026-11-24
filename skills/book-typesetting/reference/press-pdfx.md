@@ -8,7 +8,7 @@ debug it when a printer pushes back.
 
 ```bash
 quarto render book-print.qmd --to pdf
-~/.claude/skills/book-typesetting/scripts/press-pdf.sh \
+<book-typesetting skill folder>/scripts/press-pdf.sh \
     --title "Your Book Title" \
     _output/book-print.pdf \
     _output/interior-CMYK-X1a.pdf

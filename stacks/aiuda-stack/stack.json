@@ -1,0 +1,8 @@
+{
+  "name": "aiuda-stack",
+  "description": "Idea to shipped product on Flutter + Firebase + a React admin: the seven-phase spec, a scaffolded monorepo, a backlog in waves whose consistency is checked by code, developer agents that each own a lane, a QA reviewer, sprints run in parallel worktrees, and guardrails (git hooks, CI and an editor hook) that refuse changes outside the active issue. Also brings existing repositories into the method.",
+  "version": "1.0.0",
+  "agents": ["product-advisor", "flutter-dev", "firebase-dev", "react-dev", "qa-tester"],
+  "skills": ["project-kickstart", "project-adopt", "spec-guard", "operational-readiness", "html-spec-generator"],
+  "workflows": ["product-spec-orchestrator", "sprint-runner"]
+}

@@ -1,0 +1,9 @@
+[
+  { "query": "Cerramos el sprint 2, el retro está en docs/execution. Prepara el sprint 3 con el estado real del repo.", "should_trigger": true },
+  { "query": "Regenerate the orchestrator and executor prompts for sprint 4; half of the folder paths changed since governance was written.", "should_trigger": true },
+  { "query": "¿qué issues del próximo sprint deberían llevar checkpoint humano y cuáles pueden ir en paralelo? tocamos migraciones y cobros", "should_trigger": true },
+  { "query": "Sprint 1 ended with S1-09 unmerged. Route the next sprint and tell me which issues run sequentially.", "should_trigger": true },
+  { "query": "Run sprint 3 now with the agents, wave by wave, and merge what qa approves.", "should_trigger": false, "use_instead": "sprint-runner" },
+  { "query": "El spec está completo hasta arquitectura; arma todo el backlog de 13 sprints y el AGENTS.md.", "should_trigger": false, "use_instead": "multi-agent-governance" },
+  { "query": "Implementa el issue S3-07 en su worktree, soy firebase-dev.", "should_trigger": false, "use_instead": "issue-delivery" }
+]

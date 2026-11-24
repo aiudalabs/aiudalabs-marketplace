@@ -1,0 +1,21 @@
+{
+  "//": "Typecheck only (noEmit): scripts/bundle.mjs bundles src/index.ts with esbuild. Covers src/ and test/, so tests are typechecked and linted too.",
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022"],
+    "types": ["node"],
+    "noEmit": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "lib", ".deploy"]
+}

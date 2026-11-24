@@ -1,0 +1,10 @@
+[
+  { "query": "Corre las validaciones del backlog: quiero saber si hay ciclos de dependencias o issues que tocan archivos fuera del carril de su agente en docs/ISSUES.md", "should_trigger": true },
+  { "query": "We changed decision D-03, payment now happens at request time instead of confirmation. What issues, files and commits does that touch?", "should_trigger": true },
+  { "query": "¿En qué sprint vamos y qué issues de la siguiente wave ya se pueden arrancar?", "should_trigger": true },
+  { "query": "Install the hooks so no agent can commit files outside its issue on this repo, and add the CI check", "should_trigger": true },
+  { "query": "Why does functions/src/callable/confirmBooking.ts exist? Which requirement and decision is it for?", "should_trigger": true },
+  { "query": "Write the sprint backlog with issues, owners and acceptance criteria from our PRD and architecture docs", "should_trigger": false, "use_instead": "multi-agent-governance" },
+  { "query": "Review the code firebase-dev just finished for S3-07 against its acceptance criteria and tell me if it can merge", "should_trigger": false, "use_instead": "issue-review" },
+  { "query": "Run sprint 2 with the agents: one worktree per issue, QA, and merge at the end of each wave", "should_trigger": false, "use_instead": "sprint-runner" }
+]

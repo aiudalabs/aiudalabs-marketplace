@@ -1,0 +1,9 @@
+[
+  { "query": "Arranca el repo para delivery-app: Flutter + Firebase, apps customer-app, courier-app y ops-dashboard, tracker GitHub.", "should_trigger": true },
+  { "query": "Scaffold a new fastapi-react project called invoice-hub in an empty folder, with the worker and the docker compose deploy.", "should_trigger": true },
+  { "query": "kickstart de un monorepo nuevo con melos y pnpm, todavía no sé qué apps van a ser", "should_trigger": true },
+  { "query": "Create the project structure for our court-booking marketplace before we start the spec; nothing exists yet.", "should_trigger": true },
+  { "query": "Tenemos un repo de React y Node con dos años de código; queremos meter los agentes y spec-guard para la siguiente feature.", "should_trigger": false, "use_instead": "project-adopt" },
+  { "query": "Tengo una idea de app para turnos de peluquería y quiero llevarla hasta un spec construible.", "should_trigger": false, "use_instead": "product-spec-orchestrator" },
+  { "query": "Install the spec-guard git hooks and the CI check in this repo.", "should_trigger": false, "use_instead": "spec-guard" }
+]

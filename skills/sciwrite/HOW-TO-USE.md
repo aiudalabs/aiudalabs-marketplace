@@ -44,8 +44,8 @@ project directory.
 Place it in your home directory's `.claude/skills/` folder:
 
 ```bash
-mkdir -p ~/.claude/skills/manuscript-review
-cp /path/to/SKILL.md ~/.claude/skills/manuscript-review/SKILL.md
+mkdir -p <manuscript-review skill folder>
+cp /path/to/SKILL.md <manuscript-review skill folder>/SKILL.md
 ```
 
 This makes the skill available in every project you open with Claude Code.

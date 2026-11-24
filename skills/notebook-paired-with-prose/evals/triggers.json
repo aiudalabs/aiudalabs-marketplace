@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Does every chapter in my bookwright textbook need a companion Jupyter notebook, or can theory-only chapters skip it?",
+    "should_trigger": true
+  },
+  {
+    "query": "How do I write numerical-sanity targets for a chapter notebook so it checks the worked example in the prose matches?",
+    "should_trigger": true
+  },
+  {
+    "query": "What's the command to execute a chapter's Quarto notebook from a fresh kernel before committing, and what about R Markdown with renv?",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm writing the paired notebook for chapter 7 on Bloom filters. What are the conventions for verifying the empirical claims in the text?",
+    "should_trigger": true
+  },
+  {
+    "query": "Re-run each chapter's test suite and check the numbers in the passport.yaml claim ledgers still hold.",
+    "should_trigger": false,
+    "use_instead": "manuscript-checks"
+  },
+  {
+    "query": "Draft chapter 7 from its plan, prose sections and notebook together, with audits.",
+    "should_trigger": false,
+    "use_instead": "bookwright-writer"
+  },
+  {
+    "query": "Should my book use \\Cref for a forward reference to a chapter that isn't written yet?",
+    "should_trigger": false,
+    "use_instead": "cross-reference-discipline"
+  }
+]

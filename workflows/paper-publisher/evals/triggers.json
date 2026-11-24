@@ -1,0 +1,33 @@
+[
+  {
+    "query": "My manuscript on graph sparsification is final. Format it with the NeurIPS LaTeX style, anonymize it for double-blind review and build the PDF.",
+    "should_trigger": true
+  },
+  {
+    "query": "Prepare my paper for arXiv: LaTeX source, compiled PDF, bibliography, and a checklist that nothing is missing.",
+    "should_trigger": true
+  },
+  {
+    "query": "We're submitting to IEEE Transactions on Power Systems next week. Can you put the revised manuscript into their template and check the page limit and reference style?",
+    "should_trigger": true
+  },
+  {
+    "query": "paper's done and reviewed, now get it submission-ready for the ACM CHI conference",
+    "should_trigger": true
+  },
+  {
+    "query": "Before I format it, I want a peer review of the methods and statistics in my paper.",
+    "should_trigger": false,
+    "use_instead": "paper-review"
+  },
+  {
+    "query": "Turn my finished book manuscript into a print PDF and EPUB for KDP.",
+    "should_trigger": false,
+    "use_instead": "production-book-publisher"
+  },
+  {
+    "query": "Clean up the prose of my paper so it reads better before submission.",
+    "should_trigger": false,
+    "use_instead": "manuscript-revision"
+  }
+]

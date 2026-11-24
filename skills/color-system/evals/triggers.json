@@ -1,0 +1,37 @@
+[
+  {
+    "query": "Our brand color is #0f766e. Give me a full set of shades from 50 to 950, matching neutrals, and success, warning and error colors.",
+    "should_trigger": true
+  },
+  {
+    "query": "Does white text on #ff7a59 pass accessibility for our buttons? If it doesn't, what's the closest orange that does?",
+    "should_trigger": true
+  },
+  {
+    "query": "I need a dark mode version of our palette for a budgeting app. The primary is a deep plum, #5b2a86.",
+    "should_trigger": true
+  },
+  {
+    "query": "Build me a color scheme for a pediatric dental clinic, starting from a soft mint green I like.",
+    "should_trigger": true
+  },
+  {
+    "query": "can you check the contrast of every text/background combo in our palette and tell me which ones are WCAG compliant",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's our palette JSON and our fonts. Write a tokens file in the DTCG format and export it to CSS.",
+    "should_trigger": false,
+    "use_instead": "design-tokens"
+  },
+  {
+    "query": "Scan our React codebase for hex colors that aren't in the brand palette.",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  },
+  {
+    "query": "I want a complete new brand for my coworking space: the look, colors, fonts, logo, all of it.",
+    "should_trigger": false,
+    "use_instead": "visual-identity"
+  }
+]

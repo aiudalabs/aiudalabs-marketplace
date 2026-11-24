@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Write a LinkedIn article about why most RAG demos fail in production. I've built three of these and have opinions.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want a Medium post, around 1,500 words, on what our startup learned migrating from Postgres to DuckDB for analytics.",
+    "should_trigger": true
+  },
+  {
+    "query": "Draft this week's newsletter piece on the new EU AI Act deadlines for small SaaS companies, publish-ready.",
+    "should_trigger": true
+  },
+  {
+    "query": "turn my idea about 'prompt engineering is dead' into a blog post in markdown, opinionated but fact-checked",
+    "should_trigger": true
+  },
+  {
+    "query": "Write a journal paper on our trial of a new physiotherapy protocol, from idea to submission-ready draft.",
+    "should_trigger": false,
+    "use_instead": "paper-author"
+  },
+  {
+    "query": "I want to write a book about leadership in engineering teams, starting from an outline.",
+    "should_trigger": false,
+    "use_instead": "book-author"
+  },
+  {
+    "query": "I already wrote this LinkedIn post. Just remove the parts that sound AI-generated.",
+    "should_trigger": false,
+    "use_instead": "humanizer"
+  }
+]

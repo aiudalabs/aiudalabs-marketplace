@@ -1,0 +1,33 @@
+[
+  {
+    "query": "I want to write a paper on using satellite night-light data to estimate rural electrification. Take it from the idea to a review-ready manuscript.",
+    "should_trigger": true
+  },
+  {
+    "query": "Start a new paper with me: preprint on arXiv about a faster sampler for diffusion models. Lit search, draft, review and revise.",
+    "should_trigger": true
+  },
+  {
+    "query": "I have a half-written draft and a folder of results on antibiotic resistance in wastewater. Get it to a manuscript ready to submit to a journal for review.",
+    "should_trigger": true
+  },
+  {
+    "query": "help me go from research question to finished journal article on teacher attrition, with real citations and a review pass before revisions",
+    "should_trigger": true
+  },
+  {
+    "query": "Write the Introduction for my paper on wastewater surveillance; the rest is already done.",
+    "should_trigger": false,
+    "use_instead": "manuscript-drafting"
+  },
+  {
+    "query": "My paper is reviewed and revised. Put it into the ACL template and check the page limit and anonymization.",
+    "should_trigger": false,
+    "use_instead": "paper-publisher"
+  },
+  {
+    "query": "Turn my research on remote work productivity into a 1,200-word Medium post.",
+    "should_trigger": false,
+    "use_instead": "article-author"
+  }
+]

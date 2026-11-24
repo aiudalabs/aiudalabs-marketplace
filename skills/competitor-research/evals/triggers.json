@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Who are my competitors? I run a fractional CFO service for Series A startups in Germany.",
+    "should_trigger": true
+  },
+  {
+    "query": "List the alternatives to our product, a Slack bot for async standups, and how each of them prices.",
+    "should_trigger": true
+  },
+  {
+    "query": "Map the competitive landscape for AI compliance tools for small community banks, including what buyers do instead of buying anything.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want competitive intel on the three biggest players in field-service scheduling software: their messaging, their weak spots and where there's white space.",
+    "should_trigger": true
+  },
+  {
+    "query": "Audit our whole positioning and launch readiness, competitive risk included, and score it.",
+    "should_trigger": false,
+    "use_instead": "startup-positioning-audit"
+  },
+  {
+    "query": "As part of our brand brief, look at how competitors present themselves visually and tell me which conventions our new brand should break.",
+    "should_trigger": false,
+    "use_instead": "brand-strategy-brief"
+  },
+  {
+    "query": "Rewrite our homepage hero so we stand out from competitors. Give me three headline variants.",
+    "should_trigger": false,
+    "use_instead": "homepage-copy-audit"
+  }
+]

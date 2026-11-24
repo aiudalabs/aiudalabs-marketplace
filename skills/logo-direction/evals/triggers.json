@@ -1,0 +1,33 @@
+[
+  {
+    "query": "I need a logo for Fernhill Veterinary. Something simple that still reads when it's a tiny browser tab icon.",
+    "should_trigger": true
+  },
+  {
+    "query": "Give me a few monogram concepts built from my initials, N.L., for my consulting practice.",
+    "should_trigger": true
+  },
+  {
+    "query": "We're hiring a freelance designer for our logo. Can you write the brief we should give them?",
+    "should_trigger": true
+  },
+  {
+    "query": "Sketch three or four symbol ideas for a cybersecurity startup called Moat as SVGs, and show me how each holds up in one color and reversed.",
+    "should_trigger": true
+  },
+  {
+    "query": "I have the final logo SVG. Export a favicon, an apple-touch-icon and a 1200x630 Open Graph image.",
+    "should_trigger": false,
+    "use_instead": "brand-asset-kit"
+  },
+  {
+    "query": "Is our new logo being used correctly on this event flyer? Check it against our brand book.",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  },
+  {
+    "query": "We need a whole identity for our bakery chain, not just a logo: the look, colors, type, assets and guidelines.",
+    "should_trigger": false,
+    "use_instead": "visual-identity"
+  }
+]

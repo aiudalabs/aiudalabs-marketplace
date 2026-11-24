@@ -1,0 +1,33 @@
+[
+  {
+    "query": "What fonts should we use for a fintech app that needs to feel trustworthy but not stiff? Free fonts only, and we need full Vietnamese support.",
+    "should_trigger": true
+  },
+  {
+    "query": "Are we allowed to use Gotham on our website and in our logo, licensing-wise?",
+    "should_trigger": true
+  },
+  {
+    "query": "We use Inter for everything. Set up a proper type scale for headings and body, with weights and fallback stacks.",
+    "should_trigger": true
+  },
+  {
+    "query": "Recommend a heading and body pairing for a cookbook publisher's site, something that feels editorial.",
+    "should_trigger": true
+  },
+  {
+    "query": "Make me three logo ideas for Tallow & Twine, a candle shop, as SVG wordmarks.",
+    "should_trigger": false,
+    "use_instead": "logo-direction"
+  },
+  {
+    "query": "Write our style guide document covering fonts, colors, logo rules and do's and don'ts, so the marketing team stops asking.",
+    "should_trigger": false,
+    "use_instead": "brand-guidelines"
+  },
+  {
+    "query": "Convert our font sizes and spacing scale into a design tokens file and CSS custom properties.",
+    "should_trigger": false,
+    "use_instead": "design-tokens"
+  }
+]

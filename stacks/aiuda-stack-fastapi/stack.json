@@ -1,0 +1,8 @@
+{
+  "name": "aiuda-stack-fastapi",
+  "description": "The aiuda-stack method on Python (FastAPI + SQLAlchemy + Alembic + Postgres) with a React frontend: the seven-phase spec, a scaffolded repo, a backlog in waves checked by code, python-dev and react-dev agents with lanes, a QA reviewer, sprints in parallel worktrees, and guardrails that refuse changes outside the active issue.",
+  "version": "1.0.0",
+  "agents": ["product-advisor", "python-dev", "react-dev", "qa-tester"],
+  "skills": ["project-kickstart", "project-adopt", "spec-guard", "operational-readiness", "html-spec-generator"],
+  "workflows": ["product-spec-orchestrator", "sprint-runner"]
+}

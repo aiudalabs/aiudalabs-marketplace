@@ -1,0 +1,9 @@
+[
+  { "query": "Adopta este repo: es una app Flutter con Firebase que ya está en producción y quiero que los agentes construyan la exportación a CSV.", "should_trigger": true },
+  { "query": "We have a FastAPI + Vue codebase with 40k lines. Onboard it to the multi-agent method so spec-guard works and plan our next feature as a sprint.", "should_trigger": true },
+  { "query": "quiero usar flutter-dev y firebase-dev en mi proyecto existente, ¿cómo dibujo los carriles sobre mis carpetas reales?", "should_trigger": true },
+  { "query": "Our Rails app has no docs. Write down the decisions the code already made and set up lanes so agents can add multi-currency support.", "should_trigger": true },
+  { "query": "Carpeta vacía, proyecto nuevo de Flutter y Firebase: créame la estructura del monorepo.", "should_trigger": false, "use_instead": "project-kickstart" },
+  { "query": "I have an idea for a restaurant ordering app and want the full spec from discovery to governance.", "should_trigger": false, "use_instead": "product-spec-orchestrator" },
+  { "query": "Revisa el backlog: ¿hay ciclos o issues fuera de carril en ISSUES.md?", "should_trigger": false, "use_instead": "spec-guard" }
+]

@@ -63,17 +63,35 @@ test('a skeleton is refused for a bad kind, a bad name, a missing category or a 
 test('an unfilled skeleton does not pass validation', (t) => {
   for (const kind of SCAFFOLD_KINDS) {
     const root = emptyCheckout(t);
-    const { path, content } = planScaffold(kind, 'meeting-notes', { category: 'operations', components: loadAll(root) });
+    const { path, content, extra } = planScaffold(kind, 'meeting-notes', { category: 'operations', components: loadAll(root) });
     write(root, path, content);
+    for (const file of extra) write(root, file.path, file.content);
     const errors = messages(validateAll(loadAll(root)));
     assert.ok(errors.some((message) => message.includes('template placeholder')), `${kind}: ${errors.join('\n')}`);
   }
 });
 
-test('a skill and an agent skeleton pass once the description is written', (t) => {
+const filledTriggers = JSON.stringify([
+  { query: 'Turn this call transcript into notes', should_trigger: true },
+  { query: 'Summarize what we decided in standup', should_trigger: true },
+  { query: 'Notes from this recording, please', should_trigger: true },
+  { query: 'Schedule a meeting for Tuesday', should_trigger: false },
+  { query: 'Write minutes for a board meeting that has not happened', should_trigger: false },
+]);
+
+test('a skill skeleton comes with trigger evals that fail until filled in', (t) => {
+  const root = emptyCheckout(t);
+  const { extra } = planScaffold('skill', 'meeting-notes', { components: loadAll(root) });
+  assert.deepEqual(extra.map((file) => file.path), ['skills/meeting-notes/evals/triggers.json']);
+  assert.ok(JSON.parse(extra[0].content).every((entry) => entry.query.startsWith('TODO')));
+  assert.deepEqual(planScaffold('stack', 'meeting-notes', { components: loadAll(root) }).extra, []);
+});
+
+test('a skill and an agent skeleton pass once the description and triggers are written', (t) => {
   for (const kind of ['skill', 'agent']) {
     const root = emptyCheckout(t);
-    const { path, content } = planScaffold(kind, 'meeting-notes', { category: 'operations', components: loadAll(root) });
+    const { path, content, extra } = planScaffold(kind, 'meeting-notes', { category: 'operations', components: loadAll(root) });
+    for (const file of extra) write(root, file.path, filledTriggers);
     write(root, path, content.replace(/^description: .*$/m, 'description: Turns a transcript into notes. Use when asked for meeting notes.'));
     assert.deepEqual(messages(validateAll(loadAll(root))), []);
   }
@@ -94,6 +112,10 @@ test('`new` writes the skeleton into a checkout and refuses anywhere else', (t) 
 
   const elsewhere = mkdtempSync(join(tmpdir(), 'not-a-marketplace-'));
   t.after(() => rmSync(elsewhere, { recursive: true, force: true }));
+  const skill = run('skill', 'meeting-notes', '--dir', root);
+  assert.equal(skill.status, 0, skill.stderr);
+  assert.ok(existsSync(join(root, 'skills/meeting-notes/evals/triggers.json')));
+
   const outside = run('skill', 'meeting-notes', '--dir', elsewhere);
   assert.equal(outside.status, 1);
   assert.match(outside.stderr, /clone of the marketplace/);

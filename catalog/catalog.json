@@ -121,6 +121,98 @@
       "path": "agents/design/brand-guardian.md"
     },
     {
+      "name": "firebase-dev",
+      "description": "Firebase backend specialist who implements Cloud Functions, Firestore and Storage security rules, indexes and the shared TypeScript types in a flutter-firebase project. Use when an issue in docs/ISSUES.md is owned by firebase-dev, when work lands in functions, rules, indexes or the shared types, or when the user asks for a callable, trigger, scheduled function or rule change built to the spec.",
+      "version": "1.0.0",
+      "category": "engineering",
+      "requires": [
+        "issue-delivery",
+        "spec-guard"
+      ],
+      "tags": [
+        "engineering",
+        "firebase",
+        "cloud-functions",
+        "firestore",
+        "security-rules",
+        "typescript"
+      ],
+      "path": "agents/engineering/firebase-dev.md"
+    },
+    {
+      "name": "flutter-dev",
+      "description": "Senior Flutter engineer who implements mobile and tablet app issues in a flutter-firebase project, with Riverpod, go_router and design tokens. Use when an issue in docs/ISSUES.md is owned by flutter-dev, when work lands in the Flutter apps or packages, or when the user asks for a Flutter screen, widget, navigation or state change built to the spec.",
+      "version": "1.0.0",
+      "category": "engineering",
+      "requires": [
+        "issue-delivery",
+        "spec-guard"
+      ],
+      "tags": [
+        "engineering",
+        "flutter",
+        "dart",
+        "mobile",
+        "riverpod"
+      ],
+      "path": "agents/engineering/flutter-dev.md"
+    },
+    {
+      "name": "python-dev",
+      "description": "Python backend specialist who implements FastAPI endpoints, SQLAlchemy models, Alembic migrations, Pydantic contracts, workers and pytest suites in a fastapi-react project. Use when an issue in docs/ISSUES.md is owned by python-dev, when work lands in the Python package, migrations or tests, or when the user asks for a backend endpoint, worker, webhook or migration built to the spec.",
+      "version": "1.0.0",
+      "category": "engineering",
+      "requires": [
+        "issue-delivery",
+        "spec-guard"
+      ],
+      "tags": [
+        "engineering",
+        "python",
+        "fastapi",
+        "sqlalchemy",
+        "postgres",
+        "alembic"
+      ],
+      "path": "agents/engineering/python-dev.md"
+    },
+    {
+      "name": "qa-tester",
+      "description": "Reviewer of last resort who decides whether an implemented issue may merge, by checking every acceptance criterion against the diff with file:line evidence and a test that ran, rerunning the test gate, verifying lane discipline and the repository's hard rules, and never editing code. Use after a developer agent posts its SUMMARY, when the user asks to QA, review or approve an issue or PR, or to close a sprint with a retro.",
+      "version": "1.0.0",
+      "category": "engineering",
+      "requires": [
+        "issue-review",
+        "spec-guard"
+      ],
+      "tags": [
+        "engineering",
+        "qa",
+        "review",
+        "testing"
+      ],
+      "path": "agents/engineering/qa-tester.md"
+    },
+    {
+      "name": "react-dev",
+      "description": "React and TypeScript specialist who implements the web front end of a project, the admin dashboard in flutter-firebase or the frontend app in fastapi-react, with shadcn/ui, Tailwind, TanStack Query and React Hook Form with Zod. Use when an issue in docs/ISSUES.md is owned by react-dev, when work lands in the web app, or when the user asks for an admin page, table, form or dashboard built to the spec.",
+      "version": "1.0.0",
+      "category": "engineering",
+      "requires": [
+        "issue-delivery",
+        "spec-guard"
+      ],
+      "tags": [
+        "engineering",
+        "react",
+        "typescript",
+        "admin",
+        "tailwind",
+        "shadcn"
+      ],
+      "path": "agents/engineering/react-dev.md"
+    },
+    {
       "name": "latex-figure-specialist",
       "description": "Creates and adjusts TikZ/pgfplots figures, manages figure placement and layout, ensures proper label/ref wiring and figure-text-caption consistency",
       "version": "0.1.0",
@@ -147,6 +239,24 @@
       "license": "MIT",
       "source": "https://github.com/andrehuang/academic-writing-agents",
       "path": "agents/latex/latex-layout-auditor.md"
+    },
+    {
+      "name": "product-advisor",
+      "description": "Product critic who reviews a product spec across its design phases and reports contradictions, scope creep, unverified assumptions, missing pieces and decisions that never reach the schema, screens or architecture, without editing any document. Use when the user wants an adversarial review of the spec before building, asks what they are missing, or wants to know whether the phases are coherent (\"revisa el diseño\", \"qué se nos escapa\", \"challenge the spec\").",
+      "version": "1.0.0",
+      "category": "product",
+      "requires": [
+        "product-discovery",
+        "product-requirements",
+        "spec-guard"
+      ],
+      "tags": [
+        "product",
+        "review",
+        "spec",
+        "strategy"
+      ],
+      "path": "agents/product/product-advisor.md"
     },
     {
       "name": "bibliography-auditor",
@@ -177,7 +287,7 @@
       "path": "agents/research/paper-crawler.md"
     },
     {
-      "name": "paper-review",
+      "name": "paper-reviewer",
       "description": "Independent fresh-context academic manuscript peer reviewer. Invoked by the paper-review skill (single or panel mode); not triggered directly by the user.",
       "version": "0.1.0",
       "category": "research",
@@ -187,7 +297,7 @@
       ],
       "license": "BSD-3-Clause",
       "source": "https://github.com/neuromechanist/research-skills",
-      "path": "agents/research/paper-review.md"
+      "path": "agents/research/paper-reviewer.md"
     },
     {
       "name": "research-analyst",
@@ -338,13 +448,28 @@
       "path": "skills/academic-writing-principles",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "aiuda-brand",
+      "description": "Produces Aiuda Labs branded business documents (proposals, training proposals, quotes, SOWs, one-pagers, reports, case studies) as print-ready PDF from branded HTML, or HTML or Word on request, in the exact visual identity of aiudalabs.com: Satoshi, Instrument Serif and JetBrains Mono, warm cream background, orange accent, eyebrow labels, dark footer and the <ai/>labs logo. Use for 'propuesta comercial', 'propuesta de capacitación', 'cotización', 'one-pager con la marca de Aiuda Labs', 'dame esto branded'. Applies only the Aiuda Labs brand. Not for writing a brand's guidelines (use `brand-guidelines`), checking a piece against a brand (use `brand-review`), or technical architecture pages (use `html-spec-generator`).",
+      "version": "1.0.1",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/aiuda-brand",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/DESIGN_SYSTEM.md"
       ]
     },
     {
       "name": "book-typesetting",
       "description": "Use when typesetting a book for print or ebook with Quarto/LaTeX — building a print interior, converting a PDF to press-ready CMYK PDF/X-1a for IngramSpark, KDP or another print-on-demand service, laying out a wraparound cover, turning chapter markdown into a galley proof, or when a print uploader rejects a file over trim size, safety area, TrimBox, annotations, or unembedded fonts.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -376,6 +501,7 @@
         "assets/templates/chapter-proof.qmd.tmpl",
         "assets/templates/example-chapter.md",
         "assets/templates/quarto.yml.tmpl",
+        "evals/triggers.json",
         "reference/cover-geometry.md",
         "reference/galley-recipe.md",
         "reference/getting-started.md",
@@ -405,6 +531,7 @@
         "THIRD_PARTY_NOTICES.md",
         "assets/asset-manifest.template.json",
         "assets/og-image.template.html",
+        "evals/triggers.json",
         "references/deliverables.csv",
         "references/platform-sizes.md",
         "scripts/render-assets.mjs"
@@ -423,6 +550,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/brand-guidelines-template.md",
+        "evals/triggers.json",
         "references/asset-naming.md",
         "references/governance.md"
       ]
@@ -441,6 +569,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/review-report-template.md",
+        "evals/triggers.json",
         "references/review-checklist.md",
         "scripts/scan-colors.mjs"
       ]
@@ -457,6 +586,7 @@
         ".DS_Store",
         "SKILL.md",
         "assets/brand-brief-template.md",
+        "evals/triggers.json",
         "references/attributes-to-visual-decisions.md",
         "references/visual-competitor-audit.md"
       ]
@@ -464,7 +594,7 @@
     {
       "name": "citation-audit",
       "description": "Zero-context verification that every bibliographic entry in the paper is real, correctly attributed, and used in a context the cited paper actually supports — catching hallucinated authors, wrong years, fabricated venues, version mismatches, and wrong-context citations. Use when user says \"审查引用\", \"check citations\", \"citation audit\", \"verify references\", \"引用核对\", or before submission to ensure bibliography integrity.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -475,38 +605,20 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "shared-references/acceptance-gate.md",
         "shared-references/assurance-contract.md",
-        "shared-references/capture-antipatterns.md",
         "shared-references/citation-discipline.md",
-        "shared-references/compute-env-contract.md",
         "shared-references/effort-contract.md",
-        "shared-references/evidence-precheck.md",
         "shared-references/experiment-integrity.md",
         "shared-references/external-cadence.md",
         "shared-references/fan-out-pattern.md",
-        "shared-references/icra-keywords.md",
-        "shared-references/injection-hygiene.md",
         "shared-references/integration-contract.md",
-        "shared-references/output-composition.md",
-        "shared-references/output-language.md",
-        "shared-references/output-manifest.md",
-        "shared-references/output-versioning.md",
         "shared-references/page-shrink-heuristic.md",
         "shared-references/paper-preferences.md",
-        "shared-references/patent-format-cn.md",
-        "shared-references/patent-format-ep.md",
-        "shared-references/patent-format-us.md",
-        "shared-references/patent-writing-principles.md",
-        "shared-references/prior-art-databases.md",
-        "shared-references/resumable-runs.md",
-        "shared-references/review-scope-limits.md",
         "shared-references/review-tracing.md",
         "shared-references/reviewer-independence.md",
         "shared-references/reviewer-routing.md",
-        "shared-references/skill-governance.md",
-        "shared-references/taste-calibration.md",
-        "shared-references/venue-checklists.md",
         "shared-references/wiki-helper-resolution.md",
         "shared-references/writing-principles.md",
         "tools/refresh_audit_hashes.py",
@@ -525,6 +637,7 @@
         ".DS_Store",
         "SKILL.md",
         "assets/palette.template.json",
+        "evals/triggers.json",
         "references/accessibility.md",
         "references/color-roles.md",
         "scripts/color-lib.mjs",
@@ -546,6 +659,7 @@
         ".DS_Store",
         "SKILL.md",
         "assets/competitor-research-brief.md",
+        "evals/triggers.json",
         "references/competitor-analysis-framework.md",
         "scripts/perplexity_research.py"
       ]
@@ -560,7 +674,8 @@
       "path": "skills/cross-reference-discipline",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -576,6 +691,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/example.tokens.json",
+        "evals/triggers.json",
         "references/format-cheatsheet.md",
         "references/token-architecture.md",
         "scripts/export-tokens.mjs",
@@ -585,8 +701,8 @@
     },
     {
       "name": "ebook-publishing",
-      "description": "The complete ebook and audiobook self-publishing skill — write, format, convert, and publish across all major platforms. Use this skill whenever the user asks about Amazon KDP, Apple Books, Gumroad, Payhip, Kobo, Draft2Digital, IngramSpark, Barnes & Noble Press, Google Play Books, PublishDrive, StreetLib, ACX, ElevenLabs audiobooks, KDP Virtual Voice, INaudio (formerly Findaway Voices), EPUB formatting, HTML-to-PDF Puppeteer workflow, book cover design specs, ISBN strategy, KDP Select vs wide distribution, permafree strategy, BookBub, series pricing, royalty calculations, book descriptions, Amazon A+ content, keyword research, ARC readers, or any launch strategy. Also trigger for lead magnet ebooks, digital downloads, online courses packaged as ebooks, audiobook production with AI narration, print-on-demand, or any content intended for digital or print distribution and sale. MCP available for Gumroad only (rmarescu/gumroad-mcp). All other platforms require manual upload.",
-      "version": "0.1.0",
+      "description": "Self-publishing know-how for ebooks and audiobooks: choosing and using platforms (Amazon KDP, Apple Books, Kobo, Google Play Books, Draft2Digital, IngramSpark, Barnes & Noble Press, Gumroad, Payhip, PublishDrive, StreetLib, ACX, INaudio, KDP Virtual Voice, ElevenLabs), ISBN strategy, KDP Select versus wide distribution, permafree, BookBub, series pricing, royalty calculations, Amazon A+ content, ARC readers, launch plans, audiobook production with AI narration, and lead-magnet or course ebooks. Use for publishing strategy and platform questions. To build the book files use kindle-book (quick EPUB and PDF) or book-typesetting (press-ready print); to check a manuscript against KDP rules use kdp-audit; to write the KDP blurb, keywords and categories use kdp-listing.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -595,6 +711,7 @@
         "LICENSE",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/audiobooks.md",
         "references/cover-specs.md",
         "references/formatting.md",
@@ -636,6 +753,22 @@
       ]
     },
     {
+      "name": "execution-router",
+      "description": "Prepares the next sprint just in time, from the repository's real state: reads spec-guard status, the previous sprint's retro and the code that actually got merged, corrects the sprint's issues when reality moved, classifies each issue by size, scope and risk to choose its execution mode (parallel worktree or sequential, autonomous or with a human checkpoint) and its validation rigor, and rewrites that sprint's orchestrator and executor prompts in docs/SPRINT_PROMPTS.md. Use between sprints: \"prepara el sprint 3\", \"cerramos el sprint, ¿qué sigue?\", \"regenera los prompts del próximo sprint\", \"route the next sprint\". It does not plan the whole backlog (multi-agent-governance) and does not run the sprint (sprint-runner).",
+      "version": "1.2.2",
+      "license": "MIT",
+      "requires": [
+        "spec-guard",
+        "issue-delivery"
+      ],
+      "tools": [],
+      "path": "skills/execution-router",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
       "name": "homepage-copy-audit",
       "description": "Audits a homepage or landing page for clarity and conversion, covering the 5-second test, hero, CTA, message hierarchy, proof, jargon, trust signals and friction, and delivers replacement copy with at least three hero variants. Use when the user asks to review, critique, roast or rewrite a homepage, landing page, hero section, headline or CTA, or asks why a page does not convert.",
       "version": "0.1.0",
@@ -647,14 +780,33 @@
         ".DS_Store",
         "SKILL.md",
         "assets/homepage-rewrite-template.md",
+        "evals/triggers.json",
         "references/homepage-audit-framework.md",
         "scripts/extract_site_text.py"
       ]
     },
     {
+      "name": "html-spec-generator",
+      "description": "Turns a project's spec documents into one navigable HTML reference (docs/architecture.html) with a sticky section nav, in the Aiuda Labs house style or a neutral one: the product layer when present (brief summary, D-xx decisions table, PRD requirements index with ids, screens index linked to the mockups) and the architecture (Mermaid diagrams of the system, core flows, data model, auth and deployment, tables, open questions), stamped with each source version. Use for 'genera la arquitectura en HTML', 'spec navegable', 'página de arquitectura', 'quiero ver las especificaciones en una página', 'quiero el documento de arquitectura para compartir con el equipo', or to regenerate the page after a phase changed the docs. Architecture sections need docs/ARCHITECTURE.md from `system-architecture`. Not for client-facing proposals, quotes or reports (use `aiuda-brand`), clickable app screens (use `navegable-mockups`), or designing the architecture itself (use `system-architecture`).",
+      "version": "1.1.0",
+      "license": "MIT",
+      "requires": [
+        "system-architecture"
+      ],
+      "tools": [],
+      "path": "skills/html-spec-generator",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/DESIGN_SYSTEM.md",
+        "references/NEUTRAL_STYLE.md",
+        "references/checks.md"
+      ]
+    },
+    {
       "name": "humanizer",
       "description": "Use this skill for \"humanize this text\", \"remove AI tells\", \"make this less AI-sounding\", \"strip AI patterns\", \"de-AI my writing\", \"reduce AI-isms\", \"final natural-writing pass\", \"check for AI vocabulary\", \"em dash overuse\", \"rule of three overuse\", \"AI vocabulary\", \"signs of AI writing\", or when polishing prose (papers, grants, lit reviews, abstracts, cover letters, responses to reviewers) to remove signs of AI-generated text while preserving meaning and discipline-appropriate conventions.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -662,13 +814,46 @@
       "files": [
         "LICENSE",
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "issue-delivery",
+      "description": "Implements one backlog issue from docs/ISSUES.md end to end as its owning developer agent: reads the issue and its reads, works in the issue's branch or worktree, writes only inside files_touched, commits one task at a time with the issue id and the decisions it serves, keeps the test gate green, runs spec.mjs verify, and posts the SUMMARY handoff for qa-tester. Use when a developer agent (flutter-dev, firebase-dev, react-dev, python-dev or a custom one) is told to implement, build or execute an issue such as S3-07, or when a user says 'implementa S3-07', 'ejecuta el issue S2-04', 'arranca con S4-01 en su worktree'. It covers a single issue. Reviewing the result belongs to issue-review, running a whole sprint or wave belongs to the sprint-runner workflow, and checking the backlog structure belongs to spec-guard.",
+      "version": "1.2.1",
+      "license": "MIT",
+      "requires": [
+        "spec-guard"
+      ],
+      "tools": [],
+      "path": "skills/issue-delivery",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/stack-conventions.md"
+      ]
+    },
+    {
+      "name": "issue-review",
+      "description": "Reviews one implemented backlog issue as the gate before merge: checks the diff against every acceptance criterion in docs/ISSUES.md with file:line evidence and a test that actually ran, reruns the project's test gate, runs spec.mjs verify for lane discipline, checks the hard rules of the root AGENTS.md, and writes an approved or changes-requested verdict without editing code. Also closes a sprint with goal-backward verification and a retro in docs/execution/. Use when qa-tester is asked to review or approve an issue, after a developer posts its SUMMARY, or when a user says 'revisa S3-07', 'qa de este PR', 'valida contra los criterios de aceptación', 'cerrar sprint 3'. It never implements fixes: issue-delivery does that. It does not review academic papers (paper-review) or brand work (brand-review), and running a whole sprint is the sprint-runner workflow.",
+      "version": "1.2.3",
+      "license": "MIT",
+      "requires": [
+        "spec-guard"
+      ],
+      "tools": [],
+      "path": "skills/issue-review",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/verdicts.md"
       ]
     },
     {
       "name": "kdp-audit",
       "description": "Audit a book manuscript against Amazon KDP requirements: interior formatting, cover specs, metadata, and genre-specific checks. Handles technical books (LaTeX, math), fiction, and nonfiction. Produces a structured gap report with Critical and Warnings sections plus automation suggestions.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -679,15 +864,14 @@
         "docs/audit-report-template.md",
         "docs/kdp-exemplars.md",
         "docs/kdp-reference.md",
-        "docs/superpowers/plans/2026-03-18-kdp-cover-mcp-impl.md",
-        "docs/superpowers/specs/2026-03-18-kdp-cover-mcp-design.md",
-        "docs/user-config-template.md"
+        "docs/user-config-template.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "kdp-listing",
       "description": "Craft the four marketing artifacts for an Amazon KDP listing: blurb (with HTML formatting), keywords, BISAC categories, and author bio. Reads manuscript context to generate variants, then saves outputs to the user config. These four artifacts determine discoverability and conversion on Amazon.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -698,15 +882,14 @@
         "docs/audit-report-template.md",
         "docs/kdp-exemplars.md",
         "docs/kdp-reference.md",
-        "docs/superpowers/plans/2026-03-18-kdp-cover-mcp-impl.md",
-        "docs/superpowers/specs/2026-03-18-kdp-cover-mcp-design.md",
-        "docs/user-config-template.md"
+        "docs/user-config-template.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "kindle-book",
-      "description": "Convert markdown (.md) or plain text (.txt) files into Amazon KDP-ready book files: EPUB3 for Kindle digital publishing and a print-ready PDF for KDP paperback (6×9\", 5×8\", or custom trim). Use this skill whenever the user wants to: publish a book on Amazon Kindle, create an ebook from markdown, generate a KDP-ready EPUB or print PDF, self-publish a book, convert a manuscript to Kindle format, or make digital + print book files. Trigger even for partial phrases like \"make it a Kindle book\", \"publish this as an ebook\", \"KDP files\", \"format my book for Amazon\", or \"I want to sell this on Kindle\".",
-      "version": "0.1.0",
+      "description": "Converts markdown or plain-text files into an EPUB3 for Kindle and a simple print PDF for a KDP paperback (6x9, 5x8 or custom trim) with one Python script. Use for \"make it a Kindle book\", \"create an ebook from this markdown\", \"KDP files for my book\" or \"format my book for Amazon\". For a typeset, press-ready print interior or cover use book-typesetting; for the full production run of a finished book use production-book-publisher; for platform, pricing and launch advice use ebook-publishing.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [
@@ -719,22 +902,23 @@
         "THIRD_PARTY_NOTICES.md",
         "assets/epub-styles.css",
         "assets/print-template.tex",
+        "evals/triggers.json",
         "references/trim-sizes.md",
         "scripts/build_kindle.py"
       ]
     },
     {
       "name": "line-and-copy-editor",
-      "description": "Combined line and copy editing for nonfiction manuscripts: sentence-level prose work plus grammar, consistency, and factual cross-checks in one pass. Use for a line edit, copy edit, combined or stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, removing AI-drafting and humanizer artifacts from a manuscript, or editing AI-assisted text toward genuinely human prose. Produces real Word tracked changes, a running style sheet, and an editorial cover letter.",
-      "version": "2.1.0",
+      "description": "Combined line and copy editing for book-length or chapter nonfiction manuscripts: sentence-level prose work plus grammar, consistency and factual cross-checks in one pass, delivered as real Word tracked changes, a running style sheet and an editorial cover letter. Use for a line edit, copy edit, stylistic edit, manuscript tightening or compression, SPAG and consistency work, a Chicago-style cleanup, or editing AI-assisted text toward human prose. For a writing-quality audit of a research paper use sciwrite; to strip AI tells from a short text use humanizer.",
+      "version": "2.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
       "path": "skills/line-and-copy-editor",
       "files": [
-        "README.md",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/ai-prose-patterns.md",
         "references/pre-delivery-checklist.md",
         "references/style-guide-template.md"
@@ -743,7 +927,7 @@
     {
       "name": "lit-review",
       "description": "Use this skill for \"literature review workflow\", \"multi-phase lit review\", \"direction paper\", \"review paper protocol\", \"strand-based literature review\", \"citation-grounded review\", \"systematic lit review with paper cards\", \"build a lit review corpus\", \"lit review pipeline\", \"orchestrate a literature review\", \"research directions document\", \"write a literature review\", \"synthesize papers\", \"thematic review\", \"narrative review\", \"systematic review\", \"scoping review\", \"gap analysis\", or when the user wants either a rigorous multi-phase citation-traceable lit review or a single-pass thematic synthesis for an Introduction/Background section.",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -751,6 +935,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/brief-template.md",
         "references/direction-paper-template.md",
         "references/license-rules.md",
@@ -773,6 +958,7 @@
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
         "assets/logo-brief-template.md",
+        "evals/triggers.json",
         "references/logo-styles.csv",
         "references/mark-types.md",
         "references/usage-rules.md",
@@ -791,6 +977,7 @@
       "path": "skills/manuscript-checks",
       "files": [
         "SKILL.md",
+        "evals/triggers.json",
         "scripts/check_claims.py",
         "scripts/check_readability.py",
         "scripts/check_structure.py"
@@ -798,8 +985,8 @@
     },
     {
       "name": "manuscript-drafting",
-      "description": "Use this skill for \"write a paper\", \"draft manuscript\", \"write introduction\", \"write methods section\", \"write results\", \"write discussion\", \"write abstract\", \"structure a paper\", \"academic writing\", \"write for journal\", or when the user wants to draft or revise sections of an academic manuscript.",
-      "version": "0.2.1",
+      "description": "Drafts or restructures individual sections of an academic manuscript: introduction, methods, results, discussion and abstract, following IMRaD conventions for a journal. Use for \"write the introduction\", \"draft the methods section\", \"write the abstract\" or \"structure this paper\". For taking a whole paper from idea to a review-ready draft use paper-author; for revising existing text use manuscript-revision.",
+      "version": "0.3.0",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -807,14 +994,15 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/revision-response.md",
         "references/section-templates.md"
       ]
     },
     {
       "name": "manuscript-revision",
-      "description": "Use when revising or reviewing scientific, technical, or academic manuscripts, proposals, abstracts, reports, or related writing for precision, concision, logical cohesion, citation support, evidence alignment, and objective scholarly tone.",
-      "version": "0.1.0",
+      "description": "Rewrites scientific, technical or academic text in place, or comments on it, for precision, concision, logical cohesion, citation support, evidence alignment and objective scholarly tone: papers, proposals, grant text, abstracts and reports. Use when the user wants the text revised, not only reviewed. For a report of writing issues by pass use sciwrite; for peer review of methods and results use paper-review; for drafting sections from scratch use manuscript-drafting.",
+      "version": "0.2.0",
       "license": "MIT",
       "requires": [],
       "tools": [],
@@ -823,7 +1011,42 @@
         "LICENSE",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/revision-checklist.md"
+      ]
+    },
+    {
+      "name": "multi-agent-governance",
+      "description": "Turns a finished product spec into the governance of a multi-agent repository: the root AGENTS.md constitution (plus a CLAUDE.md that imports it), docs/AGENT_ROSTER.md with exclusive lanes, docs/ORCHESTRATOR.md, a sprint backlog in docs/ISSUES.md whose waves are computed by spec-guard, and paste-ready prompts for Sprint 0 and Sprint 1. Use when the spec documents (brief, defaults, PRD, schema, UI screens, architecture) exist and the user wants the repo ready for coding agents: \"preparemos esto para los agentes\", \"vamos al build\", \"backlog de issues\", \"sprint planning\", \"AGENTS.md\". Phase 6 of product-spec-orchestrator. Stops when inputs are missing. It plans the whole backlog once; preparing a later sprint from the repo's real state is execution-router, running a sprint with agents is sprint-runner, and bringing an existing codebase into the method is project-adopt.",
+      "version": "1.2.2",
+      "license": "MIT",
+      "requires": [
+        "spec-guard",
+        "stack-profile-flutter-firebase",
+        "stack-profile-fastapi-react"
+      ],
+      "tools": [],
+      "path": "skills/multi-agent-governance",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/documents.md"
+      ]
+    },
+    {
+      "name": "navegable-mockups",
+      "description": "Builds clickable HTML mockups of a product's key app screens: one standalone file per app, with a phone frame (or a desktop web frame with sidebar for web apps such as an admin dashboard), a neutral review toolbar with a screen selector, deep links to each screen, working navigation between screens, the product's own locked design tokens and realistic market data, openable by double-click with no server or dependencies. Use for 'mockups navegables', 'prototipo HTML', 'hagamos los mockups', 'quiero enseñar las pantallas al equipo o a inversores', or as Phase 7 of the product-spec workflow, which can run as soon as the key screens are picked in docs/UI_SCREENS.md. Not for specifying screens (use `ui-screens-spec`), exploring brand looks or style options (use `visual-directions`), or app code.",
+      "version": "1.1.0",
+      "license": "MIT",
+      "requires": [
+        "ui-screens-spec"
+      ],
+      "tools": [],
+      "path": "skills/navegable-mockups",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/skeleton.md"
       ]
     },
     {
@@ -836,13 +1059,155 @@
       "path": "skills/notebook-paired-with-prose",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "operational-readiness",
+      "description": "Produces docs/OPERATIONAL_READINESS.md, the non-code launch checklist of a product (legal entity, tax, banking, payments, app stores, insurance, contracts, compliance, IT), with an item-by-item owner, low/expected/high timelines, USD costs, a dependency graph, the critical path and MVP cuts. Classifies the product first into one of three playbooks: B2C-Panamá (S.A., RUC, Aviso de Operaciones, Yappy, Ley 81), B2B-LATAM (MSA, DPA, SOC2, sales ops) or Internal (SSO, MDM, audit logs, retention). Use for 'qué necesito para lanzar legalmente', 'checklist operacional', 'RUC y Yappy', 'necesitamos SOC2', 'distribución por MDM'. Runs in parallel to the build. Not legal or tax advice, and not a positioning or go-to-market audit (use `startup-positioning-audit`).",
+      "version": "1.0.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/operational-readiness",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/b2b-latam.md",
+        "references/b2c-panama.md",
+        "references/internal.md"
+      ]
+    },
+    {
+      "name": "product-discovery",
+      "description": "Takes a product idea that is about to be built from vague to locked: a one-page PRODUCT_BRIEF.md and an OPINIONATED_DEFAULTS.md with 10-12 numbered decisions (D-01, D-02...), each with rationale, rejected alternatives and a re-decide trigger, including the business model and the locked stack profile. Forces commitments, rejects 'it depends', and runs a pre-mortem before locking anything. Use when the user says 'tengo una idea para una app', 'nuevo proyecto', 'qué incluyo en el MVP', 'help me scope the MVP' or describes a marketplace, SaaS or app concept with no written brief. Phase 1 of the product-spec workflow. It does not decide whether the idea is worth building or how to position it: for brand attributes and visual direction use brand-strategy-brief, for an adversarial audit of positioning, ICP and launch readiness use startup-positioning-audit. Once a brief exists, use product-requirements for the PRD.",
+      "version": "1.1.0",
+      "license": "MIT",
+      "requires": [
+        "stack-profile-flutter-firebase",
+        "stack-profile-fastapi-react"
+      ],
+      "tools": [],
+      "path": "skills/product-discovery",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/defaults-by-model.md",
+        "references/failure-modes.md"
+      ]
+    },
+    {
+      "name": "product-requirements",
+      "description": "Turns an approved PRODUCT_BRIEF.md and OPINIONATED_DEFAULTS.md into PRD.md: functional requirements with stable ids (### FR-ORDER-1 — Title) and Given/When/Then acceptance criteria, traceability to persona jobs and D-xx decisions, explicit out of scope, numeric non-functional requirements, user stories and success metrics. Use when the user asks for a PRD, requisitos, criterios de aceptación, user stories or 'qué entra y qué no en el MVP', or for Phase 2 of the product-spec workflow once the brief is approved. It needs the brief: with only an idea and no locked decisions, use product-discovery first. It specifies what the product must do, not the data model (schema-design) or the screens (ui-screens-spec).",
+      "version": "1.1.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/product-requirements",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "project-adopt",
+      "description": "Brings an EXISTING code base into the spec-driven multi-agent method so spec-guard and the developer agents can work in it: inventories the repo (stack, folders, commands, tests, CI), proposes a stack profile or says none fits, reconstructs docs/OPINIONATED_DEFAULTS.md from decisions visible in code with the evidence file for each, maps agent lanes onto the real folders in docs/AGENT_ROSTER.md, writes a minimal AGENTS.md constitution with the commands that really work, and plans the user's next feature as one sprint in docs/ISSUES.md. Use when the repo already has code: \"adopta este repo\", \"quiero usar los agentes en mi proyecto existente\", \"onboard this codebase\", \"add the method to our app\". For an empty folder, use project-kickstart; for a new product from an idea, product-spec-orchestrator.",
+      "version": "1.0.0",
+      "license": "MIT",
+      "requires": [
+        "spec-guard",
+        "stack-profile-flutter-firebase",
+        "stack-profile-fastapi-react"
+      ],
+      "tools": [],
+      "path": "skills/project-adopt",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "project-kickstart",
+      "description": "Scaffolds a NEW, empty repository for the product-spec method, from the stack profile: for flutter-firebase a Melos + pnpm monorepo with Firebase config, Cloud Functions, CI and env files from bundled templates; for fastapi-react the src-layout Python API, worker, React frontend and Docker Compose deploy of that profile. Writes the AGENTS.md constitution and a CLAUDE.md that imports it, installs the matching aiuda stack into the chosen harness and the spec-guard guardrails, and commits it all once on main with develop as the working branch. Use at the very start of a project: \"arranca el repo\", \"kickstart\", \"crea la estructura del proyecto\", \"scaffold a new Flutter Firebase monorepo\". For a repository that already has code, use project-adopt; to design the product itself, use product-spec-orchestrator.",
+      "version": "1.2.0",
+      "license": "MIT",
+      "requires": [
+        "stack-profile-flutter-firebase",
+        "stack-profile-fastapi-react",
+        "spec-guard"
+      ],
+      "tools": [],
+      "path": "skills/project-kickstart",
+      "files": [
+        "SKILL.md",
+        "assets/flutter-firebase/.env.example",
+        "assets/flutter-firebase/.firebaserc",
+        "assets/flutter-firebase/.github/workflows/admin.yml",
+        "assets/flutter-firebase/.github/workflows/firebase.yml",
+        "assets/flutter-firebase/.github/workflows/flutter.yml",
+        "assets/flutter-firebase/.gitignore",
+        "assets/flutter-firebase/.tool-versions",
+        "assets/flutter-firebase/AGENTS.md",
+        "assets/flutter-firebase/AIUDA_HOUSE_STYLE.md",
+        "assets/flutter-firebase/CLAUDE.md",
+        "assets/flutter-firebase/README.md",
+        "assets/flutter-firebase/SESSION.md",
+        "assets/flutter-firebase/STATUS.md",
+        "assets/flutter-firebase/firebase.json",
+        "assets/flutter-firebase/firestore.indexes.json",
+        "assets/flutter-firebase/firestore.rules",
+        "assets/flutter-firebase/functions/.env.local.example",
+        "assets/flutter-firebase/functions/.gitignore",
+        "assets/flutter-firebase/functions/eslint.config.mjs",
+        "assets/flutter-firebase/functions/package.json",
+        "assets/flutter-firebase/functions/scripts/bundle.mjs",
+        "assets/flutter-firebase/functions/scripts/gen-index.mjs",
+        "assets/flutter-firebase/functions/scripts/stage-deploy.mjs",
+        "assets/flutter-firebase/functions/scripts/vitest-suite.mjs",
+        "assets/flutter-firebase/functions/src/init.ts",
+        "assets/flutter-firebase/functions/tsconfig.json",
+        "assets/flutter-firebase/functions/vitest.config.ts",
+        "assets/flutter-firebase/functions/vitest.integration.config.ts",
+        "assets/flutter-firebase/functions/vitest.rules.config.ts",
+        "assets/flutter-firebase/links/env/default/.well-known/.gitkeep",
+        "assets/flutter-firebase/links/env/prod/.well-known/.gitkeep",
+        "assets/flutter-firebase/links/env/staging/.well-known/.gitkeep",
+        "assets/flutter-firebase/links/public/open.html",
+        "assets/flutter-firebase/links/scripts/stage-links.mjs",
+        "assets/flutter-firebase/melos.yaml",
+        "assets/flutter-firebase/package.json",
+        "assets/flutter-firebase/packages-ts/types/package.json",
+        "assets/flutter-firebase/packages-ts/types/src/index.ts",
+        "assets/flutter-firebase/packages-ts/types/tsconfig.json",
+        "assets/flutter-firebase/pnpm-workspace.yaml",
+        "assets/flutter-firebase/pubspec.yaml",
+        "assets/flutter-firebase/storage.rules",
+        "assets/flutter-firebase/tools/deps-check.mjs",
+        "assets/flutter-firebase/tools/emulator-config.mjs",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "schema-design",
+      "description": "Designs a product's data model as Phase 3 of the product-spec workflow: stores and collections or tables, typed shapes, state machines with the server-side unit that owns each transition, placement per store, permissions philosophy, anticipated indexes and query costs, scaling risks, denormalization and the migration story. Writes FIREBASE_SCHEMA.md or DATA_SCHEMA.md according to the locked stack profile. Use when the user says 'diseñemos el schema', 'modelo de datos', 'qué colecciones necesito en Firestore', 'diseño de tablas' or 'Firestore vs RTDB', or after the PRD is approved. It needs PRODUCT_BRIEF.md and OPINIONATED_DEFAULTS.md with the stack profile locked. It stops at data: repo layout, Cloud Functions or endpoints inventory, CI/CD, IAM and observability belong to system-architecture.",
+      "version": "1.1.0",
+      "license": "MIT",
+      "requires": [
+        "stack-profile-flutter-firebase",
+        "stack-profile-fastapi-react"
+      ],
+      "tools": [],
+      "path": "skills/schema-design",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
       ]
     },
     {
       "name": "sciwrite",
-      "description": "Use this skill when asked to review, edit, or improve the writing quality of a scientific or engineering manuscript. Triggers include: \"review my writing,\" \"check my manuscript,\" \"improve clarity,\" \"clean up the prose,\" \"edit for journal submission,\" \"writing review,\" or any request to evaluate sentence-level quality, eliminate clutter, fix passive voice, or enforce keyword consistency in a research paper draft. Also triggers when asked to prepare a manuscript for submission to a specific journal. Do NOT use for content/technical review of methods or results, statistical analysis, or citation formatting.",
-      "version": "0.1.0",
+      "description": "Audits the writing quality of a scientific or engineering manuscript in five passes (clutter, voice and verbs, sentence architecture, terminology, numbers and citations) and reports prioritized fixes. Use for \"review my writing\", \"improve clarity\", \"clean up the prose\", \"fix passive voice\", \"keyword consistency\" or \"edit for journal submission\" in a research paper. Not for methods, results or statistics (use paper-review), not for rewriting the text in place (use manuscript-revision), and not for a book-length line and copy edit with tracked changes (use line-and-copy-editor).",
+      "version": "0.2.0",
       "license": "CC-BY-4.0",
       "requires": [],
       "tools": [],
@@ -852,7 +1217,68 @@
         "LICENSE",
         "README.md",
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
+      ]
+    },
+    {
+      "name": "spec-guard",
+      "description": "Checks a product spec and its sprint backlog with code instead of trusting the model to check them, and guards the build: verifies docs/ISSUES.md (dependency cycles, waves, files_touched inside each agent's lane, every locked decision and requirement implemented by an issue), assigns waves deterministically, reports sprint progress, traces a decision or requirement to the issues, files and commits it reaches (impact) and a file back to the decisions behind it (why), and installs git hooks, a CI check and an optional Claude Code hook that refuse changes outside the active issue. Use for \"revisa el backlog\", \"check ISSUES.md\", \"asigna las waves\", \"¿en qué sprint vamos?\", \"qué toca si cambio la decisión D-03\", \"por qué existe este archivo\", \"instala los guardrails\" or exporting the backlog to GitHub, Jira or Linear. It checks structure, not judgment: writing the backlog is multi-agent-governance, reviewing an issue's code is issue-review.",
+      "version": "1.2.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [
+        "node",
+        "git"
+      ],
+      "path": "skills/spec-guard",
+      "files": [
+        "SKILL.md",
+        "assets/example/docs/AGENT_ROSTER.md",
+        "assets/example/docs/ISSUES.md",
+        "assets/example/docs/OPINIONATED_DEFAULTS.md",
+        "assets/example/docs/PRD.md",
+        "assets/example/docs/WAVE_DAG.md",
+        "evals/triggers.json",
+        "references/formats.md",
+        "scripts/guard.mjs",
+        "scripts/install.mjs",
+        "scripts/lib.mjs",
+        "scripts/spec.mjs"
+      ]
+    },
+    {
+      "name": "stack-profile-fastapi-react",
+      "description": "Stack profile for a self-hosted Python backend (FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, Postgres, SQLite in dev) with React frontends and worker processes, deployed with Docker Compose: Postgres-first placement, separate Create/Update/Read schemas, LEGAL_TRANSITIONS and DB constraints for state machines, Postgres queues with FOR UPDATE SKIP LOCKED, default-deny auth dependencies, and the agent roster with its lanes (python-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is fastapi-react. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Postgres en este stack?', 'necesitamos Celery o basta la cola en Postgres', 'cómo evito que el cliente mande status' or 'qué carpetas son de python-dev'. For Flutter and Firebase, use stack-profile-flutter-firebase.",
+      "version": "1.2.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/stack-profile-fastapi-react",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/agents.md",
+        "references/architecture.md",
+        "references/data-layer.md",
+        "references/kickstart.md"
+      ]
+    },
+    {
+      "name": "stack-profile-flutter-firebase",
+      "description": "Stack profile for Flutter apps on Firebase with a React admin, the default profile of the product-spec workflow: Firestore and RTDB placement, TypeScript types as the contract mirrored to Dart, status transitions only through Cloud Functions with one owner per cause, custom claims or membership documents with security rules, least-privilege IAM and Secret Manager, Melos plus pnpm monorepo, emulator-first dev, and the agent roster with its lanes (flutter-dev, firebase-dev, react-dev, qa-tester). Loaded by product-discovery, schema-design, system-architecture, multi-agent-governance and project-kickstart when the locked profile is flutter-firebase. Use directly for questions about this stack's conventions, such as '¿cómo modelamos estados en Firestore en este stack?', 'qué va en RTDB y qué en Firestore', 'qué campos lleva el bloque de una Cloud Function' or 'quién es dueño de firestore.rules'. For a Python FastAPI and Postgres stack, use stack-profile-fastapi-react.",
+      "version": "1.2.1",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/stack-profile-flutter-firebase",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json",
+        "references/agents.md",
+        "references/architecture.md",
+        "references/data-layer.md",
+        "references/kickstart.md"
       ]
     },
     {
@@ -874,6 +1300,7 @@
         "assets/launch-readiness-template.md",
         "assets/scoring-matrix-template.md",
         "evals/evals.json",
+        "evals/triggers.json",
         "references/icp-framework.md",
         "references/offer-design-framework.md",
         "references/positioning-framework.md",
@@ -882,6 +1309,22 @@
         "references/sample-output.md",
         "references/scoring-rubric.md",
         "references/traction-hypotheses-framework.md"
+      ]
+    },
+    {
+      "name": "system-architecture",
+      "description": "Designs the technical architecture of a product as Phase 5 of the product-spec workflow: repo layout and package boundaries with one-way dependency rules, an inventory of every server-side unit (Cloud Functions, endpoints, workers, scheduled jobs), state-machine enforcement, transactional consistency, permissions and service identity, performance budgets per layer, local-first dev workflow, CI/CD, observability with alert thresholds, and the deferred-complexity list. Writes ARCHITECTURE.md, plus IAM_REQUIREMENTS.md when the stack profile is managed cloud. Use when the user says 'diseñemos la arquitectura', 'cómo estructuro el monorepo', 'qué Cloud Functions necesito', 'CI/CD', 'qué defiero para v1.1', or after the UI screens are approved. It needs the brief, the locked stack profile, the schema and UI_SCREENS.md. Entities, fields, state machines and indexes are schema-design; this skill takes them as given.",
+      "version": "1.2.0",
+      "license": "MIT",
+      "requires": [
+        "stack-profile-flutter-firebase",
+        "stack-profile-fastapi-react"
+      ],
+      "tools": [],
+      "path": "skills/system-architecture",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -894,7 +1337,8 @@
       "path": "skills/textbook-methodology",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -909,11 +1353,25 @@
         ".DS_Store",
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "references/font-licensing.md",
         "references/font-pairings.csv",
         "references/selection-and-pairing.md",
         "scripts/type-preview.mjs",
         "scripts/type-scale.mjs"
+      ]
+    },
+    {
+      "name": "ui-screens-spec",
+      "description": "Specifies every screen of every app in text before anything is built, writing UI_SCREENS.md: numbered screen ids (X.Y.Z), six fixed blocks per screen (header, body, primary CTA, navigation, data, permissions) with empty, loading and error states, a navigation graph per app, locked design tokens and tap targets per app context, a reusable component inventory, [COPY] placeholders, and the five key screens per app chosen for mockups. Use when the user says 'diseñemos las pantallas', 'qué pantallas necesito', 'wireframes en texto', 'screen spec' or 'componentes reutilizables', or as Phase 4 after the schema is approved. It needs the brief, the decisions and the schema document. It writes specs, not visuals: clickable HTML mockups of the key screens are navegable-mockups, which reads this document.",
+      "version": "1.2.0",
+      "license": "MIT",
+      "requires": [],
+      "tools": [],
+      "path": "skills/ui-screens-spec",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
       ]
     },
     {
@@ -927,6 +1385,7 @@
       "files": [
         "SKILL.md",
         "assets/direction.template.json",
+        "evals/triggers.json",
         "references/making-directions-different.md",
         "references/reading-an-existing-identity.md",
         "references/starting-from-zero.md",
@@ -952,7 +1411,8 @@
       "path": "skills/visual-identity",
       "files": [
         "SKILL.md",
-        "assets/owner-decisions.template.md"
+        "assets/owner-decisions.template.md",
+        "evals/triggers.json"
       ]
     }
   ],
@@ -970,7 +1430,8 @@
       "tools": [],
       "path": "workflows/article-author",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": []
     },
@@ -992,7 +1453,8 @@
       "tools": [],
       "path": "workflows/book-author",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "brainstormer",
@@ -1016,7 +1478,8 @@
       "path": "workflows/bookwright-iterator",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": []
     },
@@ -1030,7 +1493,8 @@
       "path": "workflows/bookwright-reviewer",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "cross-ref-auditor",
@@ -1049,7 +1513,8 @@
       "path": "workflows/bookwright-rewriter",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "cross-ref-auditor",
@@ -1069,7 +1534,8 @@
       "path": "workflows/bookwright-writer",
       "files": [
         "SKILL.md",
-        "THIRD_PARTY_NOTICES.md"
+        "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "quality-auditor",
@@ -1081,7 +1547,7 @@
     {
       "name": "paper-author",
       "description": "Idea to a review-ready single-document academic manuscript (journal article, conference paper, preprint) — the paper-length sibling of book-author, reusing the same underlying research/writing skills without book-author's multi-chapter machinery. Orchestrates framing, mandatory literature grounding, a single-pass IMRaD draft, an independent review pass (paper-review + citation-audit + sciwrite), and gated revision. Use when the user says \"/paper-author\", \"write a paper about X\", \"draft a manuscript for submission\", \"start a new paper\", or wants a paper (not a book, not a short article) taken from idea to revised, review-ready prose. Hands off to paper-publisher for venue formatting and submission prep. Do NOT use for a multi-chapter book (book-author) or a short-form piece meant for a blog/LinkedIn/newsletter (article-author).",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "requires": [
         "citation-audit",
@@ -1095,11 +1561,11 @@
       "tools": [],
       "path": "workflows/paper-author",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "paper-crawler",
-        "paper-review",
         "research-analyst"
       ]
     },
@@ -1119,14 +1585,15 @@
       "files": [
         "SKILL.md",
         "assets/templates/arxiv-article.tex.tmpl",
+        "evals/triggers.json",
         "references/venue-templates.md"
       ],
       "agents": []
     },
     {
       "name": "paper-review",
-      "description": "Use this skill for \"review this paper\", \"review this manuscript\", \"peer review\", \"review my paper\", \"critique this manuscript\", \"review this submission\", \"give me feedback on my paper\", \"check my methods\", \"review my statistics\", \"review as a peer reviewer\", \"evaluate this manuscript\", \"review this PDF\", or mentions manuscript review, peer review, paper critique, or methodological review.",
-      "version": "0.1.0",
+      "description": "Independent peer review of an academic manuscript's methods, statistics, logic, figures and reproducibility, run as a fresh-context reviewer in single or panel mode, returning Critical, Major and Minor issues. Use for \"review this paper\", \"peer review my manuscript\", \"critique this submission\", \"check my methods\", \"review my statistics\" or \"review as a peer reviewer\". For sentence-level writing quality use sciwrite; for checking that references are real and correctly used use citation-audit.",
+      "version": "0.2.0",
       "license": "BSD-3-Clause",
       "requires": [],
       "tools": [],
@@ -1134,6 +1601,7 @@
       "files": [
         "SKILL.md",
         "THIRD_PARTY_NOTICES.md",
+        "evals/triggers.json",
         "examples/sample-manuscript-excerpt.md",
         "examples/sample-manuscript-review.md",
         "references/figure-review-guide.md",
@@ -1144,8 +1612,33 @@
         "references/statistical-review-guide.md"
       ],
       "agents": [
-        "paper-review"
+        "paper-reviewer"
       ]
+    },
+    {
+      "name": "product-spec-orchestrator",
+      "description": "Takes a product idea to a buildable spec through seven gated phases: discovery, requirements (PRD), data schema, UI screens, architecture, multi-agent governance and optional navigable mockups, for the flutter-firebase or fastapi-react stack profile. It sequences the phase skills, stops for explicit approval after each one, surfaces the decisions worth checking, checks cross-phase coherence and resumes a half-finished spec from the files on disk. Use when the user wants the full treatment for a new product: \"quiero diseñar un producto de cero\", \"tengo una idea de app\", \"espec completa\", \"lleva esto hasta que sea buildable\". For one phase only, use that phase's skill (product-discovery for just the idea and the decisions); for an existing codebase, use project-adopt; to build, use sprint-runner.",
+      "version": "1.1.0",
+      "license": "MIT",
+      "requires": [
+        "product-discovery",
+        "product-requirements",
+        "schema-design",
+        "ui-screens-spec",
+        "system-architecture",
+        "multi-agent-governance",
+        "navegable-mockups",
+        "spec-guard",
+        "operational-readiness",
+        "html-spec-generator"
+      ],
+      "tools": [],
+      "path": "workflows/product-spec-orchestrator",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
+      ],
+      "agents": []
     },
     {
       "name": "production-book-publisher",
@@ -1168,14 +1661,15 @@
       ],
       "path": "workflows/production-book-publisher",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": []
     },
     {
       "name": "scientific-book-editor",
       "description": "End-to-end editorial and scientific QA pipeline for book-length manuscripts (scientific, technical, nonfiction). Orchestrates seven phases: global editorial assessment with a publishability verdict, scientific peer review, citation and evidence audit, scientific-writing improvement (sciwrite), manuscript revision, a final line/copy edit, and a mandatory whole-manuscript coherence read that no chapter-sharded phase can substitute for. Use when the user says \"/scientific-book-editor\", \"edit my book\", \"editorial pipeline\", \"review this book for publication\", \"run the editorial QA\", or wants a publish / major-revision / don't-publish verdict on a full manuscript. Report-only until the user approves revisions. For production (PDF/EPUB/covers/KDP) use production-book-publisher instead.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "MIT",
       "requires": [
         "citation-audit",
@@ -1188,15 +1682,36 @@
       "tools": [],
       "path": "workflows/scientific-book-editor",
       "files": [
-        "SKILL.md"
+        "SKILL.md",
+        "evals/triggers.json"
       ],
       "agents": [
         "bibliography-auditor",
         "consistency-checker",
         "logic-reviewer",
-        "paper-review",
         "technical-reviewer",
         "writing-reviewer"
+      ]
+    },
+    {
+      "name": "sprint-runner",
+      "description": "Runs one sprint of docs/ISSUES.md with coding agents, wave by wave: one git worktree per issue, the issue's owner agent dispatched with its executor prompt, qa-tester reviewing each result with spec.mjs verify, approved issues merged at the wave barrier in id order, and a sprint retro at the end. Stops for human approval before every wave and on issues marked autonomous: false. Use when the backlog exists and the user wants it built: \"corre el sprint 2\", \"ejecuta la ola 1 con los agentes\", \"arranca el build\", \"run sprint 0\". Preparing the next sprint's prompts from the repo's state is execution-router; writing the backlog is multi-agent-governance; implementing one single issue is issue-delivery.",
+      "version": "1.2.2",
+      "license": "MIT",
+      "requires": [
+        "spec-guard",
+        "issue-delivery",
+        "issue-review",
+        "execution-router"
+      ],
+      "tools": [],
+      "path": "workflows/sprint-runner",
+      "files": [
+        "SKILL.md",
+        "evals/triggers.json"
+      ],
+      "agents": [
+        "qa-tester"
       ]
     }
   ],
@@ -1223,6 +1738,53 @@
         "paper-publisher"
       ],
       "path": "stacks/academic-paper/stack.json"
+    },
+    {
+      "name": "aiuda-stack",
+      "description": "Idea to shipped product on Flutter + Firebase + a React admin: the seven-phase spec, a scaffolded monorepo, a backlog in waves whose consistency is checked by code, developer agents that each own a lane, a QA reviewer, sprints run in parallel worktrees, and guardrails (git hooks, CI and an editor hook) that refuse changes outside the active issue. Also brings existing repositories into the method.",
+      "version": "1.0.0",
+      "agents": [
+        "product-advisor",
+        "flutter-dev",
+        "firebase-dev",
+        "react-dev",
+        "qa-tester"
+      ],
+      "skills": [
+        "project-kickstart",
+        "project-adopt",
+        "spec-guard",
+        "operational-readiness",
+        "html-spec-generator"
+      ],
+      "workflows": [
+        "product-spec-orchestrator",
+        "sprint-runner"
+      ],
+      "path": "stacks/aiuda-stack/stack.json"
+    },
+    {
+      "name": "aiuda-stack-fastapi",
+      "description": "The aiuda-stack method on Python (FastAPI + SQLAlchemy + Alembic + Postgres) with a React frontend: the seven-phase spec, a scaffolded repo, a backlog in waves checked by code, python-dev and react-dev agents with lanes, a QA reviewer, sprints in parallel worktrees, and guardrails that refuse changes outside the active issue.",
+      "version": "1.0.0",
+      "agents": [
+        "product-advisor",
+        "python-dev",
+        "react-dev",
+        "qa-tester"
+      ],
+      "skills": [
+        "project-kickstart",
+        "project-adopt",
+        "spec-guard",
+        "operational-readiness",
+        "html-spec-generator"
+      ],
+      "workflows": [
+        "product-spec-orchestrator",
+        "sprint-runner"
+      ],
+      "path": "stacks/aiuda-stack-fastapi/stack.json"
     },
     {
       "name": "brand-identity",
@@ -1282,6 +1844,22 @@
       ],
       "workflows": [],
       "path": "stacks/launch-readiness/stack.json"
+    },
+    {
+      "name": "product-spec",
+      "description": "Take a product idea to a buildable spec in seven gated phases: discovery with locked decisions, a PRD with Given/When/Then requirements, the data schema, UI screens, architecture, an agent roster with a sprint backlog checked by code, and navigable mockups. Includes the operational readiness track (legal, banking, app stores) and the product advisor. Stack-agnostic: Flutter + Firebase or FastAPI + React.",
+      "version": "1.0.0",
+      "agents": [
+        "product-advisor"
+      ],
+      "skills": [
+        "operational-readiness",
+        "html-spec-generator"
+      ],
+      "workflows": [
+        "product-spec-orchestrator"
+      ],
+      "path": "stacks/product-spec/stack.json"
     },
     {
       "name": "publish-book",

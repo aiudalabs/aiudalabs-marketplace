@@ -1,0 +1,39 @@
+{
+  "name": "@{{project_name}}/functions",
+  "version": "0.1.0",
+  "private": true,
+  "main": "lib/index.js",
+  "engines": {
+    "node": "{{node_version}}"
+  },
+  "scripts": {
+    "gen:index": "node scripts/gen-index.mjs",
+    "build": "node scripts/gen-index.mjs && tsc --noEmit && node scripts/bundle.mjs",
+    "build:watch": "node scripts/gen-index.mjs && node scripts/stage-deploy.mjs --watch --bundle",
+    "lint": "node scripts/gen-index.mjs && eslint src test --no-error-on-unmatched-pattern",
+    "typecheck": "node scripts/gen-index.mjs && tsc --noEmit",
+    "test": "node scripts/gen-index.mjs && node scripts/vitest-suite.mjs unit",
+    "test:watch": "vitest",
+    "test:rules": "node scripts/vitest-suite.mjs rules",
+    "test:integration": "node scripts/vitest-suite.mjs integration",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.6.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@{{project_name}}/types": "workspace:*",
+    "@eslint/js": "^9.39.0",
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.0",
+    "eslint": "^9.39.0",
+    "firebase": "^12.0.0",
+    "typescript": "~5.9.0",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.0"
+  }
+}

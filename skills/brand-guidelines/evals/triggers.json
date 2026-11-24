@@ -1,0 +1,33 @@
+[
+  {
+    "query": "We've decided our colors, fonts and logo. Now put it all into a brand book the team and our freelancers can follow.",
+    "should_trigger": true
+  },
+  {
+    "query": "Our brand manual is from 2019 and since then we changed the accent color and added a dark logo. Can you update it?",
+    "should_trigger": true
+  },
+  {
+    "query": "Write a style guide for our brand so new hires stop asking me which blue to use.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need brand guidelines with do and don't examples, an owner, and a section on how to request exceptions.",
+    "should_trigger": true
+  },
+  {
+    "query": "Is this pitch deck on-brand? Our guidelines are attached.",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  },
+  {
+    "query": "Turn the colors and type in our brand guidelines into a tokens file for developers.",
+    "should_trigger": false,
+    "use_instead": "design-tokens"
+  },
+  {
+    "query": "We don't know yet who we're for or what our brand should feel like. Help us define that before any design.",
+    "should_trigger": false,
+    "use_instead": "brand-strategy-brief"
+  }
+]

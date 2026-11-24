@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Loop review and fix on chapter 8 until there are no blocking or substantive findings left, max 5 rounds.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want the whole book driven to clean without me babysitting it: review, fix, re-review, and give me honest final counts.",
+    "should_trigger": true
+  },
+  {
+    "query": "Keep iterating on part 2 of my textbook, reviewing and rewriting, and stop if it stalls. Pause only for high-stakes judgment calls.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run unattended review-and-revise rounds on section 4.2 until the auditors come back with zero findings.",
+    "should_trigger": true
+  },
+  {
+    "query": "Just review chapter 8 once and give me the report. No fixes.",
+    "should_trigger": false,
+    "use_instead": "bookwright-reviewer"
+  },
+  {
+    "query": "Apply the fixes from the chapter 8 review report I already have, one pass only.",
+    "should_trigger": false,
+    "use_instead": "bookwright-rewriter"
+  },
+  {
+    "query": "My finished 400-page book on epidemiology needs editorial and scientific QA before publication, with a publishability verdict.",
+    "should_trigger": false,
+    "use_instead": "scientific-book-editor"
+  }
+]

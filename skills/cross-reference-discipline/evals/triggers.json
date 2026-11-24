@@ -1,0 +1,33 @@
+[
+  {
+    "query": "What should the header comment block at the top of each section .tex file in my bookwright book look like?",
+    "should_trigger": true
+  },
+  {
+    "query": "Naming conventions for LaTeX labels in a long textbook: how do I avoid sec:intro collisions across chapters?",
+    "should_trigger": true
+  },
+  {
+    "query": "I keep getting 'Reference undefined' warnings for chapters I haven't written yet. How am I supposed to document forward references and the expected-unresolved baseline?",
+    "should_trigger": true
+  },
+  {
+    "query": "When do I use \\Cref and when should I just say 'chapter 17 covers this' in prose?",
+    "should_trigger": true
+  },
+  {
+    "query": "Audit all of chapter 3 including its cross-refs, math and plan compliance, and give me a report.",
+    "should_trigger": false,
+    "use_instead": "bookwright-reviewer"
+  },
+  {
+    "query": "Should I put a 'we'll cover this in chapter 9' deferral note, and how do running threads work across a textbook?",
+    "should_trigger": false,
+    "use_instead": "textbook-methodology"
+  },
+  {
+    "query": "Check that every citation in my paper's bibliography is real and supports the claim it's attached to.",
+    "should_trigger": false,
+    "use_instead": "citation-audit"
+  }
+]

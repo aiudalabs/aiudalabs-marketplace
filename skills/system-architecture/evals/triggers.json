@@ -1,0 +1,10 @@
+[
+  { "query": "Pantallas aprobadas. Diseñemos la arquitectura: estructura del monorepo Melos + pnpm, qué Cloud Functions necesitamos y con qué service account corre cada una.", "should_trigger": true },
+  { "query": "We need the ARCHITECTURE.md for the FastAPI app: endpoints and worker tasks with idempotency, CI/CD, secrets in compose, and alert thresholds.", "should_trigger": true },
+  { "query": "¿Necesitamos Temporal para el flujo de aprobación de pedidos o basta con funciones y una máquina de estados? Decídelo como parte de la arquitectura.", "should_trigger": true },
+  { "query": "Arma el IAM_REQUIREMENTS.md y el pipeline de deploy staging/prod para el marketplace de canchas, y qué complejidad técnica diferimos a v1.1.", "should_trigger": true },
+  { "query": "cómo estructuro el código y qué paquetes dependen de cuáles? también quiero los budgets de performance reconciliados con la arquitectura", "should_trigger": true },
+  { "query": "Define las colecciones, los campos y los índices compuestos de Firestore para reservas y pagos.", "should_trigger": false, "use_instead": "schema-design" },
+  { "query": "Genera el roster de agentes, el backlog de issues por sprint y las waves de ejecución a partir de la arquitectura aprobada.", "should_trigger": false, "use_instead": "multi-agent-governance" },
+  { "query": "Lista las pantallas del panel de administración con su navegación.", "should_trigger": false, "use_instead": "ui-screens-spec" }
+]

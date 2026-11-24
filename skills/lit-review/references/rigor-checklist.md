@@ -46,7 +46,7 @@ Apply before declaring a phase done. The checklist is per-phase; do not skip ahe
 
 ## Phase 4: Review loop
 
-- [ ] Self-review pass via `manuscript:paper-review` is recorded as comments or a sibling review document.
+- [ ] Self-review pass via `paper-review` is recorded as comments or a sibling review document.
 - [ ] Each reviewer concern is dispositioned: ground (Phase 1), restructure (Phase 2 or 3), or drop (Phase 3 with explicit removal).
 - [ ] Loop-backs are atomic: a single concern produces a single revision pass; do not bundle revisions across concerns until the final polish.
 - [ ] After the final revision pass, re-run Phase 3 checklist completely.
@@ -73,7 +73,7 @@ Read the direction paper section openings only (Section 1.1, 1.2, ..., 7.1, 7.2,
 - [ ] Does each section's opening reference what the prior section established?
 - [ ] Is there a single thesis sentence that the whole paper drives toward, recoverable from reading openings only?
 
-If reading openings only yields fragments rather than an argument, restructure with `manuscript:manuscript-writing`.
+If reading openings only yields fragments rather than an argument, restructure with `manuscript-drafting`.
 
 ### Bias balance
 

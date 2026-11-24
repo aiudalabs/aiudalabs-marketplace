@@ -1,9 +1,9 @@
 ---
 name: "manuscript-revision"
-description: "Use when revising or reviewing scientific, technical, or academic manuscripts, proposals, abstracts, reports, or related writing for precision, concision, logical cohesion, citation support, evidence alignment, and objective scholarly tone."
+description: "Rewrites scientific, technical or academic text in place, or comments on it, for precision, concision, logical cohesion, citation support, evidence alignment and objective scholarly tone: papers, proposals, grant text, abstracts and reports. Use when the user wants the text revised, not only reviewed. For a report of writing issues by pass use sciwrite; for peer review of methods and results use paper-review; for drafting sections from scratch use manuscript-drafting."
 license: "MIT"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "YSLAB-ai"
   source: "https://github.com/YSLAB-ai/manuscript-writing"
 ---

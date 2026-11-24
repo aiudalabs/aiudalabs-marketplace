@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Roast my landing page: https://getledgerly.io. Traffic is fine but almost nobody books a demo.",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's the hero section of our site. Rewrite the headline, subhead and button and give me a few options to test.",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you critique the copy on our homepage? I'm worried it's full of jargon and nobody can tell what we do.",
+    "should_trigger": true
+  },
+  {
+    "query": "Why doesn't this page convert? It's for a bookkeeping service for Etsy sellers, copy pasted below.",
+    "should_trigger": true
+  },
+  {
+    "query": "Run a full adversarial audit of our positioning with scores across ICP, offer, objections and launch readiness.",
+    "should_trigger": false,
+    "use_instead": "startup-positioning-audit"
+  },
+  {
+    "query": "Does our homepage use the right brand colors, fonts and logo per our guidelines?",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  },
+  {
+    "query": "Show me two or three totally different visual looks for our homepage so I can choose one.",
+    "should_trigger": false,
+    "use_instead": "visual-directions"
+  }
+]

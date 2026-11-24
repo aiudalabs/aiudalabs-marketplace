@@ -1,0 +1,10 @@
+[
+  { "query": "Ya tenemos el brief y las decisiones D-01 a D-11 del marketplace de canchas. Escribe el PRD con requisitos y criterios de aceptación Given/When/Then.", "should_trigger": true },
+  { "query": "Turn our approved product brief for the table-ordering app into a PRD: functional requirements with ids, out of scope, user stories and success metrics.", "should_trigger": true },
+  { "query": "Necesito las user stories por persona y los criterios de aceptación verificables para el MVP de la app de comunicados escolares.", "should_trigger": true },
+  { "query": "qué entra y qué no en el release 1? tenemos el PRODUCT_BRIEF.md, quiero el alcance con requisitos FR-ORDER-1 etc. trazados a las decisiones", "should_trigger": true },
+  { "query": "Our non-functional requirements just say 'fast and secure'. Rewrite the PRD section with measurable targets and trace each FR to the locked defaults.", "should_trigger": true },
+  { "query": "Tengo solo una idea de app de delivery para farmacias, todavía no hay nada escrito. Ayúdame a definir el MVP y las decisiones.", "should_trigger": false, "use_instead": "product-discovery" },
+  { "query": "Con el PRD aprobado, diseña las colecciones de Firestore, las máquinas de estado y los índices compuestos.", "should_trigger": false, "use_instead": "schema-design" },
+  { "query": "Lista todas las pantallas de la app del cliente con sus estados vacío, cargando y error.", "should_trigger": false, "use_instead": "ui-screens-spec" }
+]

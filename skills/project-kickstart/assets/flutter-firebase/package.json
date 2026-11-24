@@ -1,0 +1,31 @@
+{
+  "name": "{{project_name}}",
+  "version": "0.1.0",
+  "private": true,
+  "description": "{{project_title}}",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">={{node_version}}",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build",
+    "functions:stage": "pnpm --dir functions run build && node functions/scripts/stage-deploy.mjs",
+    "emulators": "pnpm run functions:stage && firebase emulators:start --import=./emulator-data --export-on-exit",
+    "emulators:check": "pnpm run functions:stage && firebase emulators:exec ${FIREBASE_CONFIG:+--config \"$FIREBASE_CONFIG\"} --only auth,firestore,functions,storage 'true'",
+    "emulators:test": "pnpm run functions:stage && firebase emulators:exec ${FIREBASE_CONFIG:+--config \"$FIREBASE_CONFIG\"} --only firestore,functions,auth 'pnpm --dir functions run test:integration'",
+    "rules:test": "firebase emulators:exec ${FIREBASE_CONFIG:+--config \"$FIREBASE_CONFIG\"} --only firestore 'pnpm --dir functions run test:rules'",
+    "deploy:staging": "firebase use staging && firebase deploy",
+    "deploy:prod": "firebase use prod && firebase deploy"
+  },
+  "devDependencies": {
+    "firebase-tools": "^15.0.0",
+    "typescript": "~5.9.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "protobufjs", "@firebase/util"]
+  }
+}

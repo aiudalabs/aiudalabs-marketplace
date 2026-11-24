@@ -103,7 +103,7 @@ A direction paper is *complete* when every paragraph contains at least one cross
 
 ## Style discipline
 
-Apply `manuscript:manuscript-writing`:
+Apply `manuscript-drafting`:
 
 - No em-dashes; commas or semicolons.
 - Abbreviations defined on first use within the document. The Abbreviations paragraph after the thesis is the canonical first-use site.
@@ -134,8 +134,8 @@ Diagnostic checklist:
 - The argument cites the same 3-4 cards repeatedly -> corpus is too narrow; loop to Phase 1.
 - Counterarguments section is generic -> read the cards tagged as contrary; the strongest objection is in there.
 - Roadmap reads as wish list -> tie each commitment to a specific gap from gap-analysis.md.
-- Storyline does not flow -> apply `manuscript:manuscript-writing` revision pass focused on transitions and topic sentences.
+- Storyline does not flow -> apply `manuscript-drafting` revision pass focused on transitions and topic sentences.
 
 ## Export to LaTeX
 
-Markdown is the base format. To export for a journal review template, delegate to `manuscript:manuscript-formatting` with the target journal. Cite-card cross-links typically convert to footnotes or in-text citations against the strand `.bib`.
+Markdown is the base format. To export for a journal review template, delegate to `paper-publisher` with the target journal. Cite-card cross-links typically convert to footnotes or in-text citations against the strand `.bib`.

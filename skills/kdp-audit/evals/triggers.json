@@ -1,0 +1,9 @@
+[
+  { "query": "Audit my book manuscript against Amazon KDP requirements before I upload it. It's a .docx historical novel, about 320 pages at 5.5x8.5.", "should_trigger": true },
+  { "query": "My statistics textbook is written in LaTeX with lots of equations and code listings. Will it pass KDP? Give me a list of what's wrong and what's only a warning.", "should_trigger": true },
+  { "query": "Before I hit publish on Amazon, can you go through my manuscript folder and tell me what's missing or out of spec: margins, gutter, fonts, cover size, metadata?", "should_trigger": true },
+  { "query": "Is my 6x9 interior going to get rejected by Kindle Direct Publishing? I'm not sure my inside margins are big enough for 450 pages.", "should_trigger": true },
+  { "query": "IngramSpark rejected my PDF for missing TrimBox and RGB images. Convert it to a compliant PDF/X-1a.", "should_trigger": false, "use_instead": "book-typesetting" },
+  { "query": "Pick the best BISAC categories and keywords for my KDP listing so the book is easier to find.", "should_trigger": false, "use_instead": "kdp-listing" },
+  { "query": "Check my manuscript for leftover TODO markers, empty sections and broken markdown before I send it to production.", "should_trigger": false, "use_instead": "manuscript-checks" }
+]

@@ -1,9 +1,9 @@
 ---
 name: "ebook-publishing"
-description: "The complete ebook and audiobook self-publishing skill — write, format, convert, and publish across all major platforms. Use this skill whenever the user asks about Amazon KDP, Apple Books, Gumroad, Payhip, Kobo, Draft2Digital, IngramSpark, Barnes & Noble Press, Google Play Books, PublishDrive, StreetLib, ACX, ElevenLabs audiobooks, KDP Virtual Voice, INaudio (formerly Findaway Voices), EPUB formatting, HTML-to-PDF Puppeteer workflow, book cover design specs, ISBN strategy, KDP Select vs wide distribution, permafree strategy, BookBub, series pricing, royalty calculations, book descriptions, Amazon A+ content, keyword research, ARC readers, or any launch strategy. Also trigger for lead magnet ebooks, digital downloads, online courses packaged as ebooks, audiobook production with AI narration, print-on-demand, or any content intended for digital or print distribution and sale. MCP available for Gumroad only (rmarescu/gumroad-mcp). All other platforms require manual upload."
+description: "Self-publishing know-how for ebooks and audiobooks: choosing and using platforms (Amazon KDP, Apple Books, Kobo, Google Play Books, Draft2Digital, IngramSpark, Barnes & Noble Press, Gumroad, Payhip, PublishDrive, StreetLib, ACX, INaudio, KDP Virtual Voice, ElevenLabs), ISBN strategy, KDP Select versus wide distribution, permafree, BookBub, series pricing, royalty calculations, Amazon A+ content, ARC readers, launch plans, audiobook production with AI narration, and lead-magnet or course ebooks. Use for publishing strategy and platform questions. To build the book files use kindle-book (quick EPUB and PDF) or book-typesetting (press-ready print); to check a manuscript against KDP rules use kdp-audit; to write the KDP blurb, keywords and categories use kdp-listing."
 license: "MIT"
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: "The GEO Lab"
   source: "https://github.com/arturseo-geo/ebook-publishing-skill"
 ---

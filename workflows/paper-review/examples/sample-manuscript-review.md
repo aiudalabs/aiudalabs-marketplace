@@ -31,7 +31,7 @@ This excerpt reports an EEG motor-imagery decoding study in eight healthy adults
 
 1. **Bar chart for N = 8 (Figure 2, described).** Bar plots with error bars for small N hide the distribution; show individual participant points, connected across paired conditions. (Figure not included in the excerpt; assessed from its text description.)
 2. **Sex/gender, ethics approval, and informed consent not reported (Participants).** Add per standard human-subjects reporting.
-3. **Significance inflation in the closing sentence.** "Robustly decodes ... left hemisphere is dominant" overstates the evidence; see manuscript:humanizer (significance inflation). Quantify or remove "robustly."
+3. **Significance inflation in the closing sentence.** "Robustly decodes ... left hemisphere is dominant" overstates the evidence; see humanizer (significance inflation). Quantify or remove "robustly."
 
 ## References
 

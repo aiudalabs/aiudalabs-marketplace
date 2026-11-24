@@ -1,0 +1,33 @@
+[
+  {
+    "query": "Our site looks so generic, like every other SaaS template out there. Show me a couple of totally different looks for it using our real copy so I can pick one.",
+    "should_trigger": true
+  },
+  {
+    "query": "Can you put together a moodboard or stylescape for a natural wine bar called Sediment? I want to see options before we commit to colors or fonts.",
+    "should_trigger": true
+  },
+  {
+    "query": "I love the look of Aesop and Teenage Engineering and I hate corporate blue. Build three full-page homepage mockups for my architecture studio, each in a different style.",
+    "should_trigger": true
+  },
+  {
+    "query": "We want to redesign our nonprofit's website but the board can't agree on a style. I need side-by-side options they can actually look at and vote on.",
+    "should_trigger": true
+  },
+  {
+    "query": "Here's the direction we picked. Build the tonal ramps and a dark mode from its two colors and check every text pairing for contrast.",
+    "should_trigger": false,
+    "use_instead": "color-system"
+  },
+  {
+    "query": "Turn our chosen colors, type scale and spacing into CSS variables for the codebase.",
+    "should_trigger": false,
+    "use_instead": "design-tokens"
+  },
+  {
+    "query": "Review this landing page I designed against our brand guidelines before it goes live.",
+    "should_trigger": false,
+    "use_instead": "brand-review"
+  }
+]
